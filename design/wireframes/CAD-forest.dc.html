@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daiku · CAD viewer · dark B · forest night</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;family=Fraunces:ital,opsz,wght,SOFT@1,9..144,300..600,100&amp;display=swap">
+<style>
+body{margin:0;color-scheme:dark}
+a{color:#B6DFB9}a:hover{color:#EAF1EA}
+.fr{font-family:'Fraunces',serif;font-style:italic;font-variation-settings:'SOFT' 100;font-weight:400}
+.mono{font-family:'DM Mono',monospace}
+.lbl{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#B5C3B8}
+.meta{font-family:'DM Mono',monospace;font-size:11px;color:#9EAEA2}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.btn{font:inherit;font-size:13px;font-weight:600;border-radius:999px;padding:9px 16px;min-height:40px;box-sizing:border-box;border:1px solid #233029;background:#1D2720;color:#EAF1EA;display:inline-flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.btn.p{background:#A2D2A6;border-color:#A2D2A6;color:#0F1511}
+.ib{font:inherit;width:44px;height:44px;border-radius:12px;border:0;background:transparent;color:#EAF1EA;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none}
+.ib.on{background:#262338;color:#B6DFB9}
+.seg{font:inherit;font-size:12px;font-weight:600;border:0;border-radius:8px;padding:8px 12px;background:transparent;color:#B5C3B8;cursor:pointer}
+.seg.on{background:#1D2720;color:#EAF1EA}
+.chip{font:inherit;font-size:12px;font-weight:600;border-radius:999px;padding:6px 12px;background:#24302A;color:#B5C3B8;border:0;cursor:pointer}
+.chip.on{background:#EAF1EA;color:#0F1511}
+.win{font:inherit;width:46px;height:40px;border:0;background:transparent;color:#EAF1EA;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px 4px 8px;font-family:'DM Mono',monospace;font-size:11px;color:#EAF1EA;white-space:nowrap}
+.pin{position:absolute;width:28px;height:28px;border-radius:50%;background:#E3A585;border:2px solid #1D2720;color:#EAF1EA;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-sizing:border-box}
+.tr{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;font-size:13px;font-weight:600}
+.tab{font:inherit;font-size:12px;font-weight:600;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:#B5C3B8;cursor:pointer}
+.tab.on{background:#24302A;color:#EAF1EA}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 900px; box-sizing: border-box; background: #0F1511; color: #EAF1EA; font-family: 'Comfortaa', sans-serif; display: flex; flex-direction: column;">
+
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-left: 14px; min-height: 40px; border-bottom: 1px solid #233029;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<svg width="18" height="17" viewBox="16 18 176 164" aria-hidden="true"><g fill="#A2D2A6"><path d="M110 96C94 80 60 78 42 92C24 106 20 140 36 156C50 170 84 174 110 156L110 147C88 162 64 160 54 147C44 134 44 110 57 99C70 88 92 89 110 104Z"></path><path d="M105 172C105 124 105 84 107 58C109 38 101 25 84 22C102 26 120 32 120 60C120 92 120 132 121 168C123 172 127 173 130 172C122 177 110 177 105 172Z"></path><path d="M119 112C130 92 152 72 186 60C182 88 166 108 140 118C146 124 152 140 162 158C168 168 176 171 186 169C174 177 156 176 148 166C140 154 132 140 119 134Z"></path></g></svg>
+<span style="font-size: 12px; font-weight: 500; color: #B5C3B8;">daiku.  /  Library  /  Shell CAD v2</span>
+</div>
+<label style="flex: 0 1 420px; display: flex; align-items: center; gap: 8px; background: #1D2720; border: 1px solid #233029; border-radius: 8px; padding: 0 10px; height: 30px; box-sizing: border-box;">
+<svg class="i" style="width: 15px; height: 15px; color: #B5C3B8;" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+<input aria-label="Search or run a command" placeholder="Search, jump, or run a command…" style="border: 0; outline: 0; background: transparent; font: inherit; font-size: 12px; flex: 1; min-width: 0; color: #EAF1EA;">
+<span class="mono" style="font-size: 11px; background: #24302A; color: #B5C3B8; border-radius: 5px; padding: 1px 6px;">Ctrl K</span>
+</label>
+<div style="display: flex; align-items: center;">
+<span style="display: flex; align-items: center; gap: 6px; padding: 0 14px; color: #B6DFB9;"><svg class="i" style="width: 16px; height: 16px;" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 1 0 6 18.9"></path><path d="m9 15 2 2 4-4"></path></svg><span class="mono" style="font-size: 11px;">Local · saved</span></span>
+<button class="win" aria-label="Minimize"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M5 12h14"></path></svg></button>
+<button class="win" aria-label="Maximize"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"></rect></svg></button>
+<button class="win" aria-label="Close"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</div>
+</header>
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 8px 16px; border-bottom: 1px solid #233029; background: #17201A;">
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+<a class="ib" href="Library-forest.dc.html" aria-label="Back to Library"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg></a>
+<h1 class="fr" style="margin: 0; font-size: 26px;">Shell CAD v2</h1>
+<span class="meta">.step · 3.1 MB · Concept A</span>
+<div role="group" aria-label="Version" style="display: flex; gap: 2px; background: #24302A; border-radius: 10px; padding: 3px;">
+<button class="seg" aria-pressed="false">v1</button><button class="seg on" aria-pressed="true">v2</button><button class="seg" aria-pressed="false">Compare v1 ↔ v2</button>
+</div>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap;"><button class="btn">Export view</button><a class="btn p" href="Canvas-forest.dc.html">Send view to canvas</a></div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; flex: 1;">
+
+<aside aria-label="Model tree" style="flex: 1 0 230px; max-width: 250px; box-sizing: border-box; background: #17201A; border-right: 1px solid #233029; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px;">
+<span class="lbl" style="padding: 0 8px 6px;">Model</span>
+<div class="tr"><svg class="i" style="width: 16px; height: 16px; color: #B5C3B8;" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>Chair_A <span class="meta" style="margin-left: auto;">asm</span></div>
+<div class="tr" style="padding-left: 30px; background: #262338;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #8C7E63;"></span>Shell<span class="meta" style="margin-left: auto;">oak ply 12</span></div>
+<div class="tr" style="padding-left: 30px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #131B16;"></span>Upholstery<span class="meta" style="margin-left: auto;">bouclé</span></div>
+<div class="tr" style="padding-left: 30px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #6F7F74;"></span>Base<span class="meta" style="margin-left: auto;">Ø22 × 1.5</span></div>
+<div class="tr" style="padding-left: 30px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #B5C3B8;"></span>Glides + fasteners<span class="meta" style="margin-left: auto;">×4</span></div>
+<span class="lbl" style="padding: 18px 8px 6px;">Saved views</span>
+<button class="tr" style="font: inherit; font-size: 13px; font-weight: 600; border: 0; background: transparent; cursor: pointer; text-align: left;">Side · seat height</button>
+<button class="tr" style="font: inherit; font-size: 13px; font-weight: 600; border: 0; background: transparent; cursor: pointer; text-align: left;">Section · shell bend</button>
+<div style="flex: 1;"></div>
+<div style="background: #0F1511; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;">
+<span class="lbl">Viewer</span>
+<span style="font-size: 12px; font-weight: 500; line-height: 1.5; color: #B5C3B8;">Opens STEP, STL, OBJ and glTF locally. Editing stays in your CAD tool.</span>
+</div>
+</aside>
+
+<main aria-label="3D viewport" style="flex: 999 1 520px; min-width: 0; position: relative; min-height: 790px; overflow: hidden; background-color: #131B16; background-image: linear-gradient(#233029 1px, transparent 1px), linear-gradient(90deg, #233029 1px, transparent 1px); background-size: 40px 40px;">
+
+<div role="toolbar" aria-label="Viewer tools" style="position: absolute; left: 16px; top: 16px; display: flex; flex-direction: column; gap: 2px; background: #17201A; border: 1px solid #233029; border-radius: 14px; padding: 4px;">
+<button class="ib" aria-label="Orbit"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"></path><path d="M21 3v6h-6"></path></svg></button>
+<button class="ib" aria-label="Pan"><svg class="i" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3"></path></svg></button>
+<button class="ib" aria-label="Section plane"><svg class="i" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4z"></path><path d="M3 12l9 4 9-4M3 17l9 4 9-4"></path></svg></button>
+<button class="ib on" aria-label="Measure" aria-pressed="true"><svg class="i" viewBox="0 0 24 24"><path d="M3 17 17 3l4 4L7 21z"></path><path d="m7 13 2 2M10 10l2 2M13 7l2 2"></path></svg></button>
+<button class="ib" aria-label="Markup pin"><svg class="i" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></button>
+<button class="ib" aria-label="Explode view"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="9" width="6" height="6" rx="1"></rect><path d="M4 4l3 3M20 4l-3 3M4 20l3-3M20 20l-3-3"></path></svg></button>
+</div>
+
+<svg style="position: absolute; left: 110px; top: 70px;" width="560" height="420" viewBox="0 0 560 420" aria-hidden="true">
+<line x1="60" y1="380" x2="520" y2="380" stroke="#6F7F74" stroke-width="1.5"></line>
+<path d="M200 300L168 380M380 300L412 380M232 304L222 380M350 304L360 380" stroke="#B5C3B8" stroke-width="7" stroke-linecap="round" fill="none"></path>
+<path d="M170 290C175 230 190 150 215 120L232 124C210 160 198 230 197 282C260 294 330 294 400 282L404 296C330 312 250 312 170 296Z" fill="#8C7E63" stroke="#B5C3B8" stroke-width="1.5"></path>
+<path d="M200 280C262 290 330 290 396 278C394 270 390 266 384 266C330 276 262 276 206 268Z" fill="#131B16" stroke="#B5C3B8" stroke-width="1"></path>
+<line x1="404" y1="288" x2="470" y2="288" stroke="#B6DFB9" stroke-width="1" stroke-dasharray="4 4"></line>
+<line x1="470" y1="288" x2="470" y2="380" stroke="#B6DFB9" stroke-width="1.5"></line>
+<path d="M464 296l6-8 6 8M464 372l6 8 6-8" stroke="#B6DFB9" stroke-width="1.5" fill="none" stroke-linejoin="round"></path>
+</svg>
+<span style="position: absolute; left: 594px; top: 404px; font-family: 'DM Mono', monospace; font-size: 12px; background: #1D2720; border: 1px solid #47634D; border-radius: 8px; padding: 4px 8px;">438 mm</span>
+
+<button class="pin" style="left: 290px; top: 338px;" aria-label="Comment 1: shell bend radius">1</button>
+<button class="pin" style="left: 604px; top: 368px; background: #47634D;" aria-label="Comment 2: seat height measurement">2</button>
+
+<div aria-label="View cube" style="position: absolute; right: 18px; top: 18px; width: 74px; height: 74px; background: #17201A; border: 1px solid #233029; border-radius: 12px; display: flex; align-items: center; justify-content: center;"><span class="mono" style="font-size: 11px; color: #B5C3B8;">SIDE</span></div>
+
+<div style="position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; background: #17201A; border: 1px solid #233029; border-radius: 999px; padding: 6px 10px; flex-wrap: wrap;">
+<button class="chip">Iso</button><button class="chip">Front</button><button class="chip on" aria-pressed="true">Side</button><button class="chip">Top</button>
+<span style="width: 1px; height: 22px; background: #233029;"></span>
+<span class="meta">section: off</span>
+</div>
+</main>
+
+<aside aria-label="Model details and comments" style="flex: 1 0 300px; max-width: 340px; box-sizing: border-box; background: #17201A; border-left: 1px solid #233029; padding: 16px 18px; display: flex; flex-direction: column; gap: 16px;">
+<div role="tablist" aria-label="Panel" style="display: flex; gap: 4px;">
+<button class="tab on" role="tab" aria-selected="true">Properties</button><button class="tab" role="tab" aria-selected="false">Comments · 2</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<span class="lbl">Mass properties · v2</span>
+<a href="Requirements-forest.dc.html" style="text-decoration: none; display: flex; justify-content: space-between; align-items: center; background: #1D2720; border: 1px solid #233029; border-radius: 12px; padding: 12px;"><span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 13px; font-weight: 700; color: #EAF1EA;">Bounding box</span><span class="mono" style="font-size: 12px; color: #EAF1EA;">590 × 560 × 780 mm</span></span><span class="badge" style="background: #1B2E21;">R4 ✓</span></a>
+<a href="Requirements-forest.dc.html" style="text-decoration: none; display: flex; justify-content: space-between; align-items: center; background: #1D2720; border: 1px solid #233029; border-radius: 12px; padding: 12px;"><span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 13px; font-weight: 700; color: #EAF1EA;">Mass</span><span class="mono" style="font-size: 12px; color: #EAF1EA;">7.15 kg · materials assigned</span></span><span class="badge" style="background: #33231B; color: #F6C1A5;">R2 ✗</span></a>
+<a href="Requirements-forest.dc.html" style="text-decoration: none; display: flex; justify-content: space-between; align-items: center; background: #1D2720; border: 1px solid #233029; border-radius: 12px; padding: 12px;"><span style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 13px; font-weight: 700; color: #EAF1EA;">Seat height · measured</span><span class="mono" style="font-size: 12px; color: #EAF1EA;">438 mm</span></span><span class="badge" style="background: #1B2E21;">R5 ✓</span></a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<span class="lbl">Comments</span>
+<div style="display: flex; gap: 10px;">
+<span class="pin" style="position: static; flex: none;">1</span>
+<div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 12px; font-weight: 700;">RK <span class="meta">· 1h</span></span><span style="font-size: 13px; font-weight: 500; line-height: 1.55;">Seat-to-back bend looks tight for 12 mm ply. What’s the minimum bend radius? [check supplier]</span></div>
+</div>
+<div style="display: flex; gap: 10px;">
+<span class="pin" style="position: static; flex: none; background: #47634D;">2</span>
+<div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 12px; font-weight: 700;">AS <span class="meta">· 40m</span></span><span style="font-size: 13px; font-weight: 500; line-height: 1.55;">Saved the seat height measurement and linked it to R5.</span></div>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px;"><span class="lbl" style="font-size: 10px;">Reply to pin 1</span><input placeholder="Write a reply…" style="font: inherit; font-size: 13px; border: 1px solid #233029; border-radius: 10px; background: #1D2720; padding: 10px 12px; color: #EAF1EA;"></label>
+</div>
+</aside>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

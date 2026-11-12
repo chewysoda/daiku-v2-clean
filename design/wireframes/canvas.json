@@ -1,0 +1,683 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "CAD-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "CAD viewer + markup · dark A · charcoal",
+      "w": 1440,
+      "x": 9840,
+      "y": 3760
+    },
+    "CAD-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "CAD viewer + markup · dark B · forest night",
+      "w": 1440,
+      "x": 16640,
+      "y": 3760
+    },
+    "CAD.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "CAD viewer + markup",
+      "w": 1440,
+      "x": 3040,
+      "y": 3760
+    },
+    "Calcs-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab › Calcs, properties + BOM · dark A · charcoal",
+      "w": 1440,
+      "x": 11360,
+      "y": 3760
+    },
+    "Calcs-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab › Calcs, properties + BOM · dark B · forest night",
+      "w": 1440,
+      "x": 18160,
+      "y": 3760
+    },
+    "Calcs.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab › Calcs, properties + BOM",
+      "w": 1440,
+      "x": 4560,
+      "y": 3760
+    },
+    "Canvas-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Canvas · evidence layer · dark A · charcoal",
+      "w": 1440,
+      "x": 6800,
+      "y": 1200
+    },
+    "Canvas-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Canvas · evidence layer · dark B · forest night",
+      "w": 1440,
+      "x": 13600,
+      "y": 1200
+    },
+    "Canvas.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Canvas · evidence layer",
+      "w": 1440,
+      "x": 0,
+      "y": 1200
+    },
+    "Claims-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Explore › Claims synthesis · dark A · charcoal",
+      "w": 1440,
+      "x": 9840,
+      "y": 5040
+    },
+    "Claims-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Explore › Claims synthesis · dark B · forest night",
+      "w": 1440,
+      "x": 16640,
+      "y": 5040
+    },
+    "Claims.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Explore › Claims synthesis",
+      "w": 1440,
+      "x": 3040,
+      "y": 5040
+    },
+    "Class-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Class Workspace · instructor view · dark A · charcoal",
+      "w": 1440,
+      "x": 9840,
+      "y": 2480
+    },
+    "Class-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Class Workspace · instructor view · dark B · forest night",
+      "w": 1440,
+      "x": 16640,
+      "y": 2480
+    },
+    "Class.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Class Workspace · instructor view",
+      "w": 1440,
+      "x": 3040,
+      "y": 2480
+    },
+    "Explore-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Explore › Discover papers · dark A · charcoal",
+      "w": 1440,
+      "x": 6800,
+      "y": 5040
+    },
+    "Explore-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Explore › Discover papers · dark B · forest night",
+      "w": 1440,
+      "x": 13600,
+      "y": 5040
+    },
+    "Explore.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Explore › Discover papers",
+      "w": 1440,
+      "x": 0,
+      "y": 5040
+    },
+    "Interviews-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Explore › Interviews + affinity · dark A · charcoal",
+      "w": 1440,
+      "x": 11360,
+      "y": 5040
+    },
+    "Interviews-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Explore › Interviews + affinity · dark B · forest night",
+      "w": 1440,
+      "x": 18160,
+      "y": 5040
+    },
+    "Interviews.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Explore › Interviews + affinity",
+      "w": 1440,
+      "x": 4560,
+      "y": 5040
+    },
+    "Lab-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab · decision matrix · dark A · charcoal",
+      "w": 1440,
+      "x": 9840,
+      "y": 1200
+    },
+    "Lab-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab · decision matrix · dark B · forest night",
+      "w": 1440,
+      "x": 16640,
+      "y": 1200
+    },
+    "Lab.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab · decision matrix",
+      "w": 1440,
+      "x": 3040,
+      "y": 1200
+    },
+    "Library-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Library · assets with provenance · dark A · charcoal",
+      "w": 1440,
+      "x": 6800,
+      "y": 2480
+    },
+    "Library-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Library · assets with provenance · dark B · forest night",
+      "w": 1440,
+      "x": 13600,
+      "y": 2480
+    },
+    "Library.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Library · assets with provenance",
+      "w": 1440,
+      "x": 0,
+      "y": 2480
+    },
+    "Main-dark.dc.html": {
+      "h": 820,
+      "radius": 16,
+      "title": "Brand · Option C type + leaf monogram · dark A · charcoal",
+      "w": 1440,
+      "x": 6800,
+      "y": 0
+    },
+    "Main-forest.dc.html": {
+      "h": 820,
+      "radius": 16,
+      "title": "Brand · Option C type + leaf monogram · dark B · forest night",
+      "w": 1440,
+      "x": 13600,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "h": 820,
+      "radius": 16,
+      "title": "Brand · Option C type + leaf monogram",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "Present-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Present · story builder · dark A · charcoal",
+      "w": 1440,
+      "x": 8320,
+      "y": 2480
+    },
+    "Present-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Present · story builder · dark B · forest night",
+      "w": 1440,
+      "x": 15120,
+      "y": 2480
+    },
+    "Present.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Present · story builder",
+      "w": 1440,
+      "x": 1520,
+      "y": 2480
+    },
+    "Reader-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Reader · highlights → evidence · dark A · charcoal",
+      "w": 1440,
+      "x": 8320,
+      "y": 5040
+    },
+    "Reader-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Reader · highlights → evidence · dark B · forest night",
+      "w": 1440,
+      "x": 15120,
+      "y": 5040
+    },
+    "Reader.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Reader · highlights → evidence",
+      "w": 1440,
+      "x": 1520,
+      "y": 5040
+    },
+    "Requirements-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab › Requirements traceability · dark A · charcoal",
+      "w": 1440,
+      "x": 6800,
+      "y": 3760
+    },
+    "Requirements-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab › Requirements traceability · dark B · forest night",
+      "w": 1440,
+      "x": 13600,
+      "y": 3760
+    },
+    "Requirements.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab › Requirements traceability",
+      "w": 1440,
+      "x": 0,
+      "y": 3760
+    },
+    "Simulation-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab › Simulation results · dark A · charcoal",
+      "w": 1440,
+      "x": 8320,
+      "y": 3760
+    },
+    "Simulation-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab › Simulation results · dark B · forest night",
+      "w": 1440,
+      "x": 15120,
+      "y": 3760
+    },
+    "Simulation.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Lab › Simulation results",
+      "w": 1440,
+      "x": 1520,
+      "y": 3760
+    },
+    "Threads-dark.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Threads · graph + backlinks · dark A · charcoal",
+      "w": 1440,
+      "x": 8320,
+      "y": 1200
+    },
+    "Threads-forest.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Threads · graph + backlinks · dark B · forest night",
+      "w": 1440,
+      "x": 15120,
+      "y": 1200
+    },
+    "Threads.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "Threads · graph + backlinks",
+      "w": 1440,
+      "x": 1520,
+      "y": 1200
+    },
+    "V2-Canvas.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "v2 · Canvas · content first",
+      "w": 1440,
+      "x": 1520,
+      "y": 6320
+    },
+    "V2-Home.dc.html": {
+      "expand": "fill",
+      "h": 1120,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "v2 · Home · gallery studio",
+      "w": 1440,
+      "x": 0,
+      "y": 6320
+    },
+    "V2-Lab.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "v2 · Lab · the decision, calmly",
+      "w": 1440,
+      "x": 4560,
+      "y": 6320
+    },
+    "V2-Library.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "v2 · Library · colour + credit search",
+      "w": 1440,
+      "x": 3040,
+      "y": 6320
+    },
+    "V2-Share.dc.html": {
+      "expand": "fill",
+      "h": 900,
+      "is_interactive": true,
+      "radius": 16,
+      "title": "v2 · Client share · no sign-in",
+      "w": 1440,
+      "x": 6080,
+      "y": 6320
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-11-01T21:05:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "noteOrder": [
+    "row1",
+    "row2",
+    "row3",
+    "row4",
+    "dark1",
+    "dark2",
+    "dark3",
+    "dark4",
+    "forest1",
+    "forest2",
+    "forest3",
+    "forest4",
+    "v2"
+  ],
+  "notes": {
+    "dark1": {
+      "kind": "title1",
+      "maxW": 4480,
+      "text": "Dark A · charcoal · capture → connect → decide",
+      "w": 240,
+      "x": 6800,
+      "y": 940
+    },
+    "dark2": {
+      "kind": "title1",
+      "maxW": 4480,
+      "text": "Dark A · charcoal · library, story and class",
+      "w": 240,
+      "x": 6800,
+      "y": 2220
+    },
+    "dark3": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Dark A · charcoal · engineering evidence",
+      "w": 240,
+      "x": 6800,
+      "y": 3500
+    },
+    "dark4": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Dark A · charcoal · research",
+      "w": 240,
+      "x": 6800,
+      "y": 4780
+    },
+    "forest1": {
+      "kind": "title1",
+      "maxW": 4480,
+      "text": "Dark B · forest night · capture → connect → decide",
+      "w": 240,
+      "x": 13600,
+      "y": 940
+    },
+    "forest2": {
+      "kind": "title1",
+      "maxW": 4480,
+      "text": "Dark B · forest night · library, story and class",
+      "w": 240,
+      "x": 13600,
+      "y": 2220
+    },
+    "forest3": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Dark B · forest night · engineering evidence",
+      "w": 240,
+      "x": 13600,
+      "y": 3500
+    },
+    "forest4": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Dark B · forest night · research",
+      "w": 240,
+      "x": 13600,
+      "y": 4780
+    },
+    "row1": {
+      "kind": "title1",
+      "maxW": 4480,
+      "text": "Capture → connect → decide",
+      "w": 240,
+      "x": 0,
+      "y": 940
+    },
+    "row2": {
+      "kind": "title1",
+      "maxW": 4480,
+      "text": "Library, story and class",
+      "w": 240,
+      "x": 0,
+      "y": 2220
+    },
+    "row3": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Engineering evidence: requirements, simulation, CAD, calcs",
+      "w": 240,
+      "x": 0,
+      "y": 3500
+    },
+    "row4": {
+      "kind": "title1",
+      "maxW": 6000,
+      "text": "Research: discover, read, weigh, listen",
+      "w": 240,
+      "x": 0,
+      "y": 4780
+    },
+    "v2": {
+      "kind": "title1",
+      "maxW": 7520,
+      "text": "v2 · designer-first, rebuilt from what designers complain about",
+      "w": 240,
+      "x": 0,
+      "y": 6060
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Canvas.dc.html",
+    "Threads.dc.html",
+    "Lab.dc.html",
+    "Library.dc.html",
+    "Present.dc.html",
+    "Class.dc.html",
+    "Requirements.dc.html",
+    "Simulation.dc.html",
+    "CAD.dc.html",
+    "Calcs.dc.html",
+    "Explore.dc.html",
+    "Reader.dc.html",
+    "Claims.dc.html",
+    "Interviews.dc.html",
+    "Main-dark.dc.html",
+    "Canvas-dark.dc.html",
+    "Threads-dark.dc.html",
+    "Lab-dark.dc.html",
+    "Library-dark.dc.html",
+    "Present-dark.dc.html",
+    "Class-dark.dc.html",
+    "Requirements-dark.dc.html",
+    "Simulation-dark.dc.html",
+    "CAD-dark.dc.html",
+    "Calcs-dark.dc.html",
+    "Explore-dark.dc.html",
+    "Reader-dark.dc.html",
+    "Claims-dark.dc.html",
+    "Interviews-dark.dc.html",
+    "Main-forest.dc.html",
+    "Canvas-forest.dc.html",
+    "Threads-forest.dc.html",
+    "Lab-forest.dc.html",
+    "Library-forest.dc.html",
+    "Present-forest.dc.html",
+    "Class-forest.dc.html",
+    "Requirements-forest.dc.html",
+    "Simulation-forest.dc.html",
+    "CAD-forest.dc.html",
+    "Calcs-forest.dc.html",
+    "Explore-forest.dc.html",
+    "Reader-forest.dc.html",
+    "Claims-forest.dc.html",
+    "Interviews-forest.dc.html",
+    "V2-Home.dc.html",
+    "V2-Canvas.dc.html",
+    "V2-Library.dc.html",
+    "V2-Lab.dc.html",
+    "V2-Share.dc.html"
+  ],
+  "pages": [],
+  "title": "Daiku Wireframes"
+}

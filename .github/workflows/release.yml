@@ -1,0 +1,40 @@
+# Builds the Windows installer when a version tag (v0.1.0, say) is pushed, and attaches it to a
+# draft GitHub release, with latest.json for auto-update once it's set up. The installer isn't
+# code-signed, so Windows SmartScreen will warn on first run.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: npm ci
+      - run: npm test
+      - run: cargo test --lib
+        working-directory: src-tauri
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signs the update files once `npm run updates:setup` has been run; unused until then.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Daiku ${{ github.ref_name }}
+          releaseDraft: true
+          prerelease: false

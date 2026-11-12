@@ -1,0 +1,55 @@
+/*
+ * The opening: a full-screen intro video that dissolves away as the app settles in underneath.
+ */
+:root {
+  --hello-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --hello-ease-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.hello {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  /* Matches the video's own near-black, so letterboxing and load-in never flash. */
+  background: #050607;
+  cursor: default;
+  user-select: none;
+  transition: opacity 1100ms var(--hello-ease-out), transform 1100ms var(--hello-ease-out);
+}
+.hello.leaving { opacity: 0; transform: scale(1.04); pointer-events: none; }
+
+.hello-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  animation: hello-video-in 600ms var(--hello-ease) both;
+}
+@keyframes hello-video-in { from { opacity: 0; } to { opacity: 1; } }
+
+.hello-skip {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  font-size: 12px;
+  color: #c9cdd3;
+  opacity: 0;
+  animation: hello-skip 900ms ease 2200ms forwards;
+}
+@keyframes hello-skip { to { opacity: 0.6; } }
+
+/* The app: waits a little back while the intro plays, then settles forward as it lifts away. */
+:root[data-hello="playing"] .shell { opacity: 0; transform: scale(0.97); }
+:root[data-hello="reveal"] .shell { animation: app-settle 1300ms var(--hello-ease) both; }
+@keyframes app-settle {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The intro follows Daiku's own settings (Opening greeting, Animations), not the system's reduce-motion flag:
+   it's a chosen, skippable moment with its own off switch. */

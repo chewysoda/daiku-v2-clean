@@ -1,0 +1,29 @@
+.export-cols { grid-template-columns: minmax(0, 1fr) 300px; }
+.export-card { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.pack-h2-x { font-size: 15px; font-weight: 600; margin: 0; overflow-wrap: anywhere; }
+.export-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: 8px 12px; align-items: center; }
+.export-row { display: contents; }
+.export-pick { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; cursor: pointer; min-width: 0; }
+.export-pick input { width: 18px; height: 18px; margin: 1px 0 0; flex: none; accent-color: var(--c-accent-strong); }
+.export-pick > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.export-file { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.export-file .field { flex: 1; min-width: 0; }
+.export-rename summary { cursor: pointer; font-size: 13px; }
+.export-rename ul { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.export-rename li { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 8px; }
+.export-path { grid-column: 1 / -1; overflow-wrap: anywhere; }
+.export-rename > .field { margin-top: 10px; width: 100%; }
+.export-side { position: sticky; top: 16px; max-height: calc(100vh - 96px); overflow-y: auto; }
+.export-tree { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; overflow-wrap: anywhere; }
+.export-tree ul { list-style: none; margin: 2px 0 0; padding-left: 14px; display: flex; flex-direction: column; gap: 1px; }
+.export-tree ul.top { padding-left: 0; }
+
+@media (max-width: 900px) {
+  .export-cols { grid-template-columns: minmax(0, 1fr); }
+  .export-side { position: static; max-height: none; }
+  .export-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.export-why { margin: 0 0 10px; }
+.export-formats { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 14px; padding: 2px 0 10px 30px; font-size: 13px; }
+.export-formats .check { font-size: 13px; font-weight: 600; }

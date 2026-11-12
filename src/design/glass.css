@@ -1,0 +1,279 @@
+/*
+ * Daiku v2: liquid glass. Two layers that never mix:
+ * - Controls (sidebar, title bar, tray, palette, menus, toasts, toolbars) sit on frosted glass.
+ * - Content (board, cards, reading text, tables, code) stays solid, so it's always easy to read.
+ * At most three blurred layers are on screen at once: the sidebar and tray (glass 1), one overlay
+ * (glass 2: palette or reader frame) and one small menu or toast (glass 3).
+ */
+
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-move: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* --- Materials --------------------------------------------------------- */
+
+.glass-1, .glass-2, .glass-3 {
+  position: relative;
+  border: 1px solid var(--glass-line);
+  box-shadow: var(--glass-shadow);
+}
+.glass-1 { background: var(--glass-1); backdrop-filter: var(--glass-blur-1); }
+.glass-2 { background: var(--glass-2); backdrop-filter: var(--glass-blur-2); }
+.glass-3 { background: var(--glass-3); backdrop-filter: var(--glass-blur-3); }
+/* The specular edge: a thin highlight along the top, fading out, like light catching glass. */
+.glass-1::before, .glass-2::before, .glass-3::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  padding: 1px;
+  background: linear-gradient(180deg, var(--glass-edge), var(--glass-edge-low) 42%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Reduce transparency (the setting, or the system's own): every layer turns solid. */
+:root[data-glass="solid"] .glass-1 { background: var(--glass-solid-1); backdrop-filter: none; }
+:root[data-glass="solid"] .glass-2 { background: var(--glass-solid-2); backdrop-filter: none; }
+:root[data-glass="solid"] .glass-3 { background: var(--glass-solid-3); backdrop-filter: none; }
+
+/* Mica: the window itself shows the desktop's colours, so the page lets it through at the edges. */
+:root[data-mica="on"]:not([data-glass="solid"]):not([data-backdrop]) body,
+:root[data-mica="on"]:not([data-glass="solid"]):not([data-backdrop]) .shell { background: color-mix(in srgb, var(--c-bg) 55%, transparent); }
+
+/* While the board pans, glass over it goes solid and comes back when it stops (set by the canvas). */
+:root[data-panning] .packtray.glass-1,
+:root[data-panning] .sidebar.glass-1 { background: var(--glass-solid-1); backdrop-filter: none; }
+
+/* --- Shell ------------------------------------------------------------- */
+
+.shell { background: var(--c-bg); }
+.titlebar {
+  flex: 0 0 var(--titlebar-height);
+  padding-left: 16px;
+  gap: 8px;
+}
+.titlebar .cap { font-size: 12.5px; color: var(--c-text-muted); letter-spacing: 0.01em; }
+.shell-body { gap: 0; padding: 0 10px 0 8px; }
+.route-view { flex: 1; min-width: 0; display: flex; border-radius: var(--radius-panel) var(--radius-panel) 0 0; overflow: hidden; background: var(--c-bg); box-shadow: 0 0 0 1px var(--c-hairline); }
+
+/* The sidebar. */
+.sidebar {
+  flex: 0 0 var(--rail-width);
+  width: var(--rail-width);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 8px calc(var(--tray-height) + 18px) 0;
+  padding: 10px;
+  border-radius: var(--radius-panel);
+  transition: flex-basis 220ms var(--ease-drawer), width 220ms var(--ease-drawer);
+  overflow: hidden;
+  z-index: 3;
+}
+.sidebar.collapsed { flex-basis: var(--rail-collapsed); width: var(--rail-collapsed); }
+.side-top { display: flex; align-items: center; gap: 8px; padding: 4px 4px 10px 6px; min-height: 40px; }
+.side-top .monogram { color: var(--c-sourced); flex: none; }
+.side-wordmark { font-family: var(--font-display); font-style: italic; font-size: 20px; font-variation-settings: "SOFT" 100, "opsz" 144; letter-spacing: -0.01em; }
+.side-collapse { margin-left: auto; width: 30px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: var(--c-icon-idle); display: grid; place-items: center; cursor: pointer; flex: none; }
+.sidebar.collapsed .side-top { flex-direction: column; padding: 4px 0 10px; }
+.sidebar.collapsed .side-collapse { margin: 0; }
+.side-collapse:hover { background: var(--c-accent-tint); color: var(--c-text); }
+
+.side-project { position: relative; margin-bottom: 10px; }
+.side-project-btn {
+  width: 100%; display: flex; align-items: center; gap: 10px; padding: 7px 8px; border: 1px solid var(--glass-line);
+  border-radius: var(--radius-control); background: color-mix(in srgb, var(--c-surface) 40%, transparent); cursor: pointer; text-align: left;
+}
+.side-project-btn:hover { background: color-mix(in srgb, var(--c-surface) 70%, transparent); }
+.side-project-mark { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; flex: none; font-size: 12px; font-weight: 600; background: var(--c-inverse); color: var(--c-on-inverse); }
+.side-project-name { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side-chevron { color: var(--c-icon-idle); flex: none; }
+.side-menu { position: absolute; left: 0; right: 0; top: calc(100% + 6px); list-style: none; margin: 0; padding: 6px; border-radius: var(--radius-control); z-index: 10; min-width: 200px; transform-origin: top left; animation: menu-in 160ms var(--ease-out); }
+.side-menu button { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 10px; border: 0; border-radius: 6px; background: transparent; text-align: left; cursor: pointer; font-size: 13.5px; }
+.side-menu button:hover, .side-menu button[aria-selected="true"] { background: var(--c-accent-tint); }
+
+.side-sections { display: flex; flex-direction: column; gap: 2px; }
+.side-link {
+  display: flex; align-items: center; gap: 11px; height: 38px; padding: 0 10px; border-radius: var(--radius-control);
+  color: var(--c-text-secondary); font-size: 14px; font-weight: 500; border: 0; background: transparent; cursor: pointer; width: 100%; text-align: left;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+.side-link .i { color: var(--c-icon-idle); transition: color 120ms ease; }
+.side-link:hover { background: color-mix(in srgb, var(--c-accent-tint) 70%, transparent); color: var(--c-text); }
+.side-link.active { background: var(--c-surface); color: var(--c-text); box-shadow: var(--shadow-control), 0 0 0 1px var(--glass-line); }
+.side-link.active .i { color: var(--c-text); }
+.side-link-label { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.side-kbd { font-family: var(--font-ui); font-size: 11.5px; color: var(--c-caption); background: none; border: 0; padding: 0; }
+.sidebar.collapsed .side-link { justify-content: center; padding: 0; }
+
+.side-boards { display: flex; flex-direction: column; gap: 1px; margin-top: 16px; min-height: 0; overflow-y: auto; }
+.side-label { font-size: 12px; font-weight: 500; color: var(--c-caption); padding: 0 10px 6px; }
+.side-board { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 10px; border-radius: 7px; font-size: 13px; color: var(--c-text-muted); }
+.side-board:hover { background: color-mix(in srgb, var(--c-accent-tint) 70%, transparent); color: var(--c-text); }
+.side-board.active { color: var(--c-text); background: color-mix(in srgb, var(--c-surface) 60%, transparent); }
+.side-board-dot { width: 6px; height: 6px; border-radius: 2px; background: var(--c-icon-idle); flex: none; opacity: 0.6; }
+.side-board.active .side-board-dot { background: var(--c-text); opacity: 1; }
+.side-board-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side-gap { flex: 1; min-height: 12px; }
+.side-search { color: var(--c-text-muted); }
+.side-me { display: flex; align-items: center; gap: 10px; padding: 10px 6px 2px; border-top: 1px solid var(--glass-line); margin-top: 6px; }
+.side-me-name { font-size: 13px; color: var(--c-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar.collapsed .side-me { justify-content: center; padding-left: 0; padding-right: 0; }
+
+/* --- Pack tray: the receipt ----------------------------------------------- */
+
+.packtray {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 20;
+  border-radius: var(--radius-panel);
+  transition: box-shadow 160ms ease, border-color 160ms ease;
+}
+.packtray.dropping { border-color: var(--c-accent); box-shadow: var(--glass-shadow), 0 0 0 3px var(--c-accent-tint); }
+.pt-bar { height: var(--tray-height); display: flex; align-items: center; gap: 16px; padding: 0 10px 0 6px; }
+.pt-toggle { display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 12px; border: 0; border-radius: var(--radius-control); background: transparent; cursor: pointer; color: var(--c-text); flex: none; }
+.pt-toggle:hover { background: color-mix(in srgb, var(--c-accent-tint) 70%, transparent); }
+.pt-title { font-weight: 600; font-size: 14px; }
+.pt-count { font-size: 13px; color: var(--c-text-muted); font-variant-numeric: tabular-nums; }
+.pt-meter { position: relative; flex: 1; height: 8px; min-width: 120px; border-radius: 999px; background: color-mix(in srgb, var(--c-border) 70%, transparent); overflow: hidden; }
+.pt-seg { position: absolute; inset: 0; transform-origin: left center; border-radius: 999px; transition: transform 260ms var(--ease-out); }
+/* Left out is drawn as a hatch: present, but not going. Pinned is solid, included a step lighter. */
+.pt-seg.out { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--c-text-muted) 45%, transparent) 0 3px, transparent 3px 6px); }
+.pt-seg.included { background: color-mix(in srgb, var(--c-text) 55%, var(--c-bg)); }
+.pt-seg.pinned { background: var(--c-text); }
+.pt-meter.over .pt-seg.included, .pt-meter.over .pt-seg.pinned { background: var(--c-conflict); }
+.pt-budget { position: absolute; top: -2px; bottom: -2px; width: 2px; margin-left: -1px; background: var(--c-text); opacity: 0.8; }
+.pt-total { font-size: 13px; color: var(--c-text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pt-total b { color: var(--c-text); font-weight: 600; font-size: 14px; }
+.pt-unit { color: var(--c-caption); }
+.pt-warn { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 8px; border-radius: 999px; font-size: 12.5px; font-weight: 500; color: var(--c-conflict-text); background: var(--c-conflict-tint); box-shadow: inset 0 0 0 1px var(--c-conflict); white-space: nowrap; }
+.pt-go { gap: 10px; flex: none; }
+.pt-kbd { font: inherit; font-size: 11.5px; opacity: 0.65; background: none; border: 0; padding: 0; }
+
+.pt-receipt { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-bottom: 1px solid var(--glass-line); animation: receipt-in 240ms var(--ease-drawer); }
+.pt-col { padding: 14px 16px 12px; min-width: 0; }
+.pt-col + .pt-col { border-left: 1px solid var(--glass-line); }
+.pt-col-head { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.pt-col-head .pt-num { margin-left: auto; font-weight: 500; }
+.pt-key { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.pt-key.pinned { background: var(--c-text); }
+.pt-key.included { background: color-mix(in srgb, var(--c-text) 55%, var(--c-bg)); }
+.pt-key.out { background: repeating-linear-gradient(135deg, var(--c-text-muted) 0 2px, transparent 2px 4px); }
+.pt-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.pt-col li { display: flex; align-items: center; gap: 8px; min-height: 28px; font-size: 13px; border-bottom: 1px dashed var(--glass-line); }
+.pt-col li:last-child { border-bottom: 0; }
+.pt-line-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-col.out .pt-line-title { color: var(--c-text-muted); }
+.pt-num { font-variant-numeric: tabular-nums; color: var(--c-text-muted); font-size: 12.5px; }
+.pt-reason { white-space: nowrap; }
+.pt-pin { width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent; color: var(--c-icon-idle); display: grid; place-items: center; cursor: pointer; opacity: 0.5; }
+.pt-col li:hover .pt-pin, .pt-pin:focus-visible, .pt-pin[aria-pressed="true"] { opacity: 1; }
+.pt-pin[aria-pressed="true"] { color: var(--c-text); }
+.pt-pin:hover { background: var(--c-accent-tint); }
+
+/* Room under every screen for the tray. */
+.route-view { margin-bottom: calc(var(--tray-height) + 18px); border-radius: var(--radius-panel); }
+.route-view > .page, .route-view > main { padding-bottom: 32px; }
+
+/* --- Overlays ---------------------------------------------------------- */
+
+/* The palette opens dozens of times a day, so it appears at once, with no animation. */
+.palette { animation: none !important; border-radius: 16px; background: var(--glass-2); backdrop-filter: var(--glass-blur-2); border: 1px solid var(--glass-line); box-shadow: var(--glass-shadow); }
+:root[data-glass="solid"] .palette { background: var(--glass-solid-2); backdrop-filter: none; }
+.palette-input { border-bottom-color: var(--glass-line); }
+.palette-row.on { background: color-mix(in srgb, var(--c-accent-tint) 85%, transparent); }
+.toast { background: var(--glass-3) !important; color: var(--c-text) !important; backdrop-filter: var(--glass-blur-3); border: 1px solid var(--glass-line); box-shadow: var(--glass-shadow); }
+.toast.error { box-shadow: var(--glass-shadow), inset 3px 0 0 var(--c-assumption); }
+:root[data-glass="solid"] .toast { background: var(--glass-solid-3) !important; backdrop-filter: none; }
+.popover { background: var(--glass-3); backdrop-filter: var(--glass-blur-3); border: 1px solid var(--glass-line); box-shadow: var(--glass-shadow); }
+:root[data-glass="solid"] .popover { background: var(--glass-solid-3); backdrop-filter: none; }
+
+/* --- Controls, sleeker -------------------------------------------------- */
+
+.pill { height: 36px; border-radius: var(--radius-control); padding: 0 14px; font-size: 13.5px; transition: transform 160ms var(--ease-out), background-color 120ms ease, border-color 120ms ease; }
+.pill.small { height: 30px; padding: 0 11px; font-size: 12.5px; }
+.pill.ink { background: var(--c-accent); border-color: var(--c-accent); color: var(--c-on-accent); }
+.pill.ink:hover:not(:disabled) { background: color-mix(in srgb, var(--c-accent) 88%, var(--c-bg)); }
+.pill:active:not(:disabled), .side-link:active, .pt-toggle:active, .side-project-btn:active { transform: scale(0.97); }
+.card { border-radius: var(--radius-card); border: 1px solid var(--c-hairline); box-shadow: none; }
+.field { border-radius: var(--radius-control); }
+:focus-visible { outline-color: var(--c-selection); }
+
+/* Evidence states: colour plus a shape or word, never colour alone. */
+.state { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: var(--radius-chip); font-size: 12px; font-weight: 500; white-space: nowrap; }
+.state.sourced { background: var(--c-sourced-tint); color: var(--c-sourced-text); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-sourced) 50%, transparent); }
+.state.guess { background: var(--c-assumption-tint); color: var(--c-assumption-text); font-style: italic; box-shadow: inset 0 0 0 1px var(--c-assumption); outline: 1px dashed var(--c-assumption); outline-offset: -1px; }
+.state.conflict { background: var(--c-conflict-tint); color: var(--c-conflict-text); box-shadow: inset 0 0 0 1px var(--c-conflict); }
+.state.out { background: transparent; color: var(--c-text-muted); box-shadow: inset 0 0 0 1px var(--c-border); }
+.state.in { background: transparent; color: var(--c-text); box-shadow: inset 0 0 0 1px var(--c-border); }
+.state.in::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c-accent); }
+
+@keyframes menu-in { from { opacity: 0; transform: scale(0.97) translateY(-2px); } }
+@keyframes receipt-in { from { opacity: 0; transform: translateY(6px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar, .pt-seg { transition: none; }
+  .side-menu, .pt-receipt { animation: fade-only 120ms ease; }
+}
+:root[data-motion="off"] .sidebar, :root[data-motion="off"] .pt-seg { transition: none; }
+@keyframes fade-only { from { opacity: 0; } }
+
+@media print {
+  .sidebar, .packtray { display: none !important; }
+  .route-view { margin: 0; box-shadow: none; }
+}
+
+/* Floating bars sit above the tray, never under it. */
+.shell .lib-toolbar { bottom: calc(var(--tray-height) + 28px); left: calc(50% + var(--rail-width) / 2); z-index: 21; }
+:root:has(.sidebar.collapsed) .shell .lib-toolbar { left: calc(50% + var(--rail-collapsed) / 2); }
+.palette-meta { display: inline-flex; align-items: center; gap: 10px; flex: none; }
+.palette-kbd { font-family: var(--font-ui); font-size: 11.5px; font-weight: 500; color: var(--c-text-muted); padding: 1px 6px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--c-border); background: transparent; }
+
+/* --- Reader panel: glass frame, solid page ------------------------------ */
+.reader-panel {
+  position: fixed;
+  top: calc(var(--titlebar-height) + 6px);
+  right: 18px;
+  bottom: calc(var(--tray-height) + 26px);
+  width: min(720px, 48vw);
+  z-index: 15;
+  border-radius: var(--radius-panel);
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  animation: panel-in 220ms var(--ease-drawer);
+}
+.reader-panel-bar { display: flex; align-items: center; gap: 4px; padding: 4px 6px 8px 10px; }
+.reader-panel-title { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reader-panel-page { flex: 1; min-height: 0; display: flex; border-radius: calc(var(--radius-panel) - 6px); overflow: hidden; background: var(--c-bg); box-shadow: 0 0 0 1px var(--c-hairline); }
+.reader-panel-page > * { flex: 1; min-width: 0; }
+.reader-panel-wait { padding: 16px; }
+@keyframes panel-in { from { opacity: 0; transform: translateX(16px); } }
+@media (prefers-reduced-motion: reduce) { .reader-panel { animation: fade-only 120ms ease; } }
+/* In the panel the page gets the room: no page strip, highlights below the page instead of beside it. */
+.reader-panel .reader-thumbs { display: none; }
+.reader-panel .reader-body { display: flex; flex-direction: column; overflow-y: auto; }
+.reader-panel .reader-stage { flex: none; min-height: 60%; }
+.reader-panel .reader-side { width: auto; max-width: none; border-left: 0; border-top: 1px solid var(--c-hairline); }
+.reader-panel .reader-head { flex-wrap: wrap; row-gap: 8px; }
+.toast-action { border: 0; background: transparent; color: inherit; font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 2px 6px; }
+
+/* Tools: every other screen, quieter than the four sections. */
+.side-tools { display: flex; flex-direction: column; gap: 1px; margin-top: 14px; }
+.side-fold { display: flex; align-items: center; justify-content: space-between; width: 100%; border: 0; background: transparent; cursor: pointer; text-align: left; font: inherit; font-size: 12px; font-weight: 500; color: var(--c-caption); padding: 0 10px 6px; }
+.side-fold:hover { color: var(--c-text); }
+.side-tool { height: 32px; font-size: 13px; font-weight: 450; }
+.sidebar { overflow-y: auto; }
+.sidebar .side-boards { overflow: visible; }
+/* Nothing in the sidebar squashes; when it runs out of room, it scrolls. */
+.sidebar > * { flex-shrink: 0; }
+.sidebar > .side-gap { flex: 1 0 12px; }
+.side-menu-sep { height: 1px; margin: 4px 6px; background: var(--glass-line); }
+.side-menu .side-menu-new { color: var(--c-text-secondary); }

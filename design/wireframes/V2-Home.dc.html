@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daiku v2 · Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;family=Fraunces:ital,opsz,wght,SOFT@1,9..144,300..600,100&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+.fr{font-family:'Fraunces',serif;font-style:italic;font-variation-settings:'SOFT' 100,'opsz' 144;font-weight:380}
+.cap{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.02em;color:#6B6D65}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.rail a{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#7A7C74;position:relative}
+.rail a.on{background:#E9EEE7;color:#3F5442}
+.rail a.on::before{content:"";position:absolute;left:-14px;top:12px;width:3px;height:20px;border-radius:2px;background:#4E6450}
+.pill{font:inherit;font-size:13px;font-weight:700;border-radius:999px;padding:0 18px;height:40px;box-sizing:border-box;border:1px solid #E4E0D7;background:#FFFFFF;color:#1E1F1C;display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 1px 2px rgba(30,31,28,.05)}
+.pill.ink{background:#1E1F1C;border-color:#1E1F1C;color:#FBFAF7}
+.ib{font:inherit;width:40px;height:40px;border-radius:999px;border:0;background:transparent;color:#5E605A;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.sw{width:28px;height:28px;border-radius:50%;border:2px solid #FFFFFF;box-shadow:0 0 0 1px #E4E0D7;padding:0;cursor:pointer;flex:none}
+.win{font:inherit;width:44px;height:36px;border:0;background:transparent;color:#7A7C74;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.ph{display:block;width:100%;height:100%;object-fit:cover}
+.cell{position:relative;min-height:0;min-width:0;background:#EDE8DF;overflow:hidden}
+.cell .ph{position:absolute;inset:0}
+.fx{border-radius:10px;overflow:hidden;background:#EDE8DF}
+.av{width:30px;height:30px;border-radius:50%;border:2px solid #FBFAF7;display:inline-flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;color:#1E1F1C;box-sizing:border-box}
+.chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;background:rgba(251,250,247,.92);font-size:11px;font-weight:700;color:#1E1F1C}
+.bc{display:flex;flex-direction:column;gap:12px}
+.bc .m{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:repeat(2,minmax(0,1fr));gap:3px;height:190px;border-radius:12px;overflow:hidden}
+.bc .m > div{position:relative;min-height:0;overflow:hidden;background:#EDE8DF}
+.bc .m > div .ph{position:absolute;inset:0}
+.bc .m > div:first-child{grid-row:span 2}
+.pal{display:flex;height:6px;border-radius:3px;overflow:hidden}
+.pal span{flex:1}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 1120px; box-sizing: border-box; background: #FBFAF7; color: #1E1F1C; font-family: 'Comfortaa', sans-serif; display: flex; flex-direction: column;">
+
+<header style="display: flex; align-items: center; justify-content: space-between; height: 36px; padding-left: 18px;">
+<span class="cap">daiku — Personal</span>
+<div style="display: flex; align-items: center;">
+<span class="cap" style="display: inline-flex; align-items: center; gap: 6px; padding-right: 14px;"><span style="width: 6px; height: 6px; border-radius: 50%; background: #4E6450;"></span>saved on this device</span>
+<button class="win" aria-label="Minimize"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M5 12h14"></path></svg></button>
+<button class="win" aria-label="Maximize"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"></rect></svg></button>
+<button class="win" aria-label="Close"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; flex: 1;">
+<nav class="rail" aria-label="Main" style="flex: 0 0 76px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 0 20px;">
+<svg width="30" height="28" viewBox="16 18 176 164" role="img" aria-label="daiku" style="margin-bottom: 18px;"><g fill="#4E6450"><path d="M110 96C94 80 60 78 42 92C24 106 20 140 36 156C50 170 84 174 110 156L110 147C88 162 64 160 54 147C44 134 44 110 57 99C70 88 92 89 110 104Z"></path><path d="M105 172C105 124 105 84 107 58C109 38 101 25 84 22C102 26 120 32 120 60C120 92 120 132 121 168C123 172 127 173 130 172C122 177 110 177 105 172Z"></path><path d="M119 112C130 92 152 72 186 60C182 88 166 108 140 118C146 124 152 140 162 158C168 168 176 171 186 169C174 177 156 176 148 166C140 154 132 140 119 134Z"></path></g></svg>
+<a class="on" href="V2-Home.dc.html" aria-label="Home" aria-current="page"><svg class="i" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"></path></svg></a>
+<a href="V2-Canvas.dc.html" aria-label="Canvas"><svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"></rect><rect x="7" y="7" width="5" height="6" rx="1"></rect><rect x="14" y="11" width="3.5" height="6" rx="1"></rect></svg></a>
+<a href="V2-Library.dc.html" aria-label="Library"><svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="9" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="5" rx="2"></rect><rect x="13.5" y="11.5" width="7" height="9" rx="2"></rect><rect x="3.5" y="15.5" width="7" height="5" rx="2"></rect></svg></a>
+<a href="Explore.dc.html" aria-label="Explore"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="m15.5 8.5-2 5-5 2 2-5z"></path></svg></a>
+<a href="Threads.dc.html" aria-label="Threads"><svg class="i" viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.5"></circle><circle cx="18" cy="6" r="2.5"></circle><circle cx="12" cy="18" r="2.5"></circle><path d="M8.3 7.9 15.6 6.6M7.2 9.2l3.6 6.6M16.9 8.3l-3.6 7.5"></path></svg></a>
+<a href="V2-Lab.dc.html" aria-label="Lab"><svg class="i" viewBox="0 0 24 24"><path d="M9.5 3.5h5M10.5 3.5v5.2L5.2 18.2A1.6 1.6 0 0 0 6.6 20.5h10.8a1.6 1.6 0 0 0 1.4-2.3L13.5 8.7V3.5"></path><path d="M7.8 14.5h8.4"></path></svg></a>
+<a href="V2-Share.dc.html" aria-label="Present and share"><svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="11.5" rx="2"></rect><path d="M12 16.5V20M8.5 20h7M10.5 8.5l3.5 2.2-3.5 2.3z"></path></svg></a>
+<div style="flex: 1;"></div>
+<a href="#" aria-label="Settings"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></a>
+<span class="av" aria-label="Aarav S." style="width: 34px; height: 34px; background: #CFC6EA; margin-top: 8px;">AS</span>
+</nav>
+
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 26px 48px 48px 36px; display: flex; flex-direction: column; gap: 32px;">
+
+<section style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<span class="cap">Monday · 2 November</span>
+<h1 class="fr" style="margin: 0; font-size: 54px; line-height: 1.02; letter-spacing: -0.015em;">Good morning, Aarav</h1>
+</div>
+<div style="display: flex; gap: 8px;"><button class="pill"><svg class="i" style="width: 18px; height: 18px;" viewBox="0 0 24 24"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 15v3.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V15"></path></svg>Import</button><a class="pill ink" href="V2-Canvas.dc.html"><svg class="i" style="width: 18px; height: 18px;" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>New board</a></div>
+</section>
+
+<section aria-label="Capture and search" style="display: flex; flex-direction: column; gap: 14px;">
+<label style="display: flex; align-items: center; gap: 12px; background: #FFFFFF; border: 1px solid #E4E0D7; border-radius: 18px; padding: 0 8px 0 20px; height: 64px; box-sizing: border-box; box-shadow: 0 1px 2px rgba(30,31,28,.04), 0 8px 24px -16px rgba(30,31,28,.18);">
+<svg class="i" style="color: #6B6D65;" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4.2-4.2"></path></svg>
+<input aria-label="Paste a link, drop images, or search by idea or colour" placeholder="Paste a link, drop images, or search “warm oak, soft curves”" style="border: 0; outline: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 600; flex: 1; min-width: 0; color: #1E1F1C;">
+<button class="ib" aria-label="Add link"><svg class="i" viewBox="0 0 24 24"><path d="M10 13.5a4.5 4.5 0 0 0 6.4.4l2.6-2.6a4.5 4.5 0 0 0-6.4-6.4l-1.4 1.4"></path><path d="M14 10.5a4.5 4.5 0 0 0-6.4-.4L5 12.7a4.5 4.5 0 0 0 6.4 6.4l1.4-1.4"></path></svg></button>
+<button class="ib" aria-label="Upload images"><svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"></rect><circle cx="9" cy="10" r="1.8"></circle><path d="m20.5 16-4.5-4.5L7 19.5"></path></svg></button>
+<span class="cap" style="background: #F2EFE9; border-radius: 6px; padding: 4px 8px; margin: 0 4px;">Ctrl K</span>
+</label>
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+<span class="cap" style="margin-right: 4px;">search by colour</span>
+<button class="sw" style="background: #C9A67D;" aria-label="Oak"></button>
+<button class="sw" style="background: #80604A;" aria-label="Walnut"></button>
+<button class="sw" style="background: #E9E1D3;" aria-label="Bouclé"></button>
+<button class="sw" style="background: #7E9180;" aria-label="Sage"></button>
+<button class="sw" style="background: #C77B57;" aria-label="Terracotta"></button>
+<button class="sw" style="background: #2F332E;" aria-label="Charcoal"></button>
+<span style="width: 1px; height: 22px; background: #E4E0D7; margin: 0 8px;"></span>
+<label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700;"><input type="checkbox" checked="" style="width: 18px; height: 18px; accent-color: #3F5442; margin: 0;">Human-made only</label>
+<label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; margin-left: 12px;"><input type="checkbox" checked="" style="width: 18px; height: 18px; accent-color: #3F5442; margin: 0;">Credited only</label>
+</div>
+</section>
+
+<section aria-label="Continue" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px;">
+<a href="V2-Canvas.dc.html" style="grid-column: span 8; display: flex; flex-direction: column; gap: 14px;">
+<div style="display: grid; grid-template-columns: 1.7fr 1fr 1fr; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 4px; height: 340px; border-radius: 16px; overflow: hidden; position: relative;">
+<div class="cell" style="grid-row: span 2;"><img class="ph" style="object-position: 20% 80%;" src="img/room.svg" alt="Interior with a bouclé chair and plant"></div>
+<div class="cell"><img class="ph" style="object-position: 50% 70%;" src="img/lounge.svg" alt="Bouclé lounge chair"></div>
+<div class="cell"><img class="ph" src="img/boucle.svg" alt="Bouclé fabric close-up"></div>
+<div class="cell"><img class="ph" src="img/sketch.svg" alt="Pencil sketch of the chair"></div>
+<div class="cell"><img class="ph" src="img/oak.svg" alt="Oak grain"></div>
+<span class="chip" style="position: absolute; left: 14px; top: 14px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #4E6450;"></span>Continue</span>
+<span style="position: absolute; left: 14px; bottom: 14px; display: flex;"><span class="av" style="background: #CFC6EA;">AS</span><span class="av" style="background: #B9C4B3; margin-left: -8px;">RK</span></span>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
+<span class="fr" style="font-size: 30px;">Furniture Study</span>
+<span class="cap">34 items · edited 2 h ago</span>
+</div>
+</a>
+
+<aside aria-label="Today" style="grid-column: span 4; display: flex; flex-direction: column; gap: 16px;">
+<div style="background: #FFFFFF; border: 1px solid #ECE8E0; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;"><span class="fr" style="font-size: 22px;">Which chair base?</span><span class="cap">Lab</span></div>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="display: grid; grid-template-columns: 22px 1fr 40px; align-items: center; gap: 10px;"><span class="cap" style="color: #1E1F1C;">A</span><span style="height: 8px; border-radius: 4px; background: #F0ECE5; overflow: hidden;"><span style="display: block; width: 75%; height: 100%; background: #4E6450; border-radius: 4px;"></span></span><span class="cap" style="color: #1E1F1C; text-align: right;">3.75</span></div>
+<div style="display: grid; grid-template-columns: 22px 1fr 40px; align-items: center; gap: 10px;"><span class="cap" style="color: #1E1F1C;">B</span><span style="height: 8px; border-radius: 4px; background: #F0ECE5; overflow: hidden;"><span style="display: block; width: 74%; height: 100%; background: #9FB29F; border-radius: 4px;"></span></span><span class="cap" style="color: #1E1F1C; text-align: right;">3.70</span></div>
+<div style="display: grid; grid-template-columns: 22px 1fr 40px; align-items: center; gap: 10px;"><span class="cap" style="color: #1E1F1C;">C</span><span style="height: 8px; border-radius: 4px; background: #F0ECE5; overflow: hidden;"><span style="display: block; width: 67%; height: 100%; background: #D5D2CA; border-radius: 4px;"></span></span><span class="cap" style="color: #1E1F1C; text-align: right;">3.35</span></div>
+</div>
+<p style="margin: 0; font-size: 13px; font-weight: 600; line-height: 1.6; color: #5E605A;">Too close to call. A’s cost score is <span style="color: #8A4A28;">still a guess</span>.</p>
+<a class="pill" href="V2-Lab.dc.html" style="align-self: flex-start; height: 36px; font-size: 12px;">Open in Lab</a>
+</div>
+<div style="display: flex; flex-direction: column;">
+<span class="cap" style="padding-bottom: 6px;">today</span>
+<a href="V2-Share.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #EFEBE4;"><span class="av" style="width: 28px; height: 28px; background: #F3E6B5; border-color: #F3E6B5;">C</span><span style="flex: 1; font-size: 13px; font-weight: 600;">Client asked for a darker oak</span><span class="cap">10 m</span></a>
+<a href="Claims.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #EFEBE4;"><span class="av" style="width: 28px; height: 28px; background: #F6E7DE; border-color: #F6E7DE; color: #8A4A28;">!</span><span style="flex: 1; font-size: 13px; font-weight: 600;">2 claims still need a source</span><span class="cap">Lab</span></a>
+<a href="Class.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 0;"><span class="av" style="width: 28px; height: 28px; background: #E9E5F6; border-color: #E9E5F6;">304</span><span style="flex: 1; font-size: 13px; font-weight: 600;">Brief 3 due Friday</span><span class="cap">class</span></a>
+</div>
+</aside>
+</section>
+
+<section aria-label="Boards" style="display: flex; flex-direction: column; gap: 16px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;"><h2 class="fr" style="margin: 0; font-size: 26px;">All boards</h2><a class="cap" href="V2-Library.dc.html" style="color: #1E1F1C;">view all →</a></div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px;">
+<a class="bc" href="V2-Canvas.dc.html">
+<div class="m"><div><img class="ph" src="img/swatch.svg" alt=""></div><div><img class="ph" src="img/linen.svg" alt=""></div><div><img class="ph" src="img/walnut.svg" alt=""></div></div>
+<div class="pal" aria-hidden="true"><span style="background: #C77B57;"></span><span style="background: #B9C4B3;"></span><span style="background: #E7DCCB;"></span><span style="background: #80604A;"></span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline;"><span class="fr" style="font-size: 20px;">Material Exploration</span><span class="cap">21</span></div>
+</a>
+<a class="bc" href="V2-Canvas.dc.html">
+<div class="m"><div><img class="ph" src="img/tube.svg" alt=""></div><div><img class="ph" src="img/detail.svg" alt=""></div><div><img class="ph" src="img/ply.svg" alt=""></div></div>
+<div class="pal" aria-hidden="true"><span style="background: #9EA29C;"></span><span style="background: #3E3226;"></span><span style="background: #D9BE98;"></span><span style="background: #EDEAE3;"></span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline;"><span class="fr" style="font-size: 20px;">Gripper Concept</span><span class="cap">18</span></div>
+</a>
+<a class="bc" href="V2-Canvas.dc.html">
+<div class="m"><div><img class="ph" src="img/frp.svg" alt=""></div><div><img class="ph" src="img/shadow.svg" alt=""></div><div><img class="ph" src="img/boucle.svg" alt=""></div></div>
+<div class="pal" aria-hidden="true"><span style="background: #7E9180;"></span><span style="background: #E9ECE6;"></span><span style="background: #E2D6C6;"></span><span style="background: #EAE2D5;"></span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline;"><span class="fr" style="font-size: 20px;">Brand Direction</span><span class="cap">40</span></div>
+</a>
+<a class="bc" href="V2-Canvas.dc.html" aria-label="New board">
+<div style="height: 190px; border-radius: 12px; border: 1.5px dashed #D8D3C9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #5E605A;">
+<svg class="i" style="width: 26px; height: 26px;" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+<span style="font-size: 13px; font-weight: 700;">New board</span>
+<span class="cap">or start from a template</span>
+</div>
+
+</a>
+</div>
+</section>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1120}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

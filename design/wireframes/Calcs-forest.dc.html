@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daiku · Lab calcs, properties and BOM · dark B · forest night</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;family=Fraunces:ital,opsz,wght,SOFT@1,9..144,300..600,100&amp;display=swap">
+<style>
+body{margin:0;color-scheme:dark}
+a{color:#B6DFB9}a:hover{color:#EAF1EA}
+.fr{font-family:'Fraunces',serif;font-style:italic;font-variation-settings:'SOFT' 100;font-weight:400}
+.mono{font-family:'DM Mono',monospace}
+.lbl{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#B5C3B8}
+.meta{font-family:'DM Mono',monospace;font-size:11px;color:#9EAEA2}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.card{background:#17201A;border:1px solid #233029;border-radius:18px;box-sizing:border-box}
+.btn{font:inherit;font-size:13px;font-weight:600;border-radius:999px;padding:9px 16px;min-height:40px;box-sizing:border-box;border:1px solid #233029;background:#1D2720;color:#EAF1EA;display:inline-flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.btn.p{background:#A2D2A6;border-color:#A2D2A6;color:#0F1511}
+.seg{font:inherit;font-size:12px;font-weight:600;border:0;border-radius:8px;padding:8px 12px;background:transparent;color:#B5C3B8;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.seg.on{background:#1D2720;color:#EAF1EA}
+.nav{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:10px;color:#B5C3B8;text-decoration:none;font-size:13px;font-weight:500}
+.nav.on{background:#24302A;color:#EAF1EA;font-weight:700}
+.win{font:inherit;width:46px;height:40px;border:0;background:transparent;color:#EAF1EA;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px 4px 8px;font-family:'DM Mono',monospace;font-size:11px;color:#EAF1EA;white-space:nowrap}
+.tb{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.tb th{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:#B5C3B8;text-align:left;padding:10px 12px;border-bottom:1px solid #233029;white-space:nowrap}
+.tb td{padding:10px 12px;border-bottom:1px solid #24302A;font-weight:600;vertical-align:middle}
+.eq{font-family:'DM Mono',monospace;font-size:12px;line-height:1.8;color:#EAF1EA}
+.u{color:#B6DFB9}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 900px; box-sizing: border-box; background: #0F1511; color: #EAF1EA; font-family: 'Comfortaa', sans-serif; display: flex; flex-direction: column;">
+
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-left: 14px; min-height: 40px; border-bottom: 1px solid #233029;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<svg width="18" height="17" viewBox="16 18 176 164" aria-hidden="true"><g fill="#A2D2A6"><path d="M110 96C94 80 60 78 42 92C24 106 20 140 36 156C50 170 84 174 110 156L110 147C88 162 64 160 54 147C44 134 44 110 57 99C70 88 92 89 110 104Z"></path><path d="M105 172C105 124 105 84 107 58C109 38 101 25 84 22C102 26 120 32 120 60C120 92 120 132 121 168C123 172 127 173 130 172C122 177 110 177 105 172Z"></path><path d="M119 112C130 92 152 72 186 60C182 88 166 108 140 118C146 124 152 140 162 158C168 168 176 171 186 169C174 177 156 176 148 166C140 154 132 140 119 134Z"></path></g></svg>
+<span style="font-size: 12px; font-weight: 500; color: #B5C3B8;">daiku.  /  Furniture Study  /  Lab  /  Properties &amp; BOM</span>
+</div>
+<label style="flex: 0 1 420px; display: flex; align-items: center; gap: 8px; background: #1D2720; border: 1px solid #233029; border-radius: 8px; padding: 0 10px; height: 30px; box-sizing: border-box;">
+<svg class="i" style="width: 15px; height: 15px; color: #B5C3B8;" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+<input aria-label="Search or run a command" placeholder="Search, jump, or run a command…" style="border: 0; outline: 0; background: transparent; font: inherit; font-size: 12px; flex: 1; min-width: 0; color: #EAF1EA;">
+<span class="mono" style="font-size: 11px; background: #24302A; color: #B5C3B8; border-radius: 5px; padding: 1px 6px;">Ctrl K</span>
+</label>
+<div style="display: flex; align-items: center;">
+<span style="display: flex; align-items: center; gap: 6px; padding: 0 14px; color: #B6DFB9;"><svg class="i" style="width: 16px; height: 16px;" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 1 0 6 18.9"></path><path d="m9 15 2 2 4-4"></path></svg><span class="mono" style="font-size: 11px;">Local · saved</span></span>
+<button class="win" aria-label="Minimize"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M5 12h14"></path></svg></button>
+<button class="win" aria-label="Maximize"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"></rect></svg></button>
+<button class="win" aria-label="Close"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; flex: 1;">
+
+<nav aria-label="Main" style="flex: 1 0 232px; max-width: 232px; box-sizing: border-box; padding: 18px 14px; background: #17201A; border-right: 1px solid #233029; display: flex; flex-direction: column; gap: 2px;">
+<div style="display: flex; align-items: center; gap: 8px; padding: 0 8px 16px;">
+<svg width="30" height="28" viewBox="16 18 176 164" aria-hidden="true"><g fill="#A2D2A6"><path d="M110 96C94 80 60 78 42 92C24 106 20 140 36 156C50 170 84 174 110 156L110 147C88 162 64 160 54 147C44 134 44 110 57 99C70 88 92 89 110 104Z"></path><path d="M105 172C105 124 105 84 107 58C109 38 101 25 84 22C102 26 120 32 120 60C120 92 120 132 121 168C123 172 127 173 130 172C122 177 110 177 105 172Z"></path><path d="M119 112C130 92 152 72 186 60C182 88 166 108 140 118C146 124 152 140 162 158C168 168 176 171 186 169C174 177 156 176 148 166C140 154 132 140 119 134Z"></path></g></svg>
+<span class="fr" style="font-size: 28px;">daiku.</span>
+</div>
+<a class="nav" href="#"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>Studio</a>
+<a class="nav" href="Canvas-forest.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M9 21V9"></path></svg>Canvas</a>
+<a class="nav" href="Library-forest.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"></path><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg>Library</a>
+<a class="nav" href="Explore-forest.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>Explore</a>
+<a class="nav" href="Threads-forest.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="2.5"></circle><circle cx="18" cy="8" r="2.5"></circle><circle cx="10" cy="18" r="2.5"></circle><path d="M8.4 6.3l7.1 1.4M6.8 8.4l2.4 7.2M16.6 10.1l-4.9 6"></path></svg>Threads</a>
+<a class="nav on" href="Lab-forest.dc.html" aria-current="page"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"></path><path d="M7 15h10"></path></svg>Lab</a>
+<a class="nav" href="Present-forest.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m10 8.5 5 3.5-5 3.5z"></path></svg>Present</a>
+<span class="lbl" style="padding: 20px 12px 6px;">Spaces</span>
+<a class="nav" href="#"><span style="width: 10px; height: 10px; border-radius: 3px; background: #47634D;"></span>Personal</a>
+<a class="nav" href="Class-forest.dc.html"><span style="width: 10px; height: 10px; border-radius: 3px; background: #5A5284;"></span>ME-304 Studio<span class="meta" style="margin-left: auto;">class</span></a>
+<a class="nav" href="#"><span style="width: 10px; height: 10px; border-radius: 3px; background: #E9D9A2; color: #26241C;"></span>Robotics Club<span class="meta" style="margin-left: auto;">team</span></a>
+<div style="flex: 1;"></div>
+<div style="display: flex; align-items: center; gap: 10px; background: #0F1511; border-radius: 12px; padding: 10px;">
+<span class="mono" style="width: 32px; height: 32px; border-radius: 50%; background: #5A5284; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">AS</span>
+<span style="display: flex; flex-direction: column;"><span style="font-size: 13px; font-weight: 700;">Aarav S.</span><span class="meta">student · free</span></span>
+</div>
+</nav>
+
+<main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 18px; padding: 24px 28px; box-sizing: border-box;">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+<div>
+<span class="lbl">Furniture Study › Chair base</span>
+<h1 class="fr" style="margin: 2px 0 0; font-size: 44px; line-height: 1.05;">Properties &amp; BOM</h1>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+<span class="badge" style="background: #24302A;">sample data</span>
+<nav aria-label="Lab views" style="display: flex; gap: 2px; background: #24302A; border-radius: 10px; padding: 3px; flex-wrap: wrap;">
+<a class="seg" href="Requirements-forest.dc.html">Requirements</a><a class="seg" href="Lab-forest.dc.html">Decision matrix</a><a class="seg" href="Simulation-forest.dc.html">Simulate</a><a class="seg on" href="Calcs-forest.dc.html" aria-current="page">Properties &amp; BOM</a>
+</nav>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+<div role="group" aria-label="Concept" style="display: flex; gap: 2px; background: #24302A; border-radius: 10px; padding: 3px;">
+<button class="seg on" aria-pressed="true">A · Oak ply</button><button class="seg" aria-pressed="false">B · FRP</button><button class="seg" aria-pressed="false">C · Steel</button>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap;">
+<span class="badge" style="background: #33231B; color: #F6C1A5;">mass 7.15 kg · R2 limit 7.00 ✗</span>
+<span class="badge" style="background: #1B2E21;">renewable 51% · R6 ✓</span>
+</div>
+</div>
+
+<section class="card" aria-label="Bill of materials, Concept A" style="padding: 8px 8px 4px; overflow-x: auto;">
+<table class="tb">
+<thead><tr><th scope="col">Part</th><th scope="col">Material</th><th scope="col">Qty / size</th><th scope="col">Mass</th><th scope="col">Unit cost</th><th scope="col">Basis</th></tr></thead>
+<tbody>
+<tr><td>Seat shell</td><td>Oak ply 12 mm</td><td class="mono" style="font-weight: 400;">0.45 m²</td><td class="mono" style="font-weight: 400;">3.67 kg</td><td class="mono" style="font-weight: 400; color: #9EAEA2;">₹[quote]</td><td><span class="badge" style="background: #1B2E21;">calc C1</span></td></tr>
+<tr><td>Upholstery</td><td>Bouclé + foam</td><td class="mono" style="font-weight: 400;">1 set</td><td class="mono" style="font-weight: 400;">0.90 kg</td><td class="mono" style="font-weight: 400; color: #9EAEA2;">₹[quote]</td><td><span class="badge" style="background: #1B2E21;">supplier spec</span></td></tr>
+<tr><td>Base</td><td>Steel tube Ø22 × 1.5</td><td class="mono" style="font-weight: 400;">3.2 m</td><td class="mono" style="font-weight: 400;">2.43 kg</td><td class="mono" style="font-weight: 400; color: #9EAEA2;">₹[quote]</td><td><span class="badge" style="background: #1B2E21;">calc C2</span></td></tr>
+<tr><td>Glides + fasteners</td><td>Mixed</td><td class="mono" style="font-weight: 400;">1 set</td><td class="mono" style="font-weight: 400;">0.15 kg</td><td class="mono" style="font-weight: 400; color: #9EAEA2;">₹[quote]</td><td><span class="badge" style="background: #24302A;"><span style="width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid #F0AE8C; box-sizing: border-box; display: inline-block;"></span>estimate</span></td></tr>
+<tr><td style="border-bottom: 0; font-size: 14px;">Total</td><td style="border-bottom: 0;"></td><td style="border-bottom: 0;"></td><td class="mono" style="border-bottom: 0; font-size: 15px; color: #F6C1A5;">7.15 kg</td><td class="mono" style="border-bottom: 0; font-weight: 400; color: #9EAEA2;">₹[sum] · needs quotes</td><td style="border-bottom: 0;"><a href="CAD-forest.dc.html" style="font-size: 12px;">matches CAD mass</a></td></tr>
+</tbody>
+</table>
+</section>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
+<section class="card" aria-label="Calc C1: shell mass" style="padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+<span class="lbl">C1 · shell mass</span>
+<div class="eq">m = A · t · ρ<br>= 0.45 <span class="u">m²</span> × 12 <span class="u">mm</span> × 680 <span class="u">kg/m³</span><br>= 0.45 × 0.012 × 680<br><strong>= 3.67 kg</strong></div>
+<span class="meta">units checked · ρ from Properties</span>
+</section>
+<section class="card" aria-label="Calc C2: tube mass" style="padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+<span class="lbl">C2 · base tube mass</span>
+<div class="eq">A = π/4 · (D² − d²)<br>= π/4 · (22² − 19²) <span class="u">mm²</span> = 96.6 <span class="u">mm²</span><br>m = A · L · ρ = 96.6 <span class="u">mm²</span> × 3.2 <span class="u">m</span> × 7850 <span class="u">kg/m³</span><br><strong>= 2.43 kg</strong></div>
+<span class="meta">units checked · ρ standard value</span>
+</section>
+<section aria-label="What-if: thinner shell" style="background: #1B2E21; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+<span class="lbl" style="color: #C9EBCC;">What-if · t = 10 mm</span>
+<div class="eq">shell = 0.45 × 0.010 × 680 = 3.06 kg<br>total = 3.06 + 0.90 + 2.43 + 0.15<br><strong>= 6.54 kg · R2 ✓</strong></div>
+<a class="btn" href="Simulation-forest.dc.html" style="min-height: 34px; padding: 5px 12px; font-size: 12px; align-self: flex-start;">Strength needs Run 04</a>
+</section>
+</div>
+</main>
+
+<aside aria-label="Material properties" style="flex: 1 0 300px; max-width: 340px; box-sizing: border-box; background: #17201A; border-left: 1px solid #233029; padding: 22px 20px; display: flex; flex-direction: column; gap: 16px;">
+<div>
+<span class="lbl">Properties</span>
+<h2 class="fr" style="margin: 4px 0 2px; font-size: 28px;">Materials in this study</h2>
+<span class="meta">every value carries its source</span>
+</div>
+<div style="background: #1D2720; border: 1px solid #233029; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+<span style="font-size: 13px; font-weight: 700;">Oak ply</span>
+<div style="display: flex; justify-content: space-between;"><span class="meta">density</span><span class="mono" style="font-size: 12px;">680 kg/m³</span></div>
+<div style="display: flex; justify-content: space-between;"><span class="meta">allowable stress</span><span class="mono" style="font-size: 12px;">40 MPa</span></div>
+<span class="badge" style="background: #1B2E21; align-self: flex-start;">supplier datasheet</span>
+</div>
+<div style="background: #1D2720; border: 1px solid #233029; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+<span style="font-size: 13px; font-weight: 700;">Structural steel tube</span>
+<div style="display: flex; justify-content: space-between;"><span class="meta">density</span><span class="mono" style="font-size: 12px;">7850 kg/m³</span></div>
+<div style="display: flex; justify-content: space-between;"><span class="meta">yield</span><span class="mono" style="font-size: 12px;">250 MPa</span></div>
+<span class="badge" style="background: #1B2E21; align-self: flex-start;">grade [spec] · standard values</span>
+</div>
+<div style="background: #1D2720; border: 1px solid #233029; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
+<span style="font-size: 13px; font-weight: 700;">FRP laminate</span>
+<div style="display: flex; justify-content: space-between;"><span class="meta">density</span><span class="mono" style="font-size: 12px; color: #9EAEA2;">[datasheet]</span></div>
+<div style="display: flex; justify-content: space-between;"><span class="meta">allowable stress</span><span class="mono" style="font-size: 12px;">110 MPa</span></div>
+<span class="badge" style="background: #E9D9A2; align-self: flex-start; color: #26241C;">density missing → B has no BOM</span>
+</div>
+<div style="flex: 1;"></div>
+<div style="display: flex; flex-direction: column; gap: 8px; background: #0F1511; border-radius: 14px; padding: 14px;">
+<span class="lbl">Material library</span>
+<span style="font-size: 12px; font-weight: 500; line-height: 1.55; color: #B5C3B8;">Open reference data plus your own datasheets. No paid lookups.</span>
+<div style="display: flex; gap: 8px; flex-wrap: wrap;"><button class="btn p">+ Material</button><button class="btn">Attach datasheet</button></div>
+</div>
+</aside>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

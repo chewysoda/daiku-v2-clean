@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daiku v2 · Client share</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;family=Fraunces:ital,opsz,wght,SOFT@1,9..144,300..600,100&amp;display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+.fr{font-family:'Fraunces',serif;font-style:italic;font-variation-settings:'SOFT' 100,'opsz' 144;font-weight:380}
+.cap{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.02em;color:#6B6D65}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.pill{font:inherit;font-size:13px;font-weight:700;border-radius:999px;padding:0 18px;height:40px;box-sizing:border-box;border:1px solid #E4E0D7;background:#FFFFFF;color:#1E1F1C;display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 1px 2px rgba(30,31,28,.05)}
+.pill.ink{background:#1E1F1C;border-color:#1E1F1C;color:#FBFAF7}
+.av{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;color:#1E1F1C;flex:none}
+.fx{position:relative;border-radius:14px;overflow:hidden;background:#EDE8DF}
+.fx img{display:block;width:100%;height:100%;object-fit:cover}
+.pin{position:absolute;width:30px;height:30px;border-radius:50% 50% 50% 4px;background:#1E1F1C;color:#FBFAF7;font-family:'DM Mono',monospace;font-size:11px;display:flex;align-items:center;justify-content:center;border:2px solid #FFFFFF;box-sizing:border-box;cursor:pointer;box-shadow:0 6px 14px -6px rgba(30,31,28,.6)}
+.cm{background:#FFFFFF;border:1px solid #ECE8E0;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 900px; box-sizing: border-box; background: #FBFAF7; color: #1E1F1C; font-family: 'Comfortaa', sans-serif; display: flex; flex-direction: column;">
+
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 18px 48px; border-bottom: 1px solid #EFEBE4;">
+<a href="V2-Home.dc.html" style="display: flex; align-items: center; gap: 10px;" aria-label="daiku">
+<svg width="24" height="23" viewBox="16 18 176 164" aria-hidden="true"><g fill="#4E6450"><path d="M110 96C94 80 60 78 42 92C24 106 20 140 36 156C50 170 84 174 110 156L110 147C88 162 64 160 54 147C44 134 44 110 57 99C70 88 92 89 110 104Z"></path><path d="M105 172C105 124 105 84 107 58C109 38 101 25 84 22C102 26 120 32 120 60C120 92 120 132 121 168C123 172 127 173 130 172C122 177 110 177 105 172Z"></path><path d="M119 112C130 92 152 72 186 60C182 88 166 108 140 118C146 124 152 140 162 158C168 168 176 171 186 169C174 177 156 176 148 166C140 154 132 140 119 134Z"></path></g></svg>
+<span class="fr" style="font-size: 22px;">daiku.</span>
+<span class="cap" style="margin-left: 10px; background: #F2EFE9; border-radius: 999px; padding: 5px 10px;">view only · no account needed</span>
+</a>
+<div style="display: flex; align-items: center; gap: 8px;">
+<button class="pill"><svg class="i" style="width: 18px; height: 18px;" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"></path></svg>PDF</button>
+<button class="pill ink"><svg class="i" style="width: 18px; height: 18px;" viewBox="0 0 24 24"><path d="M20 14.5a2 2 0 0 1-2 2H8l-4 3.5V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"></path></svg>Comment</button>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; gap: 40px; padding: 30px 48px 40px; flex: 1;">
+<main style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 24px;">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<span class="cap">for [client] · from Aarav S. · 2 November</span>
+<h1 class="fr" style="margin: 0; font-size: 64px; line-height: 0.98; letter-spacing: -0.015em;">A softer reading chair</h1>
+</div>
+<span class="cap">1 of 3 · concept</span>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: 230px 160px; gap: 14px;">
+<figure style="margin: 0; grid-column: span 7; grid-row: span 2; position: relative;">
+<div class="fx" style="height: 100%;"><img src="img/room.svg" style="object-position: 25% 80%;" alt="Reading corner with the bouclé chair"></div>
+<button class="pin" style="left: 34%; top: 50%;" aria-label="Comment 1">1</button>
+</figure>
+<figure style="margin: 0; grid-column: span 3; position: relative;"><div class="fx" style="height: 100%;"><img src="img/lounge.svg" style="object-position: 50% 68%;" alt="Bouclé lounge chair"></div></figure>
+<figure style="margin: 0; grid-column: span 2; position: relative;"><div class="fx" style="height: 100%;"><img src="img/boucle.svg" alt="Bouclé fabric"></div></figure>
+<figure style="margin: 0; grid-column: span 2; position: relative;"><div class="fx" style="height: 100%;"><img src="img/oak.svg" alt="Oak"></div><button class="pin" style="right: 10px; top: 10px;" aria-label="Comment 2">2</button></figure>
+<figure style="margin: 0; grid-column: span 3; position: relative;"><div class="fx" style="height: 100%;"><img src="img/sketch.svg" style="object-position: 50% 55%;" alt="Sketch of the shell"></div></figure>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px; align-items: start;">
+<p class="fr" style="grid-column: span 5; margin: 0; font-size: 30px; line-height: 1.18;">Soft forms, honest materials.</p>
+<div style="grid-column: span 7; display: flex; flex-direction: column; gap: 14px;">
+<p style="margin: 0; font-size: 15px; font-weight: 600; line-height: 1.7; color: #3E403B;">A rounded oak ply shell, softened with bouclé where you sit. We’re confirming one cost figure before the final pick, and you’ll see it here when it lands.</p>
+<div style="display: flex; gap: 10px; align-items: center;">
+<span style="width: 26px; height: 26px; border-radius: 50%; background: #E9E1D3; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);"></span>
+<span style="width: 26px; height: 26px; border-radius: 50%; background: #C9A67D;"></span>
+<span style="width: 26px; height: 26px; border-radius: 50%; background: #7E9180;"></span>
+<span style="width: 26px; height: 26px; border-radius: 50%; background: #B86E4B;"></span>
+<span class="cap" style="margin-left: 6px;">palette</span>
+</div>
+</div>
+</div>
+
+<nav aria-label="Pages" style="display: flex; align-items: center; gap: 10px; border-top: 1px solid #EFEBE4; padding-top: 18px; margin-top: auto;">
+<a href="#" style="display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; background: #FFFFFF; border: 1px solid #1E1F1C;"><span style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden;"><img src="img/room.svg" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block;"></span><span style="font-size: 13px; font-weight: 700;">Concept</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E4E0D7;"><span style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden;"><img src="img/swatch.svg" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block;"></span><span style="font-size: 13px; font-weight: 700; color: #5E605A;">Materials</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E4E0D7;"><span style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden;"><img src="img/sketch.svg" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block;"></span><span style="font-size: 13px; font-weight: 700; color: #5E605A;">Next steps</span></a>
+<span style="flex: 1;"></span>
+<a class="pill" href="#">Next<svg class="i" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</nav>
+</main>
+
+<aside aria-label="Comments" style="flex: 1 0 300px; max-width: 360px; display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;"><span class="fr" style="font-size: 22px;">Comments</span><span class="cap">2 open</span></div>
+<div class="cm" style="border-color: #D9D3EF; box-shadow: 0 10px 26px -18px rgba(30,31,28,.35);">
+<div style="display: flex; align-items: center; gap: 10px;"><span class="pin" style="position: static; width: 24px; height: 24px; font-size: 10px; box-shadow: none;">1</span><span class="av" style="background: #F3E6B5;">C</span><span style="display: flex; flex-direction: column;"><span style="font-size: 13px; font-weight: 700;">[Client]</span><span class="cap">guest · 10 m</span></span></div>
+<p style="margin: 0; font-size: 14px; font-weight: 600; line-height: 1.6;">Love this shape. Could we see it in a darker oak?</p>
+<div style="display: flex; gap: 10px; padding: 10px 0 0 12px; border-top: 1px solid #F1EDE6;">
+<span class="av" style="width: 26px; height: 26px; background: #CFC6EA;">AS</span>
+<span style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 13px; font-weight: 700;">Aarav <span class="cap" style="font-weight: 400;">2 m</span></span><span style="font-size: 13px; font-weight: 600; line-height: 1.6; color: #3E403B;">Yes, walnut-stained options tomorrow.</span></span>
+</div>
+</div>
+<div class="cm">
+<div style="display: flex; align-items: center; gap: 10px;"><span class="pin" style="position: static; width: 24px; height: 24px; font-size: 10px; box-shadow: none;">2</span><span class="av" style="background: #F3E6B5;">C</span><span style="display: flex; flex-direction: column;"><span style="font-size: 13px; font-weight: 700;">[Client]</span><span class="cap">guest · 6 m</span></span></div>
+<p style="margin: 0; font-size: 14px; font-weight: 600; line-height: 1.6;">Is this the actual finish or a reference?</p>
+</div>
+<label style="display: flex; flex-direction: column; gap: 8px;">
+<span class="cap">reply as a guest</span>
+<textarea rows="3" placeholder="Write a comment…" style="font: inherit; font-size: 14px; font-weight: 600; border: 1px solid #E4E0D7; border-radius: 14px; background: #FFFFFF; padding: 12px 14px; resize: vertical; color: #1E1F1C;"></textarea>
+</label>
+<div style="flex: 1;"></div>
+<details style="font-size: 12px; font-weight: 700; border-top: 1px solid #EFEBE4; padding-top: 12px;"><summary style="cursor: pointer;">Image credits · 6</summary><p class="cap" style="line-height: 1.9; margin: 8px 0 0;">Reading corner © [studio], via [site]<br>Lounge chair © [maker], via [site]<br>Bouclé © [mill] · Oak © [mill]<br>Sketch · Aarav S.</p></details>
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+.threads-wrap { flex: 1; display: flex; min-width: 0; min-height: 0; }
+.threads { gap: 16px; overflow: hidden; }
+.threads-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.threads-filter { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 999px; color: var(--c-text-muted); }
+.threads-filter input { border: 0; outline: 0; background: transparent; font-size: 13px; width: 120px; color: var(--c-text); }
+.depth { width: 130px; height: 32px; }
+.graph-stage { position: relative; flex: 1; min-height: 0; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 18px; overflow: hidden; }
+.graph-fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+/* Transparent, so the pulses and halos on the canvas beneath show through. */
+.graph { position: absolute; inset: 0; }
+.thread-panel { flex: 0 0 300px; overflow-y: auto; border-left: 1px solid var(--c-hairline); padding: 26px 20px; display: flex; flex-direction: column; gap: 12px; }
+.thread-panel h2 { font-size: 28px; line-height: 1.15; }
+.thread-open { align-self: flex-start; }
+.thread-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.thread-list button { width: 100%; border: 0; background: transparent; cursor: pointer; display: flex; justify-content: space-between; gap: 10px; padding: 9px 0; text-align: left; border-bottom: 1px solid var(--c-hairline); font-size: 13px; }
+.thread-list b { font-weight: 600; min-width: 0; }
+.thread-list .cap { flex: none; }
+.threads-spacing input { width: 84px; height: 18px; accent-color: var(--c-accent-strong); }
+.order { width: 178px; height: 32px; }

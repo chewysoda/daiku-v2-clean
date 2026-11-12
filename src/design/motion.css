@@ -1,0 +1,164 @@
+/*
+ * How the app moves. Keep to three rules:
+ * - Only opacity, colour, `translate` and `scale`. They stay smooth and never reflow the page.
+ * - `translate` and `scale`, not `transform`. They add to a transform an element already has, such
+ *   as the toast's and the canvas toolbar's translateX(-50%), instead of replacing it.
+ * - Nothing that measures itself gets shifted. The Explore pane copies its slot's position, and
+ *   Threads and the canvas read pointer positions, so those screens fade without moving.
+ */
+:root {
+  /* One ease for every UI step, no overshoot. Hover in 140ms, out 200ms, press 90ms. */
+  --m-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --m-in: 140ms;
+  --m-out: 200ms;
+  --m-press: 90ms;
+  --m-image: 600ms;
+  --ease-out: var(--m-ease);
+  --ease-pop: var(--m-ease);
+  --dur-fast: var(--m-in);
+  --dur: var(--m-out);
+  --dur-slow: 320ms;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+@keyframes rise-in {
+  from { opacity: 0; translate: 0 10px; }
+}
+@keyframes pop-in {
+  from { opacity: 0; translate: 0 6px; }
+}
+@keyframes drop-in {
+  from { opacity: 0; translate: 0 -6px; }
+}
+@keyframes bar-grow {
+  from { scale: 0 1; }
+}
+
+/* Controls: hover and press ease rather than snap. */
+.pill, .ib, .seg, .sw, .tb, .ctx, .win-btn, .chip-toggle, .rail a, .palette-row, .score-btn, .concept-add,
+.board-new, .inline-input, .toast-x, .thread-list button, .link-btn {
+  transition:
+    background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
+    color var(--dur-fast) ease,
+    box-shadow var(--dur) ease,
+    opacity var(--dur-fast) ease,
+    translate var(--dur) var(--ease-out),
+    scale var(--dur) var(--ease-out);
+}
+.field {
+  transition:
+    border-color var(--dur-fast) ease,
+    box-shadow var(--dur) ease;
+}
+.field:focus {
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 3px var(--c-accent-tint);
+}
+.ck, .concept-edit, .row-x button, .cm-x {
+  transition: opacity var(--dur-fast) ease;
+}
+/* Buttons step up 1px on hover and sink 1px below rest on press. */
+@media (hover: hover) and (pointer: fine) {
+  .pill:hover:not(:disabled) { translate: 0 -1px; }
+}
+.pill:active:not(:disabled), .board-new:active {
+  translate: 0 1px;
+  scale: 0.985;
+  transition-duration: var(--m-press);
+}
+.seg:active:not(:disabled), .chip-toggle:active, .ib:active:not(:disabled), .tb:active, .ctx:active:not(:disabled), .rail a:active, .sw:active {
+  scale: 0.985;
+  transition-duration: var(--m-press);
+}
+
+/* Cards lift on hover, and the picture inside leans in a little. */
+.board-mosaic, .lib-im-btn {
+  transition:
+    translate var(--dur) var(--ease-out),
+    box-shadow var(--dur) ease;
+}
+.board-mosaic .ph, .lib-im-btn .ph {
+  transition:
+    scale var(--m-image) var(--m-ease),
+    opacity var(--dur-slow) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .board-card:hover .board-mosaic, .lib-im:hover .lib-im-btn {
+    translate: 0 -2px;
+    box-shadow: 0 12px 24px -12px rgba(30, 31, 28, 0.1);
+  }
+  .board-card:hover .ph, .lib-im:hover .ph { scale: 1.03; }
+}
+
+/* Pictures fade in once they've loaded, rather than popping in part-way down the page. */
+.fade-img { opacity: 0; transition: opacity var(--dur-slow) ease; }
+.fade-img.loaded { opacity: 1; }
+/* The canvas drops off-screen pictures and re-adds them, so a fade there would flicker when panning. */
+.canvas .fade-img { opacity: 1; transition: none; }
+
+/* Screens swap with a short fade, and nothing on them moves in: content is in place on the first frame. */
+.route-view { flex: 1; display: flex; min-width: 0; min-height: 0; }
+.route-view > * { animation: fade-in var(--m-in) ease backwards; }
+
+/* A measure changes width when its value does, but doesn't grow in on arrival. */
+.bar span { transition: width var(--dur-slow) var(--m-ease); }
+
+/* Overlays */
+.scrim { animation: fade-in var(--dur) ease; }
+.dialog, .palette { animation: pop-in var(--m-out) var(--m-ease); }
+.popover { animation: pop-in var(--m-in) var(--m-ease); }
+.ctx-bar { animation: fade-in var(--dur-fast) ease; }
+.toast { animation: drop-in var(--m-out) var(--m-ease); }
+.toast.leaving {
+  opacity: 0;
+  translate: 0 -10px;
+  transition:
+    opacity 180ms ease,
+    translate 180ms ease;
+}
+
+/* The rail's marker slides to the screen you're on. */
+.rail { position: relative; }
+.rail a.active::before { content: none; }
+.rail-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 20px;
+  border-radius: 2px;
+  background: var(--c-accent);
+  pointer-events: none;
+  transition:
+    translate var(--dur-slow) var(--ease-out),
+    opacity var(--dur) ease;
+}
+
+:root[data-motion="off"] *, :root[data-motion="off"] *::before, :root[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0s !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0s !important;
+}
+
+/*
+ * The opening greeting is left out: it follows Daiku's own Opening greeting and Animations settings instead
+ * (and the data-motion="off" rule above still stops it). Shortening its transitions here also made every
+ * property briefly transition, so measurements taken mid-change (like the greeting's letters) read stale values.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :not(.hello, .hello *), :not(.hello *)::before, :not(.hello *)::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+@media print {
+  .fade-img { opacity: 1 !important; }
+  *, *::before, *::after { animation: none !important; }
+}

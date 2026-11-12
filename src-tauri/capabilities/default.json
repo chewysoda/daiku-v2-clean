@@ -1,0 +1,27 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Main app view only. The Explore browser pane has no capability and cannot call Tauri.",
+  "webviews": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "core:window:allow-set-size",
+    "core:webview:allow-set-webview-zoom",
+    "core:window:allow-center",
+    "core:window:allow-minimize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-close",
+    "core:window:allow-destroy",
+    "core:window:allow-start-dragging",
+    "opener:default",
+    "sql:default",
+    "sql:allow-execute",
+    "dialog:default",
+    "fs:allow-write-text-file",
+    "fs:allow-write-file",
+    "clipboard-manager:allow-write-text",
+    "updater:default"
+  ]
+}

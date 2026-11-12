@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daiku · Explore discover</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;family=Fraunces:ital,opsz,wght,SOFT@1,9..144,300..600,100&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#465948}a:hover{color:#2B2E2A}
+.fr{font-family:'Fraunces',serif;font-style:italic;font-variation-settings:'SOFT' 100;font-weight:400}
+.mono{font-family:'DM Mono',monospace}
+.lbl{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#5E625B}
+.meta{font-family:'DM Mono',monospace;font-size:11px;color:#666A62}
+.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.card{background:#FCFAF6;border:1px solid #E4DED4;border-radius:16px;box-sizing:border-box}
+.btn{font:inherit;font-size:13px;font-weight:600;border-radius:999px;padding:9px 16px;min-height:40px;box-sizing:border-box;border:1px solid #E4DED4;background:#FFFFFF;color:#2B2E2A;display:inline-flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.btn.p{background:#5A6F5C;border-color:#5A6F5C;color:#F7F4EE}
+.btn.s{min-height:34px;padding:5px 12px;font-size:12px}
+.seg{font:inherit;font-size:12px;font-weight:600;border:0;border-radius:8px;padding:8px 12px;background:transparent;color:#5E625B;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.seg.on{background:#FFFFFF;color:#2B2E2A}
+.chip{font:inherit;font-size:12px;font-weight:600;border-radius:999px;padding:7px 12px;background:#EFE8DF;color:#5E625B;border:0;cursor:pointer}
+.chip.on{background:#2B2E2A;color:#F7F4EE}
+.nav{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:10px;color:#5E625B;text-decoration:none;font-size:13px;font-weight:500}
+.nav.on{background:#EFE8DF;color:#2B2E2A;font-weight:700}
+.win{font:inherit;width:46px;height:40px;border:0;background:transparent;color:#2B2E2A;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 9px;font-family:'DM Mono',monospace;font-size:11px;color:#2B2E2A;white-space:nowrap}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 900px; box-sizing: border-box; background: #F7F4EE; color: #2B2E2A; font-family: 'Comfortaa', sans-serif; display: flex; flex-direction: column;">
+
+<header style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-left: 14px; min-height: 40px; border-bottom: 1px solid #E4DED4;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<svg width="18" height="17" viewBox="16 18 176 164" aria-hidden="true"><g fill="#5A6F5C"><path d="M110 96C94 80 60 78 42 92C24 106 20 140 36 156C50 170 84 174 110 156L110 147C88 162 64 160 54 147C44 134 44 110 57 99C70 88 92 89 110 104Z"></path><path d="M105 172C105 124 105 84 107 58C109 38 101 25 84 22C102 26 120 32 120 60C120 92 120 132 121 168C123 172 127 173 130 172C122 177 110 177 105 172Z"></path><path d="M119 112C130 92 152 72 186 60C182 88 166 108 140 118C146 124 152 140 162 158C168 168 176 171 186 169C174 177 156 176 148 166C140 154 132 140 119 134Z"></path></g></svg>
+<span style="font-size: 12px; font-weight: 500; color: #5E625B;">daiku.  /  Furniture Study  /  Explore</span>
+</div>
+<label style="flex: 0 1 420px; display: flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1px solid #E4DED4; border-radius: 8px; padding: 0 10px; height: 30px; box-sizing: border-box;">
+<svg class="i" style="width: 15px; height: 15px; color: #5E625B;" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+<input aria-label="Search or run a command" placeholder="Search, jump, or run a command…" style="border: 0; outline: 0; background: transparent; font: inherit; font-size: 12px; flex: 1; min-width: 0; color: #2B2E2A;">
+<span class="mono" style="font-size: 11px; background: #EFE8DF; color: #5E625B; border-radius: 5px; padding: 1px 6px;">Ctrl K</span>
+</label>
+<div style="display: flex; align-items: center;">
+<span style="display: flex; align-items: center; gap: 6px; padding: 0 14px; color: #465948;"><svg class="i" style="width: 16px; height: 16px;" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 1 0 6 18.9"></path><path d="m9 15 2 2 4-4"></path></svg><span class="mono" style="font-size: 11px;">Local · saved</span></span>
+<button class="win" aria-label="Minimize"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M5 12h14"></path></svg></button>
+<button class="win" aria-label="Maximize"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"></rect></svg></button>
+<button class="win" aria-label="Close"><svg class="i" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; flex: 1;">
+
+<nav aria-label="Main" style="flex: 1 0 232px; max-width: 232px; box-sizing: border-box; padding: 18px 14px; background: #FCFAF6; border-right: 1px solid #E4DED4; display: flex; flex-direction: column; gap: 2px;">
+<div style="display: flex; align-items: center; gap: 8px; padding: 0 8px 16px;">
+<svg width="30" height="28" viewBox="16 18 176 164" aria-hidden="true"><g fill="#5A6F5C"><path d="M110 96C94 80 60 78 42 92C24 106 20 140 36 156C50 170 84 174 110 156L110 147C88 162 64 160 54 147C44 134 44 110 57 99C70 88 92 89 110 104Z"></path><path d="M105 172C105 124 105 84 107 58C109 38 101 25 84 22C102 26 120 32 120 60C120 92 120 132 121 168C123 172 127 173 130 172C122 177 110 177 105 172Z"></path><path d="M119 112C130 92 152 72 186 60C182 88 166 108 140 118C146 124 152 140 162 158C168 168 176 171 186 169C174 177 156 176 148 166C140 154 132 140 119 134Z"></path></g></svg>
+<span class="fr" style="font-size: 28px;">daiku.</span>
+</div>
+<a class="nav" href="#"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>Studio</a>
+<a class="nav" href="Canvas.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M9 21V9"></path></svg>Canvas</a>
+<a class="nav" href="Library.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"></path><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg>Library</a>
+<a class="nav on" href="Explore.dc.html" aria-current="page"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>Explore</a>
+<a class="nav" href="Threads.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="2.5"></circle><circle cx="18" cy="8" r="2.5"></circle><circle cx="10" cy="18" r="2.5"></circle><path d="M8.4 6.3l7.1 1.4M6.8 8.4l2.4 7.2M16.6 10.1l-4.9 6"></path></svg>Threads</a>
+<a class="nav" href="Lab.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"></path><path d="M7 15h10"></path></svg>Lab</a>
+<a class="nav" href="Present.dc.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m10 8.5 5 3.5-5 3.5z"></path></svg>Present</a>
+<span class="lbl" style="padding: 20px 12px 6px;">Spaces</span>
+<a class="nav" href="#"><span style="width: 10px; height: 10px; border-radius: 3px; background: #9FB29F;"></span>Personal</a>
+<a class="nav" href="Class.dc.html"><span style="width: 10px; height: 10px; border-radius: 3px; background: #C9C1E6;"></span>ME-304 Studio<span class="meta" style="margin-left: auto;">class</span></a>
+<a class="nav" href="#"><span style="width: 10px; height: 10px; border-radius: 3px; background: #F6E8B4;"></span>Robotics Club<span class="meta" style="margin-left: auto;">team</span></a>
+<div style="flex: 1;"></div>
+<div style="display: flex; align-items: center; gap: 10px; background: #F7F4EE; border-radius: 12px; padding: 10px;">
+<span class="mono" style="width: 32px; height: 32px; border-radius: 50%; background: #C9C1E6; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;">AS</span>
+<span style="display: flex; flex-direction: column;"><span style="font-size: 13px; font-weight: 700;">Aarav S.</span><span class="meta">student · free</span></span>
+</div>
+</nav>
+
+<main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px; padding: 24px 28px; box-sizing: border-box;">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+<div><h1 class="fr" style="margin: 0; font-size: 44px; line-height: 1.05;">Explore</h1><p style="margin: 4px 0 0; font-size: 13px; font-weight: 500; color: #5E625B;">Find papers, standards and data that back, or break, your claims.</p></div>
+<nav aria-label="Explore views" style="display: flex; gap: 2px; background: #EFE8DF; border-radius: 10px; padding: 3px; flex-wrap: wrap;">
+<a class="seg on" href="Explore.dc.html" aria-current="page">Discover</a><a class="seg" href="Claims.dc.html">Claims</a><a class="seg" href="Interviews.dc.html">Interviews</a>
+</nav>
+</div>
+
+<form role="search" style="display: flex; flex-direction: column; gap: 10px;">
+<label style="display: flex; align-items: center; gap: 10px; background: #FFFFFF; border: 1.5px solid #9FB29F; border-radius: 16px; padding: 0 8px 0 16px; min-height: 56px; box-sizing: border-box;">
+<svg class="i" style="color: #465948;" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+<input aria-label="Search scholarly sources" value="perceived comfort of textured upholstery" style="border: 0; outline: 0; font: inherit; font-size: 15px; font-weight: 600; flex: 1; min-width: 0; background: transparent; color: #2B2E2A;">
+<button class="btn p" type="button">Search</button>
+</label>
+<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+<span class="meta">sources</span>
+<button class="chip on" type="button" aria-pressed="true">OpenAlex</button><button class="chip on" type="button" aria-pressed="true">Semantic Scholar</button><button class="chip on" type="button" aria-pressed="true">arXiv</button><button class="chip" type="button" aria-pressed="false">Crossref</button>
+<span style="width: 1px; height: 22px; background: #E4DED4; margin: 0 4px;"></span>
+<label style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600;"><input type="checkbox" checked="" style="width: 18px; height: 18px; accent-color: #5A6F5C;">Open access only</label>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;">Since <select style="font: inherit; font-size: 12px; border: 1px solid #E4DED4; border-radius: 8px; background: #FFFFFF; padding: 5px 8px;"><option>Any year</option><option selected="">2015</option><option>2020</option></select></label>
+</div>
+</form>
+
+<div style="display: flex; justify-content: space-between; align-items: center;"><span class="meta">results · sorted by relevance to your open claims</span><span class="badge" style="background: #EFE8DF;">sample results</span></div>
+
+<section aria-label="Results" style="display: flex; flex-direction: column; gap: 10px;">
+<article class="card" style="padding: 16px 18px; display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+<div style="flex: 1 1 380px; display: flex; flex-direction: column; gap: 6px; min-width: 0;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 700;">[Paper title on tactile texture and perceived softness]</h2>
+<span class="meta">[Author] et al. · [year] · [journal] · cited by [n]</span>
+<div style="display: flex; gap: 6px; flex-wrap: wrap;"><span class="badge" style="background: #E8EDE6;">open access</span><span class="badge" style="background: #EFEBF9;">matches claim: bouclé lowers hardness</span></div>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap;"><a class="btn s" href="Reader.dc.html">Open in Reader</a><button class="btn s p">Add to Library</button></div>
+</article>
+<article class="card" style="padding: 16px 18px; display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+<div style="flex: 1 1 380px; display: flex; flex-direction: column; gap: 6px; min-width: 0;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 700;">[Paper title on seat shape and comfort ratings]</h2>
+<span class="meta">[Author] et al. · [year] · [conference] · cited by [n]</span>
+<div style="display: flex; gap: 6px; flex-wrap: wrap;"><span class="badge" style="background: #E8EDE6;">open access</span><span class="badge" style="background: #F7EEE8; color: #7A4529;">contradicts: rounded shells feel softer</span></div>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap;"><a class="btn s" href="Claims.dc.html">See in Claims</a><button class="btn s p">Add to Library</button></div>
+</article>
+<article class="card" style="padding: 16px 18px; display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+<div style="flex: 1 1 380px; display: flex; flex-direction: column; gap: 6px; min-width: 0;">
+<h2 style="margin: 0; font-size: 15px; font-weight: 700;">[Study title]</h2>
+<span class="meta">[Author] et al. · [year] · [journal] · cited by [n]</span>
+<div style="display: flex; gap: 6px; flex-wrap: wrap;"><span class="badge" style="background: #E8EDE6;">in your library</span><span class="badge" style="background: #EFE8DF;">3 highlights</span></div>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap;"><a class="btn s" href="Reader.dc.html">Continue reading</a></div>
+</article>
+</section>
+</main>
+
+<aside aria-label="Research queue" style="flex: 1 0 300px; max-width: 340px; box-sizing: border-box; background: #FCFAF6; border-left: 1px solid #E4DED4; padding: 22px 20px; display: flex; flex-direction: column; gap: 18px;">
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<span class="lbl">Open claims needing sources · 2</span>
+<a href="Claims.dc.html" style="text-decoration: none; background: #F7EEE8; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 13px; font-weight: 700; color: #7A4529;">A’s unit cost is lower than B’s</span><span style="font-size: 12px; font-weight: 500; color: #2B2E2A;">assumption · decides the Lab winner</span></a>
+<a href="Claims.dc.html" style="text-decoration: none; background: #FFFFFF; border: 1px solid #E4DED4; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 13px; font-weight: 700; color: #2B2E2A;">Steel frames are heavier than ply shells</span><span class="meta">assumption · Lab C · Weight</span></a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<span class="lbl">Reading queue · 3</span>
+<span style="font-size: 13px; font-weight: 600;">[Study title] <span class="meta">· p. 14 of 22</span></span>
+<span style="font-size: 13px; font-weight: 600;">[Material test report] <span class="meta">· not started</span></span>
+<span style="font-size: 13px; font-weight: 600;">[Standard: seat static load] <span class="meta">· not started</span></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; background: #F7F4EE; border-radius: 14px; padding: 14px;">
+<span class="lbl">Saved search</span>
+<span style="font-size: 13px; font-weight: 600;">“perceived comfort of textured upholstery”</span>
+<label style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600;">New results<select style="font: inherit; font-size: 12px; border: 1px solid #E4DED4; border-radius: 8px; background: #FFFFFF; padding: 5px 8px;"><option>Weekly</option><option>Daily</option><option>Off</option></select></label>
+</div>
+<div style="flex: 1;"></div>
+<p style="margin: 0; font-size: 12px; font-weight: 500; line-height: 1.55; color: #5E625B;">Searches free, open scholarly indexes. No paid APIs; PDFs are stored locally.</p>
+</aside>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

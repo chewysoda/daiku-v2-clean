@@ -1,0 +1,58 @@
+.pack-cols { grid-template-columns: minmax(0, 1fr) 320px; }
+.pack-card { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.pack-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.pack-h2 { font-size: 15px; font-weight: 600; margin: 0; }
+.pack-side { position: sticky; top: 16px; max-height: calc(100vh - 96px); overflow-y: auto; }
+.pack-search { width: 200px; }
+
+.pack-groups { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.pack-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.pack-num { font-size: 24px; width: 22px; text-align: center; }
+.pack-group-fields { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 220px; }
+.pack-group-actions { display: flex; gap: 10px; }
+.pack-group-actions .link-btn:disabled { opacity: 0.4; cursor: default; }
+
+.pack-type { display: flex; flex-direction: column; gap: 4px; }
+.pack-type-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.pack-type-head h3 { margin: 0; font-weight: 400; }
+.pack-items { list-style: none; margin: 0; padding: 0; }
+.pack-item { padding: 8px 0; border-top: 1px solid var(--c-hairline); display: flex; flex-direction: column; gap: 6px; }
+.pack-item-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-height: 32px; }
+.pack-item-main { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; cursor: pointer; font-size: 13px; }
+.pack-item-main input { width: 18px; height: 18px; margin: 0; flex: none; accent-color: var(--c-accent-strong); }
+.pack-item-title { overflow-wrap: anywhere; }
+.pack-item.out .pack-item-title { color: var(--c-text-muted); text-decoration: line-through; }
+.pack-select { width: 170px; }
+.pack-note { margin-left: 28px; width: calc(100% - 28px); }
+
+.pack-tree { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; overflow-wrap: anywhere; }
+.pack-tree summary { cursor: pointer; }
+.pack-tree ul { list-style: none; margin: 4px 0 6px; padding-left: 16px; display: flex; flex-direction: column; gap: 2px; }
+.pack-flags { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--c-hairline); }
+.pack-flag { margin: 0; font-size: 13px; line-height: 1.4; }
+.pack-flag.assume { color: var(--c-assumption-text); }
+
+@media (max-width: 900px) {
+  .pack-cols { grid-template-columns: minmax(0, 1fr); }
+  .pack-side { position: static; max-height: none; }
+}
+.pack-group > .cap { min-width: 52px; }
+.pack-prompts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.pack-prompt { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.55; color: var(--c-text-secondary); }
+
+/* Readiness strip and brief starters */
+.pack-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.pack-steps li { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--radius-card, 12px); background: var(--c-surface); box-shadow: inset 0 0 0 1px var(--c-hairline); font-size: 13px; }
+.pack-steps li > span:last-child { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pack-step-num { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-mono); font-size: 13px; background: var(--c-surface-sunk); color: var(--c-text); }
+.pack-steps li.done .pack-step-num { background: var(--c-accent-tint); color: var(--c-accent-strong); font-weight: 600; }
+.pack-starters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pack-starter { border: 0; cursor: pointer; font-family: var(--font-ui, inherit); font-size: 13px; height: 28px; }
+.pack-starter:hover { background: var(--c-accent-tint); color: var(--c-accent-strong); }
+.pack-head-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+@media (max-width: 900px) { .pack-steps { grid-template-columns: minmax(0, 1fr); } }
+
+/* Send to Claude */
+.send-brief { display: flex; flex-direction: column; gap: 6px; }
+.send-brief textarea { font-size: 15px; }
+.dialog-actions .send-more { margin-right: auto; align-self: center; font-size: 14px; }

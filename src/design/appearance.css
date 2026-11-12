@@ -1,0 +1,95 @@
+/* Background image or video, behind the whole app. The layer over it is what keeps text readable. */
+.shell { position: relative; isolation: isolate; }
+.backdrop { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.backdrop img, .backdrop video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.backdrop::after { content: ""; position: absolute; inset: 0; background: var(--c-bg); opacity: var(--backdrop-dim, 0.7); }
+:root[data-backdrop] .shell, :root[data-backdrop] .reader { background: transparent; }
+/* The page lets the picture through as a tint; cards, panels and text on them stay solid. */
+:root[data-backdrop]:not([data-glass="solid"]) .route-view { background: color-mix(in srgb, var(--c-bg) 52%, transparent); }
+:root[data-backdrop]:not([data-mat]) .canvas { background: transparent; box-shadow: inset 1px 1px 0 var(--c-hairline); }
+
+/* A cutting mat theme prints its grid faintly across the whole window. */
+:root[data-mat]:not([data-backdrop]) .shell {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--mat-line) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--mat-line) 7%, transparent) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+.cutting-mat { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+/* Settings */
+.font-list { list-style: none; margin: 0; padding: 0 0 12px; display: flex; flex-direction: column; gap: 6px; }
+.font-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 15px; }
+.set-row > .set-actions { flex-direction: row; align-items: center; gap: 8px; flex: none; }
+.set-font { width: 200px; }
+.set-row > .set-range { flex-direction: row; align-items: center; gap: 10px; flex: none; width: 240px; }
+.set-range input { flex: 1; accent-color: var(--c-accent-strong); }
+
+.set-color { width: 30px; height: 30px; padding: 0; border: 1px solid var(--c-border); border-radius: 50%; background: transparent; cursor: pointer; overflow: hidden; }
+.set-check { width: 20px; height: 20px; flex: none; accent-color: var(--c-accent-strong); }
+
+/* Keyboard shortcuts */
+.dialog.shortcuts { width: min(820px, 94vw); max-height: 76vh; overflow-y: auto; }
+.shortcuts-head { display: flex; align-items: center; justify-content: space-between; }
+.shortcuts-cols { columns: 2 320px; column-gap: 32px; }
+.shortcuts-cols section { break-inside: avoid; margin-bottom: 18px; }
+.shortcuts-cols dl { margin: 6px 0 0; }
+.shortcuts-cols dl > div { display: flex; justify-content: space-between; gap: 16px; padding: 5px 0; border-bottom: 1px solid var(--c-hairline); font-size: 13px; }
+.shortcuts-cols dt { font-family: var(--font-mono); font-size: 13px; font-weight: 500; flex: none; }
+.shortcuts-cols dd { margin: 0; text-align: right; color: var(--c-text-secondary); }
+
+/* Typeset math */
+.katex { white-space: normal; font-style: normal; }
+.katex-display { margin: 0.5em 0; overflow-x: auto; overflow-y: hidden; }
+.katex-error { color: var(--c-assumption-text) !important; }
+.note-preview { flex: none; max-height: 40%; overflow-y: auto; padding: 12px 14px; border: 1px solid var(--c-hairline); border-radius: var(--radius-control); background: var(--c-surface); font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.note-preview > .cap { display: block; margin-bottom: 6px; }
+
+.markdown > :first-child { margin-top: 0; }
+.markdown > :last-child { margin-bottom: 0; }
+.markdown h1, .markdown h2, .markdown h3 { font-family: var(--font-display); font-weight: 420; margin: 0.8em 0 0.3em; line-height: 1.2; }
+.markdown h1 { font-size: 26px; }
+.markdown h2 { font-size: 21px; }
+.markdown h3 { font-size: 17px; }
+.markdown p, .markdown ul, .markdown ol, .markdown blockquote, .markdown pre, .markdown table { margin: 0.5em 0; }
+.markdown ul, .markdown ol { padding-left: 1.4em; }
+.markdown a { color: var(--c-accent-strong); text-decoration: underline; cursor: pointer; }
+.markdown blockquote { padding-left: 12px; border-left: 3px solid var(--c-border); color: var(--c-text-secondary); }
+.markdown code { font-family: var(--font-mono); font-size: 0.9em; padding: 1px 4px; border-radius: 4px; background: var(--c-surface-sunk); }
+.markdown pre { padding: 10px 12px; border-radius: 8px; background: var(--c-surface-sunk); overflow-x: auto; }
+.markdown pre code { padding: 0; background: transparent; }
+.markdown table { border-collapse: collapse; }
+.markdown th, .markdown td { padding: 4px 10px; border: 1px solid var(--c-border); text-align: left; }
+
+@media print {
+  .backdrop { display: none; }
+}
+
+/* Build with Claude */
+.set-row.set-stack { flex-direction: column; align-items: stretch; gap: 12px; }
+.set-row.set-stack > .lbl { display: flex; flex-direction: column; gap: 4px; }
+.claude-options { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.claude-options .grow { flex: 1; }
+
+/* An SVG is shown whole, not cropped to fill like a photo. Many are drawn in black with no background,
+   so they sit on a light card, or they'd disappear on a dark theme. */
+img.is-svg { object-fit: contain; background: #f7f6f2; padding: 6%; }
+.lib-im:hover img.is-svg, .board-card:hover img.is-svg { scale: 1; }
+
+/* Suggested themes */
+.looks { padding-bottom: 16px; }
+.looks-head { display: block; margin: 8px 0 8px; }
+.look-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.look { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.look-card { position: relative; display: block; width: 100%; aspect-ratio: 16 / 10; padding: 0; overflow: hidden; border: 1px solid var(--c-border); border-radius: 10px; cursor: pointer; transition: translate var(--dur) var(--ease-out), box-shadow var(--dur) ease; }
+.look-card:hover { translate: 0 -2px; box-shadow: var(--shadow-floating); }
+.look.on .look-card { outline: 2px solid var(--c-selection); outline-offset: 2px; }
+.look-card img, .look-card video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.look-kind {
+  position: absolute; left: 8px; bottom: 8px; display: inline-flex; align-items: center; gap: 4px;
+  height: 20px; padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.01em;
+  color: #fff; background: rgba(12, 14, 18, 0.55); backdrop-filter: blur(6px);
+}
+.look-dots { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 4px; }
+.look-dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.85); }
+.look-name { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }

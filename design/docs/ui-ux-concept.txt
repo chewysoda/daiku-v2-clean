@@ -1,0 +1,221 @@
+Daiku UI/UX Concept
+Nov 10, 2026 · @kichuratz
+Design thesis
+Daiku should feel like a calm desk where research turns into a brief, and the brief is always visible. Every screen answers one question for the builder: what will the AI see, and why?
+Three feelings to design for:
+Calm: content first, very little chrome, color only where it means something. The reference is Things 3 and Apple Notes, not a dashboard.
+Fast: every action is reachable from the keyboard in one or two steps. The reference is Linear and Raycast.
+Trustworthy: nothing is hidden. Sources stay attached, guesses look like guesses, and the pack shows exactly what goes out. The reference is a good receipt: itemised, totalled, nothing hidden.
+The test for every feature: does it make the builder's intent clearer to the AI, or does it only add another place to put things?
+Mental model
+Users should only need to learn a handful of nouns, and every one of them moves toward the pack. If someone can explain this picture after five minutes, the product is learnable.
+
+Daiku object model · 7 objects, 1 revision loop
+The same object can appear in two places: a source is a row in Library and a card on the board, but it is one object with one set of links. Editing it in one view updates it everywhere.
+Navigation: 8 sections become 4
+The current plan has eight top-level areas: Explore, Library, Reader, Canvas, Claims, Threads, Lab and Build. That is too many places for a first-time user to hold in mind. Most of them are views of the same objects, so they can become panels, card types or actions instead of destinations.
+Today
+Becomes
+Why
+Canvas
+Board (home of each project)
+Spatial memory: people remember where they put things
+Library
+Library
+One searchable list of every source, the non-spatial view
+Lab
+Decide
+Weighted decisions get their own table view
+Build
+Handoff
+The pack builder and its history
+Explore
+"Add source" action (Ctrl+K, paste, drop)
+Capture is a verb, not a place
+Reader
+Side panel that opens from any source
+Reading should never take you away from your board
+Claims
+A card type on the board and a filter in Library
+A claim is an object, not a section
+Threads
+Connections between cards
+Links belong on the board where they are visible
+Rule of thumb: if a section only lists objects that already live elsewhere, it should be a filter or a panel, not a new tab. Fewer choices at every step makes decisions faster (Hick's law).
+Layout
+One workspace with three zones and a tray, so the builder never loses sight of the board or of what the AI will receive.
+
+Workspace layout · sidebar, board, reader panel, pack tray
+Sidebar (left): the 4 sections and the project switcher. It collapses to icons for more board space.
+Board (centre): the home view. Cards show their state at a glance: a dot for in-pack, dashed for guesses, dimmed for left out.
+Reader panel (right): opens when a source is clicked, closes with Esc. Selecting text brings up the claim toolbar.
+Pack tray (bottom): always visible, like a shopping cart. It shows the token meter and the button into Handoff. This keeps the main question, what will the AI see?, answered on every screen.
+Core flows
+Five flows cover the whole product. Each should take as few steps as possible, and none should need a modal dialog.
+Capture: get research in without thinking.
+Paste a URL or drop a PDF anywhere. The card appears where it was dropped, with a loading shimmer while the text is extracted.
+Ctrl+K then "Add" works from any screen. The source lands in Library and, if a board is open, on the board.
+Credit details (title, site, date) fill in automatically and can be edited later, never as a form up front.
+Read and claim: turn a passage into evidence.
+Clicking a source opens it in the side panel. The board stays visible.
+Selecting text shows a small floating toolbar: Highlight, Make claim, Add to pack. This is the same pattern as Medium and Notion, so it needs no teaching.
+"Make claim" creates a claim card linked to that exact passage. The card shows a small source chip, and clicking it jumps back to the passage.
+Decide: compare options with honest scores.
+Decide is a table: options as rows, criteria as columns, a weight on each criterion.
+A score with evidence shows a source chip. A score without evidence is shown in italics with a dashed outline and the label "guess".
+The ranking updates live as weights change, with a short animation so the reorder can be followed.
+Hand off: build the pack the AI will read.
+Open Handoff, or press Ctrl+Enter from the board. Step one is the brief: goal, audience, must-haves, done-when. It is pre-filled from the last pack.
+Items sit in three groups: Pinned, Included, Left out. Each left-out item gives a one-line reason, such as "over budget" or "low weight".
+A budget bar shows tokens by group, labelled with the model it was counted for. Going over budget turns the bar amber and names the conflict instead of silently dropping items.
+"Preview as AI sees it" shows the exact markdown. Copy, export ZIP, or send.
+Review: check what came back against what was asked.
+Paste or drop the AI's output back into Daiku. It sits beside the brief.
+Each must-have becomes a checklist row: met, partly met, unmet. Unmet items can start a revision pack in one click.
+Cognitive principles
+Apps that feel intuitive mostly follow a small set of well-established principles from cognitive psychology and HCI. Here is each one, an app known for it, and what it means for Daiku.
+Principle
+What it says
+App that does it well
+Daiku applies it by
+Hick's law
+Decision time grows with the number of choices
+Raycast: typing narrows a huge list to a few
+4 top-level sections; the palette filters as you type
+Working-memory limits
+People hold only a few chunks at once (about 4)
+Things 3: one list, very little on screen
+Pack groups capped at 3 (Pinned, Included, Left out); brief has 4 fields
+Recognition over recall
+Seeing options beats remembering them (Nielsen)
+VS Code, Linear: Ctrl+K command palette
+Every action is listed and searchable in the palette, with its shortcut shown
+Spatial memory
+People remember where they put things
+Figma, Miro: infinite canvas
+The board is home; cards stay where the user placed them, never auto-rearranged
+Progressive disclosure
+Show the basics, reveal the advanced on demand
+Notion: the slash menu hides block types until needed
+Token budget, weights and model choice sit behind "More options" in Handoff
+Direct manipulation
+Act on the object itself, see the result at once (Shneiderman)
+Trello: drag a card between lists
+Drag a card onto the pack tray to include it; drag out to remove
+Fitts's law
+Big, close targets are faster to hit
+macOS: menu bar sits on the screen edge
+The pack tray is a wide drop zone on the bottom edge
+Visibility of system status
+Always show what the system is doing (Nielsen)
+Google Docs: "Saving… / Saved"
+Live token meter, save state, and extraction progress on every card
+Forgiveness
+Let people undo instead of asking "are you sure?"
+Gmail: Undo send
+Ctrl+Z for everything, plus a toast with Undo after deletes
+Jakob's law
+People expect your app to work like the apps they already use
+Every mainstream app: Ctrl+K, Ctrl+Z, drag and drop
+Standard shortcuts and gestures; no custom gestures to learn
+Proximity and common region
+Things close together or in one box read as a group (Gestalt)
+Figma: frames group layers
+Board regions ("Research", "Decisions") group cards visually
+Preattentive attributes
+Color and shape are noticed before reading
+Linear: small status icons
+Color only for evidence state; shape for card type
+Response time
+Interactions under about 400 ms feel instant (Doherty threshold)
+Linear: instant optimistic updates
+Optimistic UI: show the change first, save in the background
+The common thread: make the right action visible, make the result immediate, and make mistakes cheap.
+Interaction patterns
+These are the patterns that make the flows above feel effortless. Each one already exists in apps people use daily, so nothing here needs a tutorial.
+Command palette (Ctrl+K). One box that does everything: add a source, jump to a card, run an action, change a setting. Results show the shortcut beside each action, so people learn shortcuts just by using the palette.
+Keyboard shortcuts. Keep the set small and memorable:
+Shortcut
+Action
+Ctrl+K
+Command palette
+Ctrl+N
+New card on the board
+Ctrl+Enter
+Open Handoff for the current board
+P
+Pin or unpin the selected card in the pack
+Space
+Preview the selected source (Quick Look style)
+Ctrl+Z / Ctrl+Shift+Z
+Undo / redo, everywhere
+?
+Show all shortcuts
+Right-click menus. Every card has the same menu: Open, Make claim, Add to pack, Pin, Link to…, Delete. The same verbs in the same order everywhere.
+Drag and drop. Drop files or links onto the board to import. Drag cards onto the pack tray to include them. Drag a card onto another card to link them.
+Autosave, never a Save button. Show a quiet "Saved" in the corner, like Google Docs.
+Empty states that teach. An empty board says "Paste a link or drop a PDF to start" with one button. An empty Decide table offers "Add 2 options to compare." Each empty state shows the next action, not just "Nothing here."
+Onboarding with a sample project. First launch opens a small, finished example project: five sources, three claims, one decision, one pack. People learn by poking at something real, then start their own with one click. Skip product tours: they are usually dismissed and then forgotten.
+Visual language
+The interface stays neutral so the user's research is the most colorful thing on screen. Color, shape and motion each carry one job.
+Color means evidence state, nothing else. Keep a neutral base (warm greys, like the PDF's off-white) and one accent for focus and primary buttons. Reserve status colors for trust:
+State
+Look
+Meaning
+Sourced
+Solid border, small green source chip
+Backed by a linked passage
+Guess
+Dashed border, italic text, "guess" label
+No evidence attached yet
+Conflict
+Amber outline, warning icon
+Two claims or sources disagree
+In pack
+Small filled dot in the corner
+Will be sent to the AI
+Left out
+Dimmed, with a reason on hover
+Excluded by budget or weight
+Every state also has a shape or text cue, so it never depends on color alone.
+Shape means card type. Sources are rectangles with a favicon or file icon. Claims have a quote-mark corner. Decisions show a mini score bar. People can tell the type before reading a word.
+Typography. One serif for long reading in the Reader (the PDF's editorial serif fits well) and one clean sans for UI. About three sizes: title, body, caption. Body text 15–16 px with a line height around 1.5 for reading comfort.
+Density. Comfortable by default, with a compact toggle for power users. The board shows card titles and one line; details live in the side panel.
+Motion. Short and purposeful, around 150–250 ms: cards slide into the pack tray, rankings reorder smoothly, panels slide in from the edge. Motion explains where things went, never decorates. Respect the OS "reduce motion" setting.
+Dark mode from day one, built on design tokens rather than hard-coded colors.
+Accessibility and testing
+"Intuitive" is a claim to test, not a feeling to assume. Watch real people use it, and build accessibility in from the start because it also makes the app easier for everyone.
+Accessibility basics
+Text contrast at least 4.5:1 against its background (WCAG AA), including dimmed "left out" cards.
+Every action reachable by keyboard, with a visible focus ring.
+Evidence states use shape and text as well as color.
+Board cards are also listed in an accessible outline, since screen readers cannot navigate a spatial canvas well.
+Usability tests
+Run short sessions with about five people from your first target group (indie builders). A small round like this catches most of the major problems; run another round after fixing them. Give each person tasks without explaining the UI, ask them to think aloud, and only take notes.
+Task
+Pass if
+What to watch for
+Add two sources and make a claim from one
+Done in under 3 minutes without help
+Do they find text selection, or hunt for a button?
+Build a pack for a given goal
+Pack copied with the brief filled in
+Do they understand Pinned, Included and Left out?
+Explain what the AI will receive
+Can describe it from the preview
+Do they trust the token meter?
+Find why an item was left out
+Finds the reason on the card
+Is the reason visible enough?
+Track time on task and where people hesitate. A hesitation of more than a few seconds marks a design problem, not a user problem.
+Build order
+Build the UI pieces in the same order as the data work, so each screen is usable as soon as it exists. The board already exists; the rest grows around it.
+Shell: 4-item sidebar, autosave indicator, Ctrl+K palette with a few actions. The palette is cheap to build and every later feature plugs into it.
+Capture and cards: paste/drop import, source cards with loading state, Library list view.
+Side-panel reader: text selection toolbar with Make claim, claim cards with source chips.
+Pack tray and Handoff: drag to include, Pinned/Included/Left out groups, brief form, token meter, "Preview as AI sees it", Copy.
+Trust states: guess vs sourced styling, conflict outline, left-out reasons.
+Decide table: options, criteria, weights, live ranking.
+Review view: output beside the brief, met/partly/unmet checklist, revision pack.
+Polish: sample project, empty states, shortcuts sheet, dark mode, compact density.
+Steps 1–4 are the slice needed to test Gate 1. Run the first usability round right after step 4.

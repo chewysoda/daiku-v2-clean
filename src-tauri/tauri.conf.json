@@ -1,0 +1,64 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Daiku",
+  "version": "0.1.0",
+  "identifier": "com.daiku.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Daiku",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 1000,
+        "minHeight": 640,
+        "decorations": false,
+        "transparent": true,
+        "visible": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self' 'wasm-unsafe-eval'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: blob: asset: http://asset.localhost https:",
+        "font-src": "'self' data: asset: http://asset.localhost",
+        "media-src": "'self' asset: http://asset.localhost",
+        "connect-src": "'self' ipc: http://ipc.localhost asset: http://asset.localhost data: blob:",
+        "worker-src": "'self' blob:",
+        "frame-src": "'none'",
+        "object-src": "'none'"
+      },
+      "dangerousDisableAssetCspModification": ["style-src"],
+      "assetProtocol": { "enable": true, "scope": [] }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "category": "Productivity",
+    "resources": { "models/mfr/*": "models/mfr/" },
+    "shortDescription": "A place where ideas take form",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "installerIcon": "icons/icon.ico"
+      }
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}
