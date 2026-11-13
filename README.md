@@ -18,18 +18,26 @@ See [design/README.md](design/README.md) for the design package.
 
 ## Install it
 
-Double-click **`Install Daiku.cmd`**. It checks for Node.js, Rust, the Microsoft C++ build tools and WebView2, offers to
-install anything missing with winget (it asks first), builds the app and runs the Daiku setup. Daiku installs for your
-user only. The first build compiles Rust and takes 10 to 20 minutes.
-
-From PowerShell: `powershell -ExecutionPolicy Bypass -File .\install.ps1` with `-BuildOnly` to only build the
-installer, `-Yes` to skip the questions, or `-SkipChecks` on a machine that's already set up.
+**Got `Daiku-Setup-<version>.exe`?** Double-click it. Daiku installs in under a minute for your user only, with nothing
+else to download. It isn't code-signed, so Windows asks you to confirm: "More info", then "Run anyway".
 
 ### Give it to someone
 
-Nobody else should have to build it. `npm run installer` makes `Daiku_<version>_x64-setup.exe` in
-`src-tauri/target/release/bundle/nsis/`: send them that file. It isn't code-signed, so Windows asks them to confirm
-("More info", then "Run anyway"). Pushing a version tag to GitHub builds the same installer as a draft release.
+Don't send them this folder: building it on a new PC downloads several GB of tools and takes half an hour or more.
+Run `npm run share` instead. It builds the installer and puts `Daiku-Setup-<version>.exe` (about 120 MB) in `share\`,
+then opens that folder. Send them that one file. Pushing a version tag to GitHub builds the same installer as a draft
+release, so you can send a download link instead.
+
+### Build it from source
+
+Double-click **`Install Daiku.cmd`**. If a ready-made setup file is next to it, or in `share\`, it just runs that.
+Otherwise it checks for Node.js, Rust, the Microsoft C++ build tools and WebView2, offers to install anything missing
+with winget (it asks first), builds the app and runs the Daiku setup. On a new PC the tools are several GB and the
+first build compiles Rust for 10 to 20 minutes.
+
+From PowerShell: `powershell -ExecutionPolicy Bypass -File .\install.ps1` with `-BuildOnly` to only build the
+installer, `-Share` to build it into `share\`, `-Rebuild` to build even when a setup file is there, `-Yes` to skip
+the questions, or `-SkipChecks` on a machine that's already set up.
 
 ### Updates
 

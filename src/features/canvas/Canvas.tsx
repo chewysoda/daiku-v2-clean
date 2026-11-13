@@ -36,10 +36,12 @@ import { projectsIn } from "../../lib/projects";
 import { NewDialog } from "../../app/NewDialog";
 import { Guide, smartSnap } from "../../lib/designTools";
 import { PaletteTools } from "./PaletteTools";
+import { FolderDialog } from "./FolderDialog";
+import { FOLDER_SIZE, folderName, pickFiles, uploadAsMarkdown } from "./folderUpload";
 import "./canvas.css";
 import "./cards.css";
 
-type Tool = "select" | "hand" | "pencil" | "marker" | "eraser" | "shape" | "text" | "sticky" | "image" | "connector" | "sticker";
+type Tool = "select" | "hand" | "pencil" | "marker" | "eraser" | "shape" | "text" | "sticky" | "image" | "upload" | "connector" | "sticker";
 const isDrawTool = (t: Tool): t is DrawTool => t === "pencil" || t === "marker" || t === "shape";
 
 const TOOLS: { tool: Tool; icon: IconName; label: string; key: string }[] = [
@@ -52,6 +54,7 @@ const TOOLS: { tool: Tool; icon: IconName; label: string; key: string }[] = [
   { tool: "text", icon: "text", label: "Text", key: "T" },
   { tool: "sticky", icon: "sticky-note", label: "Sticky note", key: "N" },
   { tool: "image", icon: "image", label: "Image from Library", key: "I" },
+  { tool: "upload", icon: "import", label: "Upload files as Markdown", key: "U" },
   { tool: "connector", icon: "connector", label: "Connector", key: "C" },
   { tool: "sticker", icon: "stickers", label: "Sticker", key: "S" },
 ];
@@ -68,6 +71,15 @@ type Gesture =
   | { kind: "shape"; x: number; y: number }
   | { kind: "erase" }
   | { kind: "focus"; x: number; y: number; id: string; fx: number; fy: number };
+
+/** True when the wheel lands on something inside the board that can scroll itself, like a long code block. */
+function scrollsInside(target: EventTarget | null, board: HTMLElement | null): boolean {
+  for (let el = target as HTMLElement | null; el && el !== board; el = el.parentElement) {
+    const { overflowY } = getComputedStyle(el);
+    if ((overflowY === "auto" || overflowY === "scroll") && el.scrollHeight > el.clientHeight) return true;
+  }
+  return false;
+}
 
 function ItemCaption({ item, asset }: { item: BoardItem; asset: Asset | undefined }) {
   if (!asset) return <figcaption className="cap">file removed</figcaption>;
@@ -297,6 +309,7 @@ function BoardCanvas({ board }: { board: Board }) {
   const [menu, setMenu] = useState<"claim" | "more" | "sticker" | "boards" | null>(null);
   const [cropping, setCropping] = useState<string | null>(null);
   const [dialog, setDialog] = useState<"image" | "rename" | "new" | "delete" | null>(null);
+  const [openFolder, setOpenFolder] = useState<string | null>(null);
   const [spaceDown, setSpaceDown] = useState(false);
   const viewport = useRef<HTMLDivElement>(null);
   const fitted = useRef(false);
@@ -353,6 +366,25 @@ function BoardCanvas({ board }: { board: Board }) {
     };
     doc.put(item);
     return item;
+  };
+
+  // The upload tool: pick files, read each as Markdown into the Library, and put them on the board as one folder.
+  const uploadFolder = async () => {
+    const picked = await pickFiles();
+    if (!picked.length) return;
+    toast(`Reading ${picked.length === 1 ? picked[0].name : `${picked.length} files`}…`);
+    const created = await uploadAsMarkdown(picked);
+    if (!created.length) return;
+    const c = center();
+    const it = addItem({
+      kind: "folder",
+      x: c.x - FOLDER_SIZE.w / 2,
+      y: c.y - FOLDER_SIZE.h / 2,
+      ...FOLDER_SIZE,
+      data: { caption: folderName(created), files: created.map((a) => a.id) },
+    });
+    setSelection([it.id]);
+    toast(`Added ${created.length === 1 ? "1 file" : `${created.length} files`} as Markdown. Double-click the folder to read ${created.length === 1 ? "it" : "them"}.`);
   };
 
   const addAssets = useCallback(
@@ -805,25 +837,34 @@ function BoardCanvas({ board }: { board: Board }) {
       setMenu(null);
     }
     if (next === "image") setDialog("image");
+    else if (next === "upload") void uploadFolder();
     else if (next === "sticker") setMenu((m) => (m === "sticker" ? null : "sticker"));
     else setTool(next);
   };
 
   const onWheel = (e: React.WheelEvent) => {
+    if (!e.ctrlKey && scrollsInside(e.target, viewport.current)) return;
     const r = viewport.current!.getBoundingClientRect();
-    if (e.ctrlKey || e.metaKey) {
-      setView((v) => zoomAt(v, e.clientX - r.left, e.clientY - r.top, Math.exp(-e.deltaY * 0.0015)));
+    // Scrolling zooms around the pointer. Shift+scroll pans (sideways on a plain mouse wheel),
+    // and a sideways touchpad swipe still pans. Pinch arrives as Ctrl+wheel and zooms too.
+    const zoom = e.ctrlKey || e.metaKey || (!e.shiftKey && e.deltaX === 0);
+    if (zoom) {
+      // Line-mode wheels (Firefox) report a few lines rather than pixels.
+      const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      setView((v) => zoomAt(v, e.clientX - r.left, e.clientY - r.top, Math.exp(-dy * 0.0015)));
+    } else if (e.shiftKey && e.deltaX === 0) {
+      setView((v) => ({ ...v, x: v.x - e.deltaY }));
     } else {
       setView((v) => ({ ...v, x: v.x - e.deltaX, y: v.y - e.deltaY }));
     }
   };
 
-  // React attaches wheel listeners as passive, so Ctrl+wheel needs this to stop page zoom.
+  // React attaches wheel listeners as passive, so this stops page zoom and scroll behind the board.
   useEffect(() => {
     const el = viewport.current;
     if (!el) return;
     const stop = (e: WheelEvent) => {
-      if (e.ctrlKey) e.preventDefault();
+      if (e.ctrlKey || !scrollsInside(e.target, el)) e.preventDefault();
     };
     el.addEventListener("wheel", stop, { passive: false });
     return () => el.removeEventListener("wheel", stop);
@@ -1155,6 +1196,10 @@ function BoardCanvas({ board }: { board: Board }) {
           const hit = itemAt(document.elementFromPoint(e.clientX, e.clientY));
           const it = hit ? doc.get(hit) : null;
           const closedShape = it?.kind === "shape" && it.data.figure !== "line" && it.data.figure !== "arrow";
+          if (it?.kind === "folder") {
+            setOpenFolder(it.id);
+            return;
+          }
           if (it && !it.data.locked && !it.data.emoji && (closedShape || ["sticky", "text", "section", "sticker"].includes(it.kind))) setEditing(it.id);
         }}
       >
@@ -1371,6 +1416,21 @@ function BoardCanvas({ board }: { board: Board }) {
                     ) : (
                       it.data.text
                     )}
+                  </div>
+                );
+              }
+              if (it.kind === "folder") {
+                const count = it.data.files?.length ?? 0;
+                return (
+                  <div key={it.id} className={`folder-item ${sel ? "sel" : ""}`} data-item={it.id} {...common} title="Double-click to open">
+                    <span className="folder-glyph">
+                      <Icon name="folder" size={72} fill />
+                      <span className="folder-badge cap">MD</span>
+                    </span>
+                    <span className="folder-label">{it.data.caption || "Folder"}</span>
+                    <span className="cap">
+                      {count} {count === 1 ? "file" : "files"}
+                    </span>
                   </div>
                 );
               }
@@ -1812,6 +1872,13 @@ function BoardCanvas({ board }: { board: Board }) {
         )}
       </div>
 
+      {openFolder && byId.get(openFolder) && (
+        <FolderDialog
+          item={byId.get(openFolder)!}
+          onChange={(data) => doc.patch([{ id: openFolder, changes: { data } }])}
+          onClose={() => setOpenFolder(null)}
+        />
+      )}
       {dialog === "image" && (
         <ImagePicker
           onClose={() => setDialog(null)}

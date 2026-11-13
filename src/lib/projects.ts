@@ -13,7 +13,12 @@ export function projectAssetIds(s: Rows, project: ProjectData): Set<string> {
   const ids = new Set(project.asset_ids);
   const boards = new Set(project.board_ids);
   const decisions = new Set(project.decision_ids);
-  for (const i of s.board_items) if (i.asset_id && boards.has(i.board_id)) ids.add(i.asset_id);
+  for (const i of s.board_items) {
+    if (!boards.has(i.board_id)) continue;
+    if (i.asset_id) ids.add(i.asset_id);
+    // A folder on the board holds its files by id rather than through asset_id.
+    for (const f of i.data.files ?? []) ids.add(f);
+  }
   const concepts = new Set<string>();
   for (const c of s.concepts) {
     if (!decisions.has(c.decision_id)) continue;

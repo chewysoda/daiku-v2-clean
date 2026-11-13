@@ -38,3 +38,6 @@ AGENTS.md
 
 # Knowledge graph of this repo (graphify): rebuilt locally
 graphify-out/
+
+# Setup files made by npm run share, for sending to people: built, not source
+share/

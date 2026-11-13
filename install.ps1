@@ -11,8 +11,17 @@
   Run it from Explorer with "Install Daiku.cmd", or from PowerShell:
     powershell -ExecutionPolicy Bypass -File .\install.ps1
 
+  If a ready-made Daiku setup file (Daiku*-setup.exe or Daiku-Setup*.exe) is next to this script, none of that
+  happens: it just runs that file, which takes under a minute and needs no tools at all.
+
 .PARAMETER BuildOnly
   Build the installer but don't run it. It is left in src-tauri\target\release\bundle\nsis\.
+
+.PARAMETER Share
+  Build the installer and copy it to share\Daiku-Setup-<version>.exe, ready to send to someone. Doesn't install it here.
+
+.PARAMETER Rebuild
+  Build from source even if a ready-made setup file is next to this script.
 
 .PARAMETER Yes
   Install missing tools without asking each time.
@@ -23,9 +32,12 @@
 [CmdletBinding()]
 param(
   [switch]$BuildOnly,
+  [switch]$Share,
+  [switch]$Rebuild,
   [switch]$Yes,
   [switch]$SkipChecks
 )
+if ($Share) { $BuildOnly = $true }
 
 $ErrorActionPreference = 'Stop'
 $Root = $PSScriptRoot
@@ -94,10 +106,38 @@ function Test-WebView2 {
 
 Write-Host ""
 Write-Host "  Daiku installer" -ForegroundColor White
+
+# ---- Fast path: a ready-made setup file next to this script --------------------------
+# Building from source downloads Node, Rust and several GB of C++ build tools, then compiles for
+# 10 to 20 minutes. Someone who was sent the setup file needs none of that.
+if (-not $Rebuild -and -not $BuildOnly) {
+  $ready = @(Get-ChildItem -Path $Root -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^Daiku.*setup.*\.exe$' }) +
+    @(Get-ChildItem -Path (Join-Path $Root 'share') -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^Daiku.*setup.*\.exe$' }) |
+    Sort-Object LastWriteTime -Descending | Select-Object -First 1
+  if ($ready) {
+    Write-Host "  Found a ready-made installer, so there's nothing to download or build." -ForegroundColor Gray
+    Write-Host ""
+    Info "Running $($ready.Name). It's unsigned, so if Windows SmartScreen asks, choose 'More info', then 'Run anyway'."
+    $proc = Start-Process -FilePath $ready.FullName -PassThru -Wait
+    if ($proc.ExitCode -ne 0) { Fail "Setup ended with code $($proc.ExitCode). You can run $($ready.FullName) again yourself." }
+    Ok 'Daiku is installed. Find it in the Start menu.'
+    Write-Host ""
+    exit 0
+  }
+}
+
 Write-Host "  Builds the app from this folder, then installs it for your user." -ForegroundColor Gray
 
 if (-not (Test-Path (Join-Path $Root 'package.json'))) {
   Fail "Run this from the Daiku folder (the one with package.json)."
+}
+if (-not $BuildOnly) {
+  Write-Host ""
+  Warn 'No ready-made installer was found, so Daiku will be built from source.'
+  Info 'On a new PC that means downloading Node.js, Rust and the C++ build tools (several GB), then'
+  Info 'a 10 to 20 minute compile. If someone has Daiku already, ask them for Daiku-Setup.exe instead:'
+  Info 'it installs in under a minute. They make it with "npm run share".'
+  if (-not (Ask 'Build from source anyway?')) { exit 0 }
 }
 
 # ---- 1. Prerequisites ----------------------------------------------------------------
@@ -160,7 +200,17 @@ Ok ("Built in {0:N0} minutes: {1}" -f ((Get-Date) - $started).TotalMinutes, $set
 
 # ---- 4. Install ----------------------------------------------------------------------
 Step 4 'Installing Daiku'
-if ($BuildOnly) {
+if ($Share) {
+  $outDir = Join-Path $Root 'share'
+  New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+  $version = (Get-Content (Join-Path $Root 'src-tauri\tauri.conf.json') -Raw | ConvertFrom-Json).version
+  $out = Join-Path $outDir "Daiku-Setup-$version.exe"
+  Copy-Item $setup.FullName $out -Force
+  Ok ("Ready to send: {0} ({1:N0} MB)" -f $out, ((Get-Item $out).Length / 1MB))
+  Info 'Send that one file. They double-click it and Daiku installs in under a minute, for their user only.'
+  Info "It isn't code-signed, so Windows asks them to confirm: 'More info', then 'Run anyway'."
+  Start-Process explorer.exe "/select,`"$out`""
+} elseif ($BuildOnly) {
   Info "Skipped, as asked. The installer is here:"
   Info $setup.FullName
 } else {

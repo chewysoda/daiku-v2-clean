@@ -47,7 +47,8 @@ export interface Board {
   is_sample: boolean;
 }
 
-export type ItemKind = "image" | "sticky" | "text" | "section" | "palette" | "connector" | "sticker" | "stroke" | "shape";
+/** "folder" holds uploaded files turned into Markdown: their asset ids are in `files`, its name in `caption`. */
+export type ItemKind = "image" | "sticky" | "text" | "section" | "palette" | "connector" | "sticker" | "stroke" | "shape" | "folder";
 export type ConnectorKind = "plain" | "supports" | "contradicts" | "inspired-by" | "requires";
 
 export type TextSize = "s" | "m" | "l" | "xl";
@@ -93,6 +94,8 @@ export interface ItemData {
   look?: "curve" | "wavy" | "loopy" | "zigzag" | "hops";
   colors?: string[];
   count?: number;
+  /** A folder's files, as Library asset ids, in the order they were added. */
+  files?: string[];
   /** A sticky that stands for a claim: it shows the claim, its evidence and its state. */
   claim?: string;
   /** Put on the board from an AI's answer and not yet accepted. Shown dashed, and left out of packs until accepted. */

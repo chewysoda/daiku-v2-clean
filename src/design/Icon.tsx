@@ -21,7 +21,7 @@ export type IconName =
   | "explore" | "hand" | "home" | "image" | "import" | "lab" | "library" | "link" | "maximize"
   | "minimize" | "more" | "nav-present" | "palette" | "play" | "plus" | "remove" | "search"
   | "select" | "settings" | "stickers" | "sticky-note" | "text" | "threads" | "zoom-in" | "zoom-out" | "pencil" | "marker" | "eraser" | "shapes"
-  | "board" | "decide" | "handoff" | "pin" | "review" | "tray" | "sidebar" | "brief" | "warning" | "open";
+  | "board" | "decide" | "handoff" | "pin" | "review" | "tray" | "sidebar" | "brief" | "warning" | "open" | "folder";
 
 export function Icon({ name, size = 20, fill = false }: { name: IconName; size?: number; fill?: boolean }) {
   return (

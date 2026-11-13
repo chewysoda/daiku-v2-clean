@@ -14,6 +14,7 @@
     "tokens": "node scripts/gen-tokens.mjs",
     "updates:setup": "node scripts/setup-updates.mjs",
     "installer": "tauri build",
+    "share": "powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1 -Share -SkipChecks -Yes",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "lint": "eslint src",

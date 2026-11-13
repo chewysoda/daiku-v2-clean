@@ -108,6 +108,14 @@ function describeItem(it: BoardItem, assetOf: (id: string | null) => Asset | und
       return it.data.text ? `- Labelled ${it.data.figure ?? "shape"}: ${oneLine(it.data.text)}` : null;
     case "palette":
       return `- Palette${it.data.caption ? ` from ${it.data.caption}` : ""}: ${(it.data.colors ?? []).join(", ")}`;
+    case "folder": {
+      const files = (it.data.files ?? []).map((id) => assetOf(id)).filter((a): a is Asset => !!a);
+      const name = oneLine(it.data.caption) || "Folder";
+      if (!files.length) return `- Folder: ${name} (empty)`;
+      // The files were already turned into Markdown on upload, so their text goes along in full.
+      const body = files.map((a) => `  - File: ${a.title}${a.via ? ` (from ${a.via})` : ""}\n\n${a.notes.trim().replace(/^/gm, "    ")}`).join("\n\n");
+      return `- Folder: ${name}, ${files.length} ${files.length === 1 ? "file" : "files"} as Markdown:\n\n${body}\n`;
+    }
     case "image": {
       const a = assetOf(it.asset_id);
       if (!a) return "- Image: not in this export";
@@ -139,6 +147,7 @@ export function boardMarkdown(board: Board, items: BoardItem[], assets: Asset[],
   const nameOf = (id: string | undefined) => {
     const it = items.find((i) => i.id === id);
     if (!it) return "(removed)";
+    if (it.kind === "folder") return oneLine(it.data.caption) || "a folder";
     return it.kind === "image" ? (assetOf(it.asset_id)?.title ?? "an image") : oneLine(it.data.text) || it.kind;
   };
   const links = items.filter((i) => i.kind === "connector");
