@@ -75,3 +75,36 @@ test("scrolling zooms the board, and shift+scroll pans", async ({ page }) => {
   await page.keyboard.up("Shift");
   await expect(zoom).toHaveText(zoomed!);
 });
+
+test("pinching zooms the board, on a touchpad and on a touchscreen", async ({ page }) => {
+  await page.goto("/#/canvas/b-furniture");
+  await expect(page.getByTestId("item-sticky").first()).toBeVisible();
+  const zoom = page.getByTestId("zoom");
+  const percent = async () => parseInt((await zoom.textContent())!, 10);
+
+  // A touchpad pinch is Ctrl+wheel in small steps; a short pinch should still move the zoom a lot.
+  const start = await percent();
+  await page.mouse.move(700, 450);
+  await page.keyboard.down("Control");
+  for (let i = 0; i < 10; i++) await page.mouse.wheel(0, -4);
+  await page.keyboard.up("Control");
+  await expect.poll(percent).toBeGreaterThan(start * 1.4);
+
+  // Two fingers moving apart on a touchscreen zoom in; moving together zoom out.
+  const cdp = await page.context().newCDPSession(page);
+  const touch = (type: string, gap: number) =>
+    cdp.send("Input.dispatchTouchEvent", {
+      type,
+      touchPoints: type === "touchEnd" ? [] : [{ x: 700 - gap, y: 450, id: 1 }, { x: 700 + gap, y: 450, id: 2 }],
+    });
+  const before = await percent();
+  await touch("touchStart", 50);
+  for (const gap of [70, 90, 110, 130, 150]) await touch("touchMove", gap);
+  await touch("touchEnd", 0);
+  await expect.poll(percent).toBeGreaterThan(before * 2);
+  const zoomedIn = await percent();
+  await touch("touchStart", 150);
+  for (const gap of [120, 90, 75]) await touch("touchMove", gap);
+  await touch("touchEnd", 0);
+  await expect.poll(percent).toBeLessThan(zoomedIn * 0.7);
+});

@@ -25,7 +25,7 @@ import { readStickerFile } from "./stickerPicture";
 import { AlignBar, StickerPicker, StyleBar } from "./StyleBar";
 import { fillPalette, newAsset, saveLink } from "../library/importing";
 import { DotGrid } from "./DotGrid";
-import { CONNECTOR_LOOKS, connectorPath, connectorShape, fitView, inRect, itemsInSection, View, visibleItems, zoomAt } from "./geometry";
+import { CONNECTOR_LOOKS, connectorPath, connectorShape, fitView, inRect, itemsInSection, MAX_ZOOM, MIN_ZOOM, View, visibleItems, zoomAt } from "./geometry";
 import { SendToClaude } from "../pack/SendToClaude";
 import { accepted, isProposal } from "../../lib/proposals";
 import { updatePlan } from "../pack/usePack";
@@ -845,18 +845,63 @@ function BoardCanvas({ board }: { board: Board }) {
   const onWheel = (e: React.WheelEvent) => {
     if (!e.ctrlKey && scrollsInside(e.target, viewport.current)) return;
     const r = viewport.current!.getBoundingClientRect();
-    // Scrolling zooms around the pointer. Shift+scroll pans (sideways on a plain mouse wheel),
-    // and a sideways touchpad swipe still pans. Pinch arrives as Ctrl+wheel and zooms too.
+    // As in FigJam: scroll and pinch both zoom around the pointer. Shift+scroll pans sideways,
+    // and a sideways touchpad swipe still pans.
     const zoom = e.ctrlKey || e.metaKey || (!e.shiftKey && e.deltaX === 0);
     if (zoom) {
       // Line-mode wheels (Firefox) report a few lines rather than pixels.
       const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
-      setView((v) => zoomAt(v, e.clientX - r.left, e.clientY - r.top, Math.exp(-dy * 0.0015)));
+      // A touchpad pinch arrives as Ctrl+wheel in small, fractional steps; a mouse notch is about 100.
+      // Pinch steps get more weight, so the board follows the fingers.
+      const pinch = e.ctrlKey && Math.abs(dy) < 40;
+      const step = Math.max(-150, Math.min(150, dy));
+      setView((v) => zoomAt(v, e.clientX - r.left, e.clientY - r.top, Math.exp(-step * (pinch ? 0.012 : 0.0022))));
     } else if (e.shiftKey && e.deltaX === 0) {
       setView((v) => ({ ...v, x: v.x - e.deltaY }));
     } else {
       setView((v) => ({ ...v, x: v.x - e.deltaX, y: v.y - e.deltaY }));
     }
+  };
+
+  // Two fingers on a touchscreen pinch-zoom and pan together, whatever tool is in hand.
+  const touches = useRef(new Map<number, { x: number; y: number }>());
+  const pinchStart = useRef<{ dist: number; mx: number; my: number; view: View } | null>(null);
+  const pinchState = () => {
+    const [a, b] = [...touches.current.values()];
+    const r = viewport.current!.getBoundingClientRect();
+    return { dist: Math.hypot(a.x - b.x, a.y - b.y) || 1, mx: (a.x + b.x) / 2 - r.left, my: (a.y + b.y) / 2 - r.top };
+  };
+  const onTouchPointer = (e: React.PointerEvent, phase: "down" | "move" | "up") => {
+    if (e.pointerType !== "touch") return false;
+    if (phase === "up") touches.current.delete(e.pointerId);
+    else if (phase === "down" || touches.current.has(e.pointerId)) touches.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (phase === "down" && touches.current.size === 2) {
+      // The second finger turns whatever the first one started into a pinch.
+      drawnPoints.current = [];
+      previewPath.current?.setAttribute("d", "");
+      setGesture(null);
+      setShapeDraft(null);
+      setOffset({ dx: 0, dy: 0 });
+      setGuides([]);
+      setMarquee(null);
+      setRubber(null);
+      setResizing(null);
+      viewport.current!.setPointerCapture(e.pointerId);
+      pinchStart.current = { ...pinchState(), view };
+      return true;
+    }
+    if (!pinchStart.current) return false;
+    if (phase === "move" && touches.current.size >= 2) {
+      const start = pinchStart.current;
+      const now = pinchState();
+      const z = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, start.view.zoom * (now.dist / start.dist)));
+      // The board point under the fingers' starting midpoint stays under their midpoint now.
+      const wx = (start.mx - start.view.x) / start.view.zoom;
+      const wy = (start.my - start.view.y) / start.view.zoom;
+      setView({ zoom: z, x: now.mx - wx * z, y: now.my - wy * z });
+    }
+    if (phase === "up" && touches.current.size < 2) pinchStart.current = null;
+    return true;
   };
 
   // React attaches wheel listeners as passive, so this stops page zoom and scroll behind the board.
@@ -876,6 +921,7 @@ function BoardCanvas({ board }: { board: Board }) {
     if (e.button === 2) return;
     const target = e.target as HTMLElement;
     if (target.closest("[data-ui]")) return;
+    if (onTouchPointer(e, "down")) return;
     // Blur explicitly: unmounting a focused textarea wouldn't fire onBlur, losing what was typed.
     if (editing) {
       (document.activeElement as HTMLElement | null)?.blur();
@@ -971,6 +1017,7 @@ function BoardCanvas({ board }: { board: Board }) {
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
+    if (onTouchPointer(e, "move")) return;
     if (!gesture) return;
     switch (gesture.kind) {
       case "draw": {
@@ -1079,6 +1126,7 @@ function BoardCanvas({ board }: { board: Board }) {
   };
 
   const onPointerUp = (e: React.PointerEvent) => {
+    if (onTouchPointer(e, "up")) return;
     if (!gesture) return;
     if (gesture.kind === "draw") {
       const style = drawStyles[gesture.tool];
