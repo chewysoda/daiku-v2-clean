@@ -376,7 +376,7 @@ export function Interviews() {
         <div className="scrim" onPointerDown={(e) => e.target === e.currentTarget && setImporting(false)}>
           <div className="dialog" role="dialog" aria-label="Import notes">
             <h2 className="fr dialog-title">Import notes</h2>
-            <textarea className="field paste" autoFocus aria-label="Notes to import" placeholder={"P1: Moves the chair every day\nP2: Can't lift it one-handed"} value={paste} onChange={(e) => setPaste(e.target.value)} />
+            <textarea className="field paste" autoFocus aria-label="Notes to import" placeholder={"P1: Wired a button to pin 35\nP2: Never knows which COM port"} value={paste} onChange={(e) => setPaste(e.target.value)} />
             <div className="dialog-actions">
               <Pill onClick={() => setImporting(false)}>Cancel</Pill>
               <Pill ink onClick={runImport}>

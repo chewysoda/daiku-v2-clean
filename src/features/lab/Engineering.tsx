@@ -174,8 +174,15 @@ const MARK: Record<Verdict, string> = { pass: "✓", fail: "✗", open: "○" };
 
 function fmt(value: number | null, unit = "") {
   if (value === null) return "–";
-  const text = Math.abs(value) >= 100 ? value.toFixed(0) : value.toFixed(2).replace(/\.?0+$/, "");
+  const text = sig(value);
   return unit ? `${text} ${unit}` : text;
+}
+
+/** Two decimals, or three significant figures below 1, so 0.039 kg doesn't read as 0.04. */
+function sig(value: number) {
+  const abs = Math.abs(value);
+  if (abs >= 100) return value.toFixed(0);
+  return (abs >= 1 || abs === 0 ? value.toFixed(2) : String(Number(value.toPrecision(3)))).replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
 }
 
 function RequirementCell({ row, concept, lab }: { row: RecordRow<"requirement">; concept: Concept; lab: LabData }) {
@@ -474,7 +481,7 @@ function CalcCard({ row }: { row: RecordRow<"calc"> }) {
       </label>
       {result.ok ? (
         <b className="mono" data-testid={`calc-${d.code}`}>
-          = {result.value.toFixed(2)} {d.unit}
+          = {Math.abs(result.value) >= 1 ? result.value.toFixed(2) : sig(result.value)} {d.unit}
         </b>
       ) : (
         <b className="fail-text" role="alert" data-testid={`calc-${d.code}`}>

@@ -11,7 +11,7 @@ export const LAB_TEMPLATES: LabTemplate[] = [
   {
     id: "product",
     label: "Product or design",
-    placeholder: "Which chair base?",
+    placeholder: "Which enclosure?",
     criteria: [["Usability", 25], ["Look and feel", 20], ["Cost", 20], ["Durability", 15], ["Ease of making", 10], ["Sustainability", 10]],
   },
   {

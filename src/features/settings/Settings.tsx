@@ -92,7 +92,7 @@ export default function Settings() {
         <div className="set-row">
           <span>
             <b>Sample data</b>
-            <span className="cap">{hasSamples ? "The demo boards, images and decision from the design package." : "Removed."}</span>
+            <span className="cap">{hasSamples ? "The ESP32 Node Programmer example: its boards, files, decisions and notes." : "Removed."}</span>
           </span>
           <Pill disabled={!hasSamples} onClick={() => setConfirming(true)}>
             Remove sample data

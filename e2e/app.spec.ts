@@ -1,17 +1,15 @@
 import { expect, Page, test } from "@playwright/test";
-import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
 });
 
-test("Home shows the design's board, decision and feed", async ({ page }) => {
+test("Home shows the example's board, decision and feed", async ({ page }) => {
   await page.goto("/#/home");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Home");
-  await expect(page.getByRole("link", { name: "Continue Furniture Study" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Continue ESP32 Node Programmer" })).toBeVisible();
   await expect(page.getByLabel("Needs a look")).toContainText("still a guess");
   await expect(page.getByRole("main").getByText("ESP32 Node Programmer").first()).toBeVisible();
 });
@@ -21,7 +19,7 @@ test("opens on the board, and every sidebar link opens its screen", async ({ pag
   await expect(page).toHaveURL(/#\/board/);
   for (const [label, heading] of [
     ["Library", "Library"],
-    ["Decide", "Which chair base?"],
+    ["Decide", "Which code target first?"],
     ["Handoff", "Handoff"],
     ["Settings", "Settings"],
   ]) {
@@ -30,69 +28,77 @@ test("opens on the board, and every sidebar link opens its screen", async ({ pag
   }
 });
 
-test("Lab shows the expected totals and flips when a guess is corrected", async ({ page }) => {
-  await page.goto("/#/lab");
-  await expect(page.getByTestId("total-A")).toHaveText("3.75");
-  await expect(page.getByTestId("total-B")).toHaveText("3.70");
+test("Decide shows the expected totals and flips when a guess is corrected", async ({ page }) => {
+  await page.goto("/#/decide");
+  await expect(page.getByTestId("total-A")).toHaveText("4.40");
+  await expect(page.getByTestId("total-B")).toHaveText("3.30");
   await expect(page.getByTestId("total-C")).toHaveText("3.35");
-  await expect(page.getByRole("heading", { name: "Too close to call." })).toBeVisible();
-  await expect(page.getByLabel("Verdict")).toContainText("A drops to 3.55 and B leads");
-  await expect(page.getByLabel("Verdict")).toContainText("B takes the lead below 18.3%");
+  await expect(page.getByRole("heading", { name: "A leads." })).toBeVisible();
 
-  await page.getByRole("button", { name: /Oak ply shell, Cost: 4, a guess/ }).click();
-  await page.getByRole("group", { name: "Score" }).getByRole("button", { name: "3" }).click();
+  // The enclosure's lead rests on a guess: printed PLA's pin access.
+  await page.goto("/#/decide/d-esp32-case");
+  await expect(page.getByTestId("total-A")).toHaveText("4.15");
+  await expect(page.getByTestId("total-C")).toHaveText("3.80");
+  await expect(page.getByLabel("Verdict")).toContainText("its pin access score is a guess");
+  await expect(page.getByLabel("Verdict")).toContainText("C takes the lead above 36.7%");
+  await page.getByRole("button", { name: /Printed PLA tray, Pin access: 5, a guess/ }).click();
+  await page.getByRole("group", { name: "Score" }).getByRole("button", { name: "2" }).click();
   await page.keyboard.press("Escape");
-  await expect(page.getByTestId("total-A")).toHaveText("3.55");
+  await expect(page.getByTestId("total-A")).toHaveText("3.40");
+  // C now leads, but C's own protection score is a guess too, and the verdict says so.
+  await expect(page.getByRole("heading", { name: "The lead rests on a guess." })).toBeVisible();
+  await expect(page.getByLabel("Verdict")).toContainText("C leads by 0.25");
 });
 
 test("linking a source turns a guess into a sourced score; unlinking reverts it", async ({ page }) => {
-  await page.goto("/#/lab");
-  await page.getByRole("button", { name: /Oak ply shell, Cost: 4, a guess/ }).click();
+  await page.goto("/#/decide/d-esp32-case");
+  await page.getByRole("button", { name: /Printed PLA tray, Cost: 4, a guess/ }).click();
   await page.getByRole("button", { name: "Link a source" }).click();
-  await page.getByRole("button", { name: "Rift oak" }).click();
-  await expect(page.getByRole("button", { name: /Oak ply shell, Cost: 4, sourced/ })).toBeVisible();
-  await page.getByRole("button", { name: "Unlink Rift oak" }).click();
-  await expect(page.getByRole("button", { name: /Oak ply shell, Cost: 4, a guess/ })).toBeVisible();
+  await page.getByRole("button", { name: "Enclosure tray v1" }).click();
+  await expect(page.getByRole("button", { name: /Printed PLA tray, Cost: 4, sourced/ })).toBeVisible();
+  await page.getByRole("button", { name: "Unlink Enclosure tray v1" }).click();
+  await expect(page.getByRole("button", { name: /Printed PLA tray, Cost: 4, a guess/ })).toBeVisible();
 });
 
 test("the what-if slider only keeps weights when asked", async ({ page }) => {
-  await page.goto("/#/lab");
-  await page.getByLabel("How much does cost matter?").fill("15");
-  await expect(page.getByTestId("total-B")).not.toHaveText("3.70");
+  await page.goto("/#/decide/d-esp32-case");
+  await page.getByLabel("How much does pin access matter?").fill("15");
+  await expect(page.getByTestId("total-B")).not.toHaveText("3.55");
   await page.getByRole("button", { name: "Reset" }).click();
-  await expect(page.getByTestId("total-B")).toHaveText("3.70");
+  await expect(page.getByTestId("total-B")).toHaveText("3.55");
 });
 
 test("Library searches by text and colour, and adds to a board with credits", async ({ page }) => {
   await page.goto("/#/library");
-  await expect(page.getByRole("figure")).toHaveCount(35);
-  await page.getByLabel(/Search the library/).fill("walnut");
+  await expect(page.getByRole("figure")).toHaveCount(18);
+  await page.getByLabel(/Search the library/).fill("breadboard");
   await expect(page.getByRole("figure")).toHaveCount(1);
   await page.getByLabel(/Search the library/).fill("");
-  await expect(page.getByRole("figure")).toHaveCount(35);
+  await expect(page.getByRole("figure")).toHaveCount(18);
 
-  await page.goto("/#/library?colour=%23C9A67D");
-  await expect(page.getByRole("figure").first()).toContainText("Rift oak");
-  await expect(page.getByText(/near oak/)).toBeVisible();
+  await page.goto("/#/library?colour=%23B4B499");
+  await expect(page.getByRole("figure").first()).toContainText("ESP32 die shot");
+  await expect(page.getByText(/near /)).toBeVisible();
 
   await page.goto("/#/library");
+  // Everything in the example is credited, so this keeps it all.
   await page.getByLabel("Credited only").check();
-  await expect(page.getByText("Tube base")).toHaveCount(0);
+  await expect(page.getByRole("figure")).toHaveCount(18);
   await page.getByLabel("Credited only").uncheck();
-  await page.getByText("Walnut veneer").hover();
-  await page.getByRole("button", { name: "Select Walnut veneer" }).click();
+  await page.getByText("ESP32 die shot").first().hover();
+  await page.getByRole("button", { name: "Select ESP32 die shot" }).click();
   await expect(page.getByText("1 selected")).toBeVisible();
   await page.getByRole("button", { name: "Add to board" }).click();
-  await page.getByRole("dialog").getByRole("button", { name: "Brand Direction" }).click();
-  await expect(page.getByRole("button", { name: "Brand Direction" })).toBeVisible();
+  await page.getByRole("dialog").getByRole("button", { name: "ESP32 Enclosure" }).click();
+  await expect(page.getByRole("button", { name: "ESP32 Enclosure" })).toBeVisible();
 });
 
 test("Home's search and swatches lead to the Library", async ({ page }) => {
   await page.goto("/#/home");
-  await page.getByLabel(/Paste a link/).fill("oak");
+  await page.getByLabel(/Paste a link/).fill("pins");
   await page.keyboard.press("Enter");
   await expect(page.getByRole("heading", { name: "Library" })).toBeVisible();
-  await expect(page.getByLabel(/Search the library/)).toHaveValue("oak");
+  await expect(page.getByLabel(/Search the library/)).toHaveValue("pins");
 });
 
 test("a pasted link goes to the browser pane, which explains itself outside the desktop app", async ({ page }) => {
@@ -106,43 +112,44 @@ test("a pasted link goes to the browser pane, which explains itself outside the 
 
 test.describe("canvas", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/#/canvas/b-furniture");
-    await expect(page.getByRole("button", { name: "Furniture Study" })).toBeVisible();
+    await page.goto("/#/canvas/b-esp32");
+    await expect(page.getByRole("button", { name: "ESP32 Node Programmer" })).toBeVisible();
   });
 
   test("renders the seeded board with provenance marks", async ({ page }) => {
     await expect(page.getByTestId("item-image").first()).toBeVisible();
-    await expect(page.getByTestId("item-sticky")).toContainText("mould lead time");
-    await expect(page.getByLabel("assumption, no source yet")).toBeVisible();
-    await expect(page.getByText("no source yet")).toBeVisible();
+    await expect(page.getByTestId("item-sticky").filter({ hasText: "no pull-up" })).toBeVisible();
+    await expect(page.getByRole("img", { name: "sourced" }).first()).toBeVisible();
+    await expect(page.getByText("no evidence yet")).toBeVisible();
   });
 
   test("adds a sticky, undoes it, and redoes it", async ({ page }) => {
     await expect(page.getByTestId("item-sticky").first()).toBeVisible();
-    const before = await page.getByTestId("item-sticky").count();
+    // Only what's on screen is mounted, so count the new note itself.
+    const note = page.getByTestId("item-sticky").filter({ hasText: "Test note" });
     await page.getByRole("button", { name: "Sticky note" }).click();
     await page.mouse.click(1100, 640);
     await page.getByLabel("Sticky note text").fill("Test note");
     await page.mouse.click(1380, 300);
-    await expect(page.getByText("Test note")).toBeVisible();
-    await expect(page.getByTestId("item-sticky")).toHaveCount(before + 1);
+    await expect(note).toHaveCount(1);
     await page.keyboard.press("Control+z");
     await page.keyboard.press("Control+z");
-    await expect(page.getByTestId("item-sticky")).toHaveCount(before);
+    await expect(note).toHaveCount(0);
     await page.keyboard.press("Control+Shift+z");
-    await expect(page.getByTestId("item-sticky")).toHaveCount(before + 1);
+    await expect(note).toHaveCount(1);
   });
 
   test("selecting an image shows where it's from, and dragging moves it", async ({ page }) => {
-    const image = page.getByRole("img", { name: "Reading corner" });
+    const image = page.getByRole("img", { name: "ESP32 dev board" });
     await image.click();
-    await expect(page.getByLabel("Where it's from")).toContainText("[studio]");
+    await expect(page.getByLabel("Where it's from")).toContainText("Ubahnverleih");
     await expect(page.getByLabel("Where it's from")).toContainText("Human-made");
     await expect(page.getByRole("toolbar", { name: "Selection actions" })).toBeVisible();
     const box = (await image.boundingBox())!;
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    // Near the top: the details panel can sit over the lower half of a picture low on the screen.
+    await page.mouse.move(box.x + box.width / 2, box.y + 8);
     await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 2 - 200, box.y + box.height / 2 + 40, { steps: 5 });
+    await page.mouse.move(box.x + box.width / 2 - 200, box.y + 48, { steps: 5 });
     await page.mouse.up();
     const after = (await image.boundingBox())!;
     expect(after.x).toBeLessThan(box.x - 100);
@@ -163,9 +170,9 @@ test.describe("canvas", () => {
     await zoom.click();
     await expect(zoom).toHaveText(start!);
 
-    const image = page.getByRole("img", { name: "Lounge, oak legs" });
+    const image = page.getByRole("img", { name: "ESP32 die shot" });
     const before = (await image.boundingBox())!;
-    const label = (await page.getByText("form", { exact: true }).boundingBox())!;
+    const label = (await page.getByText("The board", { exact: true }).boundingBox())!;
     await page.mouse.move(label.x + 5, label.y + 5);
     await page.mouse.down();
     await page.mouse.move(label.x + 80, label.y + 60, { steps: 4 });
@@ -188,8 +195,8 @@ test.describe("canvas", () => {
 test("Threads draws a graph and lists what's unsupported", async ({ page }) => {
   await page.goto("/#/threads");
   await expect(page.getByTestId("graph").locator("canvas").first()).toBeVisible();
-  await expect(page.getByLabel("Details")).toContainText("Tube base");
-  await page.getByLabel("Details").getByRole("button", { name: /Tube base/ }).click();
+  await expect(page.getByLabel("Details")).toContainText("Beginners will prefer");
+  await page.getByLabel("Details").getByRole("button", { name: /Beginners will prefer/ }).click();
   await expect(page.getByLabel("Details").getByRole("link", { name: "Open" })).toBeVisible();
 });
 
@@ -249,9 +256,9 @@ test("Threads keeps the same graph when filtering, and restores it", async ({ pa
 });
 
 test("Share shows the page and comments, and takes a new one", async ({ page }) => {
-  await page.goto("/#/share/b-furniture");
-  await expect(page.getByLabel("Headline")).toHaveValue("A softer reading chair");
-  await expect(page.getByLabel("Comments")).toContainText("darker oak");
+  await page.goto("/#/share/b-esp32");
+  await expect(page.getByLabel("Headline")).toHaveValue("Wire blocks, get firmware");
+  await expect(page.getByLabel("Comments")).toContainText("I2C pins");
   await page.getByPlaceholder("Write a comment…").fill("Looks good");
   await page.getByRole("button", { name: "Comment", exact: true }).click();
   await expect(page.getByLabel("Comments")).toContainText("Looks good");
@@ -259,28 +266,28 @@ test("Share shows the page and comments, and takes a new one", async ({ page }) 
 });
 
 test("Share exports a self-contained page", async ({ page }) => {
-  await page.goto("/#/share/b-furniture");
+  await page.goto("/#/share/b-esp32");
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export share page" }).click();
-  expect((await download).suggestedFilename()).toBe("A softer reading chair.html");
+  expect((await download).suggestedFilename()).toBe("Wire blocks get firmware.html");
 });
 
 test("Present steps through sections", async ({ page }) => {
-  await page.goto("/#/present/b-furniture");
-  await expect(page.getByRole("heading", { name: "form" })).toBeVisible();
+  await page.goto("/#/present/b-esp32");
+  await expect(page.getByRole("heading", { name: "Hardware" })).toBeVisible();
   await page.keyboard.press("ArrowRight");
-  await expect(page.getByRole("heading", { name: "materials" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Editor" })).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(page.getByRole("button", { name: "Furniture Study" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "ESP32 Node Programmer" })).toBeVisible();
 });
 
 test("the command palette navigates and searches", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
   await page.keyboard.press("Control+k");
-  await page.getByLabel("Search or run a command").fill("gripper");
+  await page.getByLabel("Search or run a command").fill("ESP32 Enclosure");
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("button", { name: "Gripper Concept" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "ESP32 Enclosure" })).toBeVisible();
 });
 
 test("settings: name is kept, dark theme applies, sample data removes cleanly", async ({ page }) => {
@@ -292,7 +299,7 @@ test("settings: name is kept, dark theme applies, sample data removes cleanly", 
   await page.getByRole("alertdialog").getByRole("button", { name: "Remove" }).click();
   await expect(page.getByPlaceholder("Your name")).toHaveValue("Test Person");
   await page.goto("/#/home");
-  await expect(page.getByText("Furniture Study")).toHaveCount(0);
+  await expect(page.getByText("ESP32 Node Programmer")).toHaveCount(0);
   await page.goto("/#/library");
   await expect(page.getByText("Your library is empty.")).toBeVisible();
   await page.goto("/#/lab");

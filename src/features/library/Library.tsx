@@ -338,7 +338,7 @@ export function Library() {
               )}
               <input
                 aria-label="Search the library by idea, colour or maker"
-                placeholder="soft curves, lounge, maker…"
+                placeholder="pins, breadboard, Espressif…"
                 value={query}
                 onChange={(e) => setParam("q", e.target.value || null)}
               />

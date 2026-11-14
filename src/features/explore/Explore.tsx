@@ -109,7 +109,7 @@ function PapersTab({ initial, onOpen }: { initial: string; onOpen: (url: string)
         <input
           value={query}
           aria-label="Search papers"
-          placeholder="perceived comfort of textured upholstery"
+          placeholder="microcontroller programming for beginners"
           onChange={(e) => setQuery(e.target.value)}
         />
         <Pill ink type="submit" disabled={busy || !sources.length || !query.trim()}>

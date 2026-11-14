@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { Repo, openRepo } from "./repo";
-import { ESP_BOARD, ESP_BOARD_ITEMS, ESP_BRIEF, ESP_ITEMS_AT, ESP_REVIEW, ESP_V1_ITEM_IDS, esp32Plan, SEED_ESP32 } from "./seedEsp32";
+import { ESP_BOARD, ESP_BOARD_ITEMS, ESP_BRIEF, ESP_ITEMS_AT, ESP_PROJECT, ESP_REVIEW, ESP_V1_ITEM_IDS, esp32Plan, SEED_ESP32 } from "./seedEsp32";
 import {
   Asset,
   Board,
@@ -92,6 +92,8 @@ export interface Settings {
   seeded_v4: string;
   /** Set once the ESP32 board has its claim cards. */
   seeded_v5: string;
+  /** Set once the older samples are gone and the ESP32 example has everything it shows. */
+  seeded_v6: string;
   /** "open" shows the pack tray's itemised breakdown. */
   tray: string;
   seeded_v3: string;
@@ -149,6 +151,7 @@ const DEFAULTS: Settings = {
   sidebar: "",
   seeded_v4: "",
   seeded_v5: "",
+  seeded_v6: "",
   tray: "",
   seeded_v3: "",
   packs: "",
@@ -277,6 +280,56 @@ function snapshotValue(table: TableName, row: Record<string, unknown>): string |
 
 /** A row that failed to save, as "table\u0000id". Retried from memory, so a stale write never wins. */
 const dirtyKey = (table: TableName, id: string) => `${table}\u0000${id}`;
+
+/**
+ * Removes the older samples (furniture, engineering, agents) from a store loaded before they were retired, and
+ * gives the ESP32 example any rows added to it since. Only sample rows go, plus what lived inside a sample board
+ * or decision; the ESP32 example and the person's own work stay. Changes `loaded` to match what it writes.
+ */
+export async function retireOldSamples(repo: Repo, loaded: Record<TableName, unknown[]>) {
+  type Row = { id: string; is_sample?: boolean; board_id?: string | null; decision_id?: string; concept_id?: string; parent_id?: string | null };
+  const rows = (t: TableName) => loaded[t] as Row[];
+  const esp = new Set(Object.values(SEED_ESP32).flatMap((list) => (list as { id: string }[]).map((r) => r.id)));
+  const old = (r: Row) => !!r.is_sample && !esp.has(r.id);
+  const boards = new Set(rows("boards").filter(old).map((r) => r.id));
+  const decisions = new Set(rows("decisions").filter(old).map((r) => r.id));
+  const concepts = new Set(rows("concepts").filter((r) => decisions.has(r.decision_id!)).map((r) => r.id));
+  const gone: Partial<Record<TableName, (r: Row) => boolean>> = {
+    assets: old,
+    boards: old,
+    claims: old,
+    evidence_links: old,
+    decisions: old,
+    comments: (r) => old(r) || boards.has(r.board_id!),
+    records: (r) => old(r) || decisions.has(r.parent_id!),
+    board_items: (r) => boards.has(r.board_id!),
+    concepts: (r) => concepts.has(r.id),
+    criteria: (r) => decisions.has(r.decision_id!),
+    scores: (r) => concepts.has(r.concept_id!),
+  };
+  for (const [table, test] of Object.entries(gone) as [TableName, (r: Row) => boolean][]) {
+    const drop = rows(table).filter(test);
+    for (const r of drop) await repo.del(table, r.id);
+    if (drop.length) loaded[table] = rows(table).filter((r) => !test(r));
+  }
+  // Only for someone who still has the ESP32 example: add what's missing, never replacing a row they have.
+  if (!rows("boards").some((b) => b.id === ESP_BOARD)) return;
+  for (const [table, seed] of Object.entries(SEED_ESP32) as [TableName, Row[]][]) {
+    const have = new Set(rows(table).map((r) => r.id));
+    const missing = seed.filter((r) => !have.has(r.id) && r.id !== ESP_PROJECT);
+    for (const r of missing) await repo.put(table, r as never);
+    if (missing.length) loaded[table] = [...rows(table), ...missing];
+  }
+  // The project lists the new parts too, keeping anything the person added to it.
+  const project = (loaded.records as RecordRow[]).find((r) => r.id === ESP_PROJECT && r.type === "project") as RecordRow<"project"> | undefined;
+  const seeded = SEED_ESP32.records.find((r) => r.id === ESP_PROJECT) as RecordRow<"project">;
+  if (project) {
+    const merge = (k: "board_ids" | "decision_ids" | "asset_ids" | "record_ids") => [...new Set([...project.data[k], ...seeded.data[k]])];
+    const next = { ...project, data: { ...project.data, board_ids: merge("board_ids"), decision_ids: merge("decision_ids"), asset_ids: merge("asset_ids"), record_ids: merge("record_ids") } };
+    await repo.put("records", next);
+    loaded.records = (loaded.records as RecordRow[]).map((r) => (r.id === ESP_PROJECT ? next : r));
+  }
+}
 
 export const useStore = create<State>((set, get) => {
   const dirty = new Set<string>();
@@ -417,7 +470,7 @@ export const useStore = create<State>((set, get) => {
           (config as Record<string, string>)[row.id] = row.value;
         }
         // A fresh install starts with one example: the ESP32 Node Programmer (added just below).
-        // The older furniture, engineering and agents samples are no longer seeded.
+        // The older furniture, engineering and agents samples are no longer seeded, and seeded_v6 removes them.
         const fresh = !config.seeded;
         if (fresh) {
           for (const id of ["seeded", "seeded_v2", "seeded_v3"] as const) {
@@ -469,6 +522,13 @@ export const useStore = create<State>((set, get) => {
           }
           config.seeded_v5 = "1";
           await repo.put("settings", { id: "seeded_v5", value: "1" });
+        }
+        // The ESP32 project is the only example. The older samples go, with everything inside their boards and
+        // decisions (as Remove sample data does). Anyone who still has the ESP32 sample gains the parts added since.
+        if (!config.seeded_v6) {
+          await retireOldSamples(repo, loaded);
+          config.seeded_v6 = "1";
+          await repo.put("settings", { id: "seeded_v6", value: "1" });
         }
         if (isTauri) {
           if (!config.library_dir) {

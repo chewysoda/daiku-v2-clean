@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { CalcData, PartData, RequirementData } from "../data/types";
-import { SEED_V2 } from "../data/seed";
+import { SEED_ESP32 } from "../data/seedEsp32";
 import { bomMass, convergenceStep, convert, evaluate, LabData, meets, requirementValue, runCalc, safetyFactor, standing, targetText } from "./engineering";
 import { bibEntry, claimStrength, csvCell, frontMatter, gatePasses, parseInterviewNotes, parseWikiLinks, safeFileName, shareCell, stanceOf, toCsv } from "./studio";
 import { canvasFor } from "./vault";
 
 const calc = (inputs: [string, string][], formula: string, unit: string) => runCalc({ inputs: inputs.map(([name, expr]) => ({ name, expr })), formula, unit });
 
-const of = (type: string) => SEED_V2.records.filter((r) => r.type === type);
+// The enclosure decision in the ESP32 example: its parts, calculations and drop-test runs.
+const of = (type: string) => SEED_ESP32.records.filter((r) => r.type === type && r.parent_id === "d-esp32-case");
 const lab: LabData = {
   parts: of("part").map((p) => p.data as PartData),
   calcs: of("calc").map((c) => ({ id: c.id, data: c.data as CalcData })),
@@ -61,34 +62,38 @@ describe("unit-aware calculations", () => {
 });
 
 describe("requirements against the sample data", () => {
-  it("rolls the BOM up to 7.15 kg, as the wireframe does", () => {
-    expect(bomMass(lab.parts, lab.calcs)).toBeCloseTo(7.15, 2);
+  it("rolls the enclosure's BOM up to 0.039 kg, with the tray's mass from calc C1", () => {
+    expect(bomMass(lab.parts, lab.calcs)).toBeCloseTo(0.01 + 0.0094 * 0.002 * 1240 + 0.004 + 0.002, 5);
   });
   it("won't total a BOM with a part of unknown mass", () => {
     const parts = [...lab.parts, { ...lab.parts[1], mass_kg: null, calc_id: null }];
     expect(bomMass(parts, lab.calcs)).toBeNull();
     expect(bomMass([], lab.calcs)).toBeNull();
   });
-  it("computes the wireframe's safety factors", () => {
-    expect(safetyFactor({ max_stress_mpa: 19, allowable_mpa: 40 })).toBeCloseTo(2.1, 1);
-    expect(safetyFactor({ max_stress_mpa: 42, allowable_mpa: 110 })).toBeCloseTo(2.6, 1);
+  it("computes the drop runs' safety factors", () => {
+    expect(safetyFactor({ max_stress_mpa: 11, allowable_mpa: 30 })).toBeCloseTo(2.7, 1);
+    expect(safetyFactor({ max_stress_mpa: 14, allowable_mpa: 40 })).toBeCloseTo(2.9, 1);
     expect(safetyFactor({ max_stress_mpa: null, allowable_mpa: 40 })).toBeNull();
   });
-  it("reports mesh convergence of about 1.1%", () => {
-    expect(convergenceStep([{ value: 17.6 }, { value: 18.8 }, { value: 19 }])).toBeCloseTo(0.0106, 3);
+  it("reports mesh convergence of about 0.9%", () => {
+    expect(convergenceStep([{ value: 10.2 }, { value: 10.9 }, { value: 11 }])).toBeCloseTo(0.0091, 3);
     expect(convergenceStep([{ value: 1 }])).toBeNull();
   });
-  it("gives concept A the wireframe's 4 pass, 1 fail, 1 open", () => {
-    const st = standing(reqs, "k-a", lab);
-    expect(st).toEqual({ pass: 4, fail: 1, open: 1, failedMust: ["R2"] });
+  it("fails the printed tray on mass, as 2 mm walls make it too heavy", () => {
+    expect(standing(reqs, "espc-a", lab)).toEqual({ pass: 3, fail: 2, open: 0, failedMust: ["R2"] });
   });
-  it("gives B and C the wireframe's 1 pass, 5 open", () => {
-    for (const id of ["k-b", "k-c"]) expect(standing(reqs, id, lab)).toEqual({ pass: 1, fail: 0, open: 5, failedMust: [] });
+  it("passes the mass once the walls are 1.5 mm", () => {
+    const thinner = lab.calcs.map((c) => (c.data.code === "C1" ? { ...c, data: { ...c.data, inputs: c.data.inputs.map((i) => (i.name === "t" ? { ...i, expr: "1.5 mm" } : i)) } } : c));
+    expect(standing(reqs, "espc-a", { ...lab, calcs: thinner }).failedMust).toEqual([]);
+  });
+  it("fails the ABS box on its USB slot, and leaves the bare board open", () => {
+    expect(standing(reqs, "espc-b", lab)).toEqual({ pass: 1, fail: 1, open: 3, failedMust: ["R3"] });
+    expect(standing(reqs, "espc-c", lab)).toEqual({ pass: 0, fail: 0, open: 5, failedMust: [] });
   });
   it("uses the weakest run, so a good one can't hide a bad one", () => {
     const r1 = reqs[0];
-    const runs = [{ ...lab.runs[0], concept_id: "x" }, { ...lab.runs[0], concept_id: "x", max_stress_mpa: 30 }];
-    expect(requirementValue(r1, "x", { ...lab, runs }).value).toBeCloseTo(40 / 30);
+    const runs = [{ ...lab.runs[0], concept_id: "x" }, { ...lab.runs[0], concept_id: "x", max_stress_mpa: 15 }];
+    expect(requirementValue(r1, "x", { ...lab, runs }).value).toBeCloseTo(30 / 15);
   });
   it("ignores queued runs", () => {
     const queued = { ...lab.runs[0], concept_id: "x", status: "queued" as const };
