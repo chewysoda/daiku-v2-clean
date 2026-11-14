@@ -1,5 +1,10 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { withOlderSamples } from "./samples";
+
+test.beforeEach(async ({ page }) => {
+  await withOlderSamples(page);
+});
 
 const shots = process.env.RECORD_SHOTS;
 

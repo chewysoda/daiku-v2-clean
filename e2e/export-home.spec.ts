@@ -1,8 +1,10 @@
 import { readFileSync } from "node:fs";
 import { expect, Page, test } from "@playwright/test";
 import { strFromU8, unzipSync } from "fflate";
+import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
+  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
@@ -111,7 +113,7 @@ test.describe("home", () => {
     await expect(start).toContainText("0 of 5 done");
     await expect(start).toContainText("Paste a link above");
     await start.getByRole("link", { name: "See every step on the example board" }).click();
-    await expect(page.getByTestId("item-sticky").filter({ hasText: "No face, no mascot" })).toBeVisible();
+    await expect(page.getByTestId("item-sticky").filter({ hasText: "GPIO 34–39 are input only" })).toBeVisible();
     await page.goto("/#/home");
     await start.getByRole("button", { name: "Hide" }).click();
     await expect(start).toHaveCount(0);

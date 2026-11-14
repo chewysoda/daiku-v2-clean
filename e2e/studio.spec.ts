@@ -1,8 +1,10 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { strFromU8, unzipSync } from "fflate";
+import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
+  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });

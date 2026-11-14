@@ -1,6 +1,8 @@
 import { expect, Page, test } from "@playwright/test";
+import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
+  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });

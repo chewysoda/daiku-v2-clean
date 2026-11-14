@@ -1,5 +1,6 @@
 import { expect, Page, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
+import { withOlderSamples } from "./samples";
 
 const FONT = "node_modules/@fontsource/dm-mono/files/dm-mono-latin-400-normal.woff2";
 const FONT_2 = "node_modules/@fontsource/dm-mono/files/dm-mono-latin-500-normal.woff2";
@@ -8,6 +9,7 @@ const IMAGE = "src-tauri/icons/128x128.png";
 const VIDEO = "e2e/fixtures/loop.webm";
 
 test.beforeEach(async ({ page }) => {
+  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
