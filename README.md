@@ -14,7 +14,6 @@ selection. Windows-first desktop app, built with Tauri 2, React and TypeScript.
 
 How the features connect: [FEATURES.md](FEATURES.md).
 
-See [design/README.md](design/README.md) for the design package.
 
 ## Install it
 

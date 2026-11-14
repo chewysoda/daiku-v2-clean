@@ -1,8 +1,7 @@
 # Daiku's features and how they connect
 
 Everything sits on one local store (`src/data/store.ts`, the most connected part of the code). The features below read
-and write it, and a handful of shared rules travel with the data wherever it goes. The connections here come from the
-code graph in `graphify-out/` (`graph.html` to explore it).
+and write it, and a handful of shared rules travel with the data wherever it goes.
 
 ## The research loop
 

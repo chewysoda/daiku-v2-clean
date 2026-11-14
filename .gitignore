@@ -41,3 +41,12 @@ graphify-out/
 
 # Setup files made by npm run share, for sending to people: built, not source
 share/
+
+# Internal notes, AI prompts and design work files: kept on this machine, not published
+DAIKU_V2_EXPLAINER.md
+DAIKU_V2_GLASS_PROMPT.md
+REDESIGN_PROMPT.md
+design/README.md
+design/docs/
+design/screens/
+design/wireframes/
