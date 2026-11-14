@@ -136,7 +136,7 @@ function AssetDetails({ asset, onClose }: { asset: Asset; onClose: () => void })
         <Pill
           className="small"
           disabled={!asset.source_url}
-          onClick={() => asset.source_url && void openExternal(asset.source_url)}
+          onClick={() => asset.source_url && void openExternal(asset.source_url).catch(() => toast("That link can't be opened. A source link has to start with http:// or https://.", "error"))}
         >
           Open source
         </Pill>

@@ -11,17 +11,20 @@ test("Home shows the example's board, decision and feed", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Home");
   await expect(page.getByRole("link", { name: "Continue ESP32 Node Programmer" })).toBeVisible();
   await expect(page.getByLabel("Needs a look")).toContainText("still a guess");
-  await expect(page.getByRole("main").getByText("ESP32 Node Programmer").first()).toBeVisible();
+  await expect(page.getByRole("region", { name: "Decisions" })).toContainText("Which code target first?");
+  await expect(page.getByRole("region", { name: "Recently saved" })).toContainText("Espressif");
 });
 
-test("opens on the board, and every sidebar link opens its screen", async ({ page }) => {
+test("opens on Home, and every sidebar link opens its screen", async ({ page }) => {
   await page.goto("/");
-  await expect(page).toHaveURL(/#\/board/);
+  await expect(page).toHaveURL(/#\/home/);
+  await expect(page.getByRole("region", { name: "At a glance" })).toContainText("Claims backed");
   for (const [label, heading] of [
     ["Library", "Library"],
     ["Decide", "Which code target first?"],
     ["Handoff", "Handoff"],
     ["Settings", "Settings"],
+    ["Home", "Home"],
   ]) {
     await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: label, exact: true }).click();
     await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();

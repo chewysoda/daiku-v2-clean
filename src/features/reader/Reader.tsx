@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import * as pdfjs from "pdfjs-dist";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
@@ -15,7 +15,8 @@ import { Capture } from "../../lib/web";
 import { CaptureTray } from "../explore/CaptureTray";
 import { SnipOverlay } from "../explore/SnipOverlay";
 import { fetchBytes } from "../../lib/saveFile";
-import { openBoardId, placeOnBoard } from "../../lib/placeOnBoard";
+import { useBoardHere } from "../../lib/boardHere";
+import { placeOnBoard } from "../../lib/placeOnBoard";
 import "../studio.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
@@ -69,8 +70,9 @@ function PageView({
     let layer: { cancel: () => void } | null = null;
     onRendered(false);
     void (async () => {
-      const p = await doc.getPage(page);
-      if (cancelled) return;
+      // A page the file doesn't have (or can't read) leaves the view blank, rather than an unhandled error.
+      const p = await doc.getPage(page).catch(() => null);
+      if (cancelled || !p) return;
       const viewport = p.getViewport({ scale });
       const ratio = window.devicePixelRatio || 1;
       const c = canvas.current;
@@ -151,7 +153,7 @@ export default function Reader({ assetId: givenId, embedded = false }: { assetId
   const deleteRecord = useStore((s) => s.deleteRecord);
   const linkEvidence = useStore((s) => s.linkEvidence);
   const addClaim = useStore((s) => s.addClaim);
-  const boardId = openBoardId(useLocation().pathname);
+  const boardId = useBoardHere();
   const [doc, setDoc] = useState<PDFDocumentProxy | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -242,7 +244,10 @@ export default function Reader({ assetId: givenId, embedded = false }: { assetId
     try {
       const hits: { page: number; text: string }[] = [];
       for (let n = 1; n <= doc.numPages && hits.length < 100; n++) {
-        const content = await (await doc.getPage(n)).getTextContent();
+        const p = await doc.getPage(n);
+        const content = await p.getTextContent();
+        // Lets go of the page's data, or a long file's pages all stay in memory after one search.
+        p.cleanup();
         const line = content.items.map((i) => ("str" in i ? i.str : "")).join(" ").replace(/\s+/g, " ");
         const lower = line.toLowerCase();
         for (let at = lower.indexOf(q.toLowerCase()); at >= 0 && hits.length < 100; at = lower.indexOf(q.toLowerCase(), at + q.length)) {
@@ -251,6 +256,8 @@ export default function Reader({ assetId: givenId, embedded = false }: { assetId
       }
       setFound({ query: q, hits });
       if (hits[0]) setPage(hits[0].page);
+    } catch {
+      toast("Couldn't search this file. It may be damaged.", "error");
     } finally {
       setFinding(false);
     }

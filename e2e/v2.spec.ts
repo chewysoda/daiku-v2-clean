@@ -49,8 +49,38 @@ test("the tray opens into a receipt, and the sidebar collapses to icons", async 
   await expect(tray.getByRole("heading", { name: /Pinned/ })).toBeVisible();
   await expect(tray.getByRole("heading", { name: /Left out/ })).toBeVisible();
   await page.keyboard.press("Control+\\");
-  await expect(page.locator(".sidebar.collapsed")).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Decide", exact: true })).toBeVisible();
+  const nav = page.getByRole("navigation", { name: "Main" });
+  await expect(nav).toHaveClass(/collapsed/);
+  await expect(nav.getByRole("link", { name: "Decide", exact: true })).toBeVisible();
+});
+
+test("the collapsed sidebar is a narrow rail, whatever other stylesheets are loaded", async ({ page }) => {
+  // pdf.js ships a global .sidebar rule (min-width 180px) that once held the rail open at 180px.
+  await page.goto("/#/home");
+  // The Reader (and with it pdf.js's stylesheet) is preloaded shortly after start; wait until it is in.
+  await page.waitForFunction(() =>
+    [...document.styleSheets].some((s) => {
+      try {
+        return [...s.cssRules].some((r) => r.cssText.includes("--sidebar-min-width"));
+      } catch {
+        return false;
+      }
+    }),
+  );
+  const nav = page.getByRole("navigation", { name: "Main" });
+  await nav.getByRole("button", { name: "Collapse the sidebar" }).click();
+  await expect(nav).toHaveClass(/collapsed/);
+  await expect.poll(async () => (await nav.boundingBox())?.width ?? 0).toBeLessThanOrEqual(64);
+});
+
+test("on a short window the bottom of the sidebar stays reachable with Tools open", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/#/home");
+  const nav = page.getByRole("navigation", { name: "Main" });
+  const tools = nav.getByRole("button", { name: "Tools" });
+  if ((await tools.getAttribute("aria-expanded")) !== "true") await tools.click();
+  await expect(nav.getByRole("link", { name: "Settings" })).toBeInViewport();
+  await expect(nav.getByRole("button", { name: "Everything else" })).toBeInViewport();
 });
 
 test("reduce transparency makes the glass solid; the browser preview never claims Mica", async ({ page }) => {
@@ -59,7 +89,7 @@ test("reduce transparency makes the glass solid; the browser preview never claim
   await page.getByLabel("Reduce transparency").selectOption("on");
   await expect(page.locator("html")).toHaveAttribute("data-glass", "solid");
   await page.goto("/#/library");
-  const filter = await page.locator(".sidebar").evaluate((el) => getComputedStyle(el).backdropFilter);
+  const filter = await page.locator(".app-sidebar").evaluate((el) => getComputedStyle(el).backdropFilter);
   expect(filter).toBe("none");
 });
 

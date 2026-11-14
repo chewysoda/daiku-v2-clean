@@ -1,11 +1,15 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { useShallow } from "zustand/react/shallow";
 import { Board, useStore } from "../../data/store";
 import { ESP_BOARD } from "../../data/seedEsp32";
 import { firstRunSteps } from "../../lib/firstRun";
 import { Icon } from "../../design/Icon";
 import { AssetImage, Pill } from "../../design/primitives";
 import { asWebUrl } from "../../lib/web";
+import { greetingFor } from "../../lib/greeting";
+import { projectsIn } from "../../lib/projects";
+import { projectSummary, ProjectSummary, standingText } from "../../lib/projectSummary";
 import { pickAndImport } from "../library/importing";
 import { NewDialog } from "../../app/NewDialog";
 import "./home.css";
@@ -41,32 +45,173 @@ function BoardRow({ board }: { board: Board }) {
   );
 }
 
+/** The project in numbers, each one a door to where it's worked on. */
+function AtAGlance({ p }: { p: ProjectSummary }) {
+  const records = useStore((s) => s.records);
+  const setSetting = useStore((s) => s.setSetting);
+  const projects = useMemo(() => projectsIn({ records }), [records]);
+  const share = p.claims ? Math.round((p.backed / p.claims) * 100) : 0;
+  const scored = p.decisions.filter((d) => d.kind !== "empty").length;
+  const tiles: { label: string; value: string; note: string; to: string; meter?: number }[] = [
+    {
+      label: "Sources",
+      value: String(p.sources.length),
+      note: p.sources.length ? `${p.credited} with their credit` : "nothing saved yet",
+      to: "/library",
+    },
+    {
+      label: "Claims backed",
+      value: p.claims ? `${p.backed}/${p.claims}` : "0",
+      note: p.claims ? `${share}% have evidence` : "no claims yet",
+      to: "/explore/claims",
+      meter: p.claims ? p.backed / p.claims : undefined,
+    },
+    {
+      label: "Decisions",
+      value: String(p.decisions.length),
+      note: p.decisions.length ? `${scored} scored` : "none started",
+      to: "/decide",
+    },
+    {
+      label: "Guesses left",
+      value: String(p.guesses),
+      note: p.guesses ? "scores with no evidence" : "every score is backed",
+      to: "/decide",
+    },
+  ];
+  return (
+    <section aria-label="At a glance" className="home-glance">
+      <div className="home-glance-head">
+        <label className="home-project">
+          <span className="sr-only">Project</span>
+          <select className="home-project-pick" value={p.projectId ?? ""} onChange={(e) => setSetting("project_current", e.target.value)}>
+            <option value="">All work</option>
+            {projects.map((x) => (
+              <option key={x.id} value={x.id}>
+                {x.data.name || "Untitled project"}
+              </option>
+            ))}
+          </select>
+          <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </label>
+        <span className="cap">
+          {p.boards.length} {p.boards.length === 1 ? "board" : "boards"}
+          {p.lastActive && <> · last worked on {timeAgo(p.lastActive)}</>}
+        </span>
+      </div>
+      <ul className="home-tiles">
+        {tiles.map((t) => (
+          <li key={t.label}>
+            <Link to={t.to} className="home-tile">
+              <span className="cap">{t.label}</span>
+              <span className="home-tile-value">{t.value}</span>
+              {t.meter !== undefined && (
+                <span className="home-meter" aria-hidden="true">
+                  <span style={{ width: `${Math.round(t.meter * 100)}%` }} />
+                </span>
+              )}
+              <span className="home-tile-note">{t.note}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/** Each decision and who's ahead, in one sentence. */
+function Decisions({ p }: { p: ProjectSummary }) {
+  if (!p.decisions.length) return null;
+  return (
+    <section aria-label="Decisions" className="home-section">
+      <div className="home-section-head">
+        <h2 className="cap">decisions</h2>
+        <Link to="/decide/all" className="cap">
+          all decisions →
+        </Link>
+      </div>
+      <ul className="home-rows">
+        {p.decisions.slice(0, 3).map((d) => (
+          <li key={d.decision.id}>
+            <Link to={`/decide/${d.decision.id}`} className="home-row">
+              <span className={`home-thumb home-standing ${d.kind}`}>
+                <Icon name="decide" size={18} />
+              </span>
+              <span className="home-row-text">
+                <span className="home-row-name">{d.decision.title || "Untitled decision"}</span>
+                <span className="cap">{standingText(d)}</span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /** One line per thing that needs a person, and nothing when nothing does. */
-function NeedsALook() {
-  const claims = useStore((s) => s.claims);
-  const links = useStore((s) => s.evidence_links);
-  const scores = useStore((s) => s.scores);
-  const unsourced = claims.filter((c) => !links.some((l) => l.target_type === "claim" && l.target_id === c.id));
-  const guesses = scores.filter((x) => x.is_assumption).length;
-  if (!unsourced.length && !guesses) return null;
+function NeedsALook({ p }: { p: ProjectSummary }) {
+  const unsourced = p.claims - p.backed;
+  const uncredited = p.sources.length - p.credited;
+  if (!unsourced && !p.guesses && !uncredited) return null;
   return (
     <section aria-label="Needs a look" className="home-section">
       <h2 className="cap">needs a look</h2>
       <ul className="home-lines">
-        {unsourced.length > 0 && (
+        {unsourced > 0 && (
           <li>
             <Link to="/explore/claims">
-              {unsourced.length} {unsourced.length === 1 ? "claim still needs" : "claims still need"} a source
+              {unsourced} {unsourced === 1 ? "claim still needs" : "claims still need"} a source
             </Link>
           </li>
         )}
-        {guesses > 0 && (
+        {p.guesses > 0 && (
           <li>
             <Link to="/decide">
-              {guesses} {guesses === 1 ? "score is" : "scores are"} <span className="guess">still a guess</span>
+              {p.guesses} {p.guesses === 1 ? "score is" : "scores are"} <span className="guess">still a guess</span>
             </Link>
           </li>
         )}
+        {uncredited > 0 && (
+          <li>
+            <Link to="/library">
+              {uncredited} {uncredited === 1 ? "source doesn't say" : "sources don't say"} where it came from
+            </Link>
+          </li>
+        )}
+      </ul>
+    </section>
+  );
+}
+
+const hostOf = (url: string | null) => {
+  try {
+    return url ? new URL(url).hostname.replace(/^www\./, "") : "";
+  } catch {
+    return "";
+  }
+};
+
+/** The latest things saved, so a new source is easy to find again and place. */
+function RecentlySaved({ p }: { p: ProjectSummary }) {
+  if (!p.sources.length) return null;
+  return (
+    <section aria-label="Recently saved" className="home-section">
+      <div className="home-section-head">
+        <h2 className="cap">recently saved</h2>
+        <Link to="/library" className="cap">
+          library →
+        </Link>
+      </div>
+      <ul className="home-saved">
+        {p.sources.slice(0, 5).map((a) => (
+          <li key={a.id}>
+            <Link to={`/library?q=${encodeURIComponent(a.title)}`}>{a.title || "Untitled"}</Link>
+            <span className="cap">{a.credit || hostOf(a.source_url) || "no credit yet"}</span>
+          </li>
+        ))}
       </ul>
     </section>
   );
@@ -116,13 +261,29 @@ function StartHere() {
 }
 
 export function Home() {
-  const boards = useStore((s) => s.boards);
+  const name = useStore((s) => s.config.name);
+  const projectId = useStore((s) => s.config.project_current);
+  const rows = useStore(
+    useShallow((s) => ({
+      records: s.records,
+      boards: s.boards,
+      assets: s.assets,
+      board_items: s.board_items,
+      claims: s.claims,
+      evidence_links: s.evidence_links,
+      decisions: s.decisions,
+      concepts: s.concepts,
+      criteria: s.criteria,
+      scores: s.scores,
+    })),
+  );
+  const summary = useMemo(() => projectSummary(rows, projectId), [rows, projectId]);
   const startHidden = useStore((s) => !!s.config.example_hidden);
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [naming, setNaming] = useState(false);
 
-  const recent = useMemo(() => [...boards].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 3), [boards]);
+  const recent = summary.boards.slice(0, 4);
 
   const submit = () => {
     const text = query.trim();
@@ -136,9 +297,10 @@ export function Home() {
   return (
     <main className="page home">
       <div className="page-head">
-        <h1 className="fr page-title">
-          Home
-        </h1>
+        <div className="home-title">
+          <span className="cap">{greetingFor(new Date().getHours(), name)}</span>
+          <h1 className="fr page-title">Home</h1>
+        </div>
         <div className="head-actions">
           <Pill onClick={() => void pickAndImport()}>
             <Icon name="import" size={18} />
@@ -170,25 +332,33 @@ export function Home() {
         )}
       </form>
 
+      <AtAGlance p={summary} />
+
       <div className="home-columns">
-        <section aria-label="Pick up where you left off" className="home-section">
-          <div className="home-section-head">
-            <h2 className="cap">pick up where you left off</h2>
-            <Link to="/board" className="cap">
-              all boards →
-            </Link>
-          </div>
-          {recent.length ? (
-            <ul className="home-rows">
-              {recent.map((b) => (
-                <BoardRow key={b.id} board={b} />
-              ))}
-            </ul>
-          ) : (
-            <p className="cap">No boards yet. Start one, or import some pictures.</p>
-          )}
-        </section>
-        <NeedsALook />
+        <div className="home-stack">
+          <section aria-label="Pick up where you left off" className="home-section">
+            <div className="home-section-head">
+              <h2 className="cap">pick up where you left off</h2>
+              <Link to="/board" className="cap">
+                all boards →
+              </Link>
+            </div>
+            {recent.length ? (
+              <ul className="home-rows">
+                {recent.map((b) => (
+                  <BoardRow key={b.id} board={b} />
+                ))}
+              </ul>
+            ) : (
+              <p className="cap">No boards yet. Start one, or import some pictures.</p>
+            )}
+          </section>
+          <Decisions p={summary} />
+        </div>
+        <div className="home-stack">
+          <NeedsALook p={summary} />
+          <RecentlySaved p={summary} />
+        </div>
       </div>
 
       {!startHidden && <StartHere />}

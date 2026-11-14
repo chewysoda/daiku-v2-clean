@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { PLACE_EVENT, PlaceRequest } from "../../lib/placeOnBoard";
 import { isWebAddress } from "../../lib/links";
 import { Link, useLocation, useNavigate, useParams } from "react-router";
@@ -237,6 +237,17 @@ function ImagePicker({ onPick, onClose }: { onPick: (ids: string[]) => void; onC
   );
 }
 
+/**
+ * True while the keyboard belongs to the Reader open beside the board: the key or clipboard event came from
+ * inside it, or text is selected in it (selecting PDF text leaves the focus on the page itself).
+ */
+function inReaderPanel(target: EventTarget | null): boolean {
+  const within = (node: Node | null | undefined) => !!(node instanceof Element ? node : node?.parentElement)?.closest(".reader-panel");
+  if (target instanceof Node && within(target)) return true;
+  const picked = window.getSelection();
+  return !!picked && !picked.isCollapsed && within(picked.anchorNode);
+}
+
 function BoardCanvas({ board }: { board: Board }) {
   const navigate = useNavigate();
   const assets = useStore((s) => s.assets);
@@ -299,6 +310,36 @@ function BoardCanvas({ board }: { board: Board }) {
   const [tool, setTool] = useState<Tool>("select");
   const [selection, setSelection] = useState<string[]>([]);
   const [editing, setEditing] = useState<string | null>(null);
+  /** Saves what was typed into an item's text box. Each kind has its own rule for an empty box. */
+  const commitText = (id: string, value: string) => {
+    const it = doc.get(id);
+    if (!it) return;
+    if (it.kind === "text") {
+      if (value.trim()) doc.patch([{ id, changes: { data: { ...it.data, text: value } } }]);
+      else doc.remove([id]);
+    } else if (it.kind === "sticker") {
+      const text = value.trim();
+      if (!text) return;
+      const data = { ...it.data, text };
+      doc.patch([{ id, changes: { data, ...stickerBox(text, data) } }]);
+    } else if (it.kind === "shape") {
+      doc.patch([{ id, changes: { data: { ...it.data, text: value.trim() || undefined } } }]);
+    } else {
+      doc.patch([{ id, changes: { data: { ...it.data, text: value } } }]);
+    }
+  };
+  // Text is saved when its box loses focus. A box that is unmounted while focused (a shortcut or a link
+  // leaving the board) gets no blur that React hears, so what's in it is saved here, while it's still in the page.
+  const commitOnLeave = useRef(commitText);
+  commitOnLeave.current = commitText;
+  useLayoutEffect(
+    () => () => {
+      const box = document.activeElement;
+      const id = box instanceof HTMLElement ? box.dataset.edit : undefined;
+      if (id && viewport.current?.contains(box)) commitOnLeave.current(id, (box as HTMLInputElement | HTMLTextAreaElement).value);
+    },
+    [],
+  );
   const [gesture, setGesture] = useState<Gesture | null>(null);
   const [offset, setOffset] = useState({ dx: 0, dy: 0 });
   // Smart guides: lines showing what a dragged item lines up with. Alt turns snapping off.
@@ -535,6 +576,7 @@ function BoardCanvas({ board }: { board: Board }) {
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
+      if (inReaderPanel(t)) return;
       // A slider, colour or checkbox takes no typing, so having just used one mustn't kill the shortcuts.
       const typesNothing = t.tagName === "INPUT" && ["range", "color", "checkbox"].includes((t as HTMLInputElement).type);
       if (!typesNothing && (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName))) return;
@@ -650,7 +692,7 @@ function BoardCanvas({ board }: { board: Board }) {
       return !!t && (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName));
     };
     const copy = (e: ClipboardEvent) => {
-      if (typing() || !selection.length || !e.clipboardData) return;
+      if (typing() || inReaderPanel(e.target) || !selection.length || !e.clipboardData) return;
       const chosen = selection.map((id) => doc.get(id)).filter((i): i is BoardItem => !!i && i.kind !== "connector");
       if (!chosen.length) return;
       e.preventDefault();
@@ -658,7 +700,7 @@ function BoardCanvas({ board }: { board: Board }) {
       e.clipboardData.setData("text/plain", chosen.map((i) => i.data.text ?? "").filter(Boolean).join("\n"));
     };
     const paste = (e: ClipboardEvent) => {
-      if (typing() || !e.clipboardData) return;
+      if (typing() || inReaderPanel(e.target) || !e.clipboardData) return;
       const c = center();
       const items = parseClipboardItems(e.clipboardData.getData(CLIPBOARD_TYPE));
       if (e.clipboardData.getData(CLIPBOARD_TYPE)) {
@@ -1119,7 +1161,9 @@ function BoardCanvas({ board }: { board: Board }) {
         // Dragging the picture moves its focus point the opposite way.
         const fx = Math.max(0, Math.min(100, gesture.fx - ((e.clientX - gesture.x) / (it.w * view.zoom)) * 100));
         const fy = Math.max(0, Math.min(100, gesture.fy - ((e.clientY - gesture.y) / (it.h * view.zoom)) * 100));
-        doc.patch([{ id: it.id, changes: { data: { ...it.data, focusX: fx, focusY: fy } } }]);
+        // Shown from local state while dragging, and saved once on release: a write per mouse move
+        // would queue dozens of database writes for one gesture.
+        setResizing({ ...it, data: { ...it.data, focusX: fx, focusY: fy } });
         break;
       }
     }
@@ -1166,6 +1210,8 @@ function BoardCanvas({ board }: { board: Board }) {
       );
     } else if (gesture.kind === "resize" && resizing) {
       doc.patch([{ id: resizing.id, changes: { x: resizing.x, y: resizing.y, w: resizing.w, h: resizing.h } }]);
+    } else if (gesture.kind === "focus" && resizing) {
+      doc.patch([{ id: resizing.id, changes: { data: resizing.data } }]);
     } else if (gesture.kind === "marquee" && marquee) {
       const inside = doc.all().filter((i) => i.kind !== "connector" && i.kind !== "section" && inRect(i, marquee)).map((i) => i.id);
       setSelection((cur) => (gesture.additive ? [...new Set([...cur, ...inside])] : inside));
@@ -1337,9 +1383,10 @@ function BoardCanvas({ board }: { board: Board }) {
                           data-ui
                           className="section-input fr"
                           aria-label="Section name"
+                          data-edit={it.id}
                           defaultValue={it.data.text}
                           onBlur={(e) => {
-                            doc.patch([{ id: it.id, changes: { data: { ...it.data, text: e.target.value } } }]);
+                            commitText(it.id, e.target.value);
                             setEditing(null);
                           }}
                           onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
@@ -1362,7 +1409,7 @@ function BoardCanvas({ board }: { board: Board }) {
                     style={style}
                     editing={editing === it.id}
                     onLabel={(text) => {
-                      doc.patch([{ id: it.id, changes: { data: { ...it.data, text: text || undefined } } }]);
+                      commitText(it.id, text);
                       setEditing(null);
                     }}
                   />
@@ -1395,9 +1442,10 @@ function BoardCanvas({ board }: { board: Board }) {
                         autoFocus
                         data-ui
                         aria-label="Sticky note text"
+                        data-edit={it.id}
                         defaultValue={it.data.text}
                         onBlur={(e) => {
-                          doc.patch([{ id: it.id, changes: { data: { ...it.data, text: e.target.value } } }]);
+                          commitText(it.id, e.target.value);
                           setEditing(null);
                         }}
                       />
@@ -1419,10 +1467,10 @@ function BoardCanvas({ board }: { board: Board }) {
                         data-ui
                         className="fr"
                         aria-label="Text"
+                        data-edit={it.id}
                         defaultValue={it.data.text}
                         onBlur={(e) => {
-                          if (e.target.value.trim()) doc.patch([{ id: it.id, changes: { data: { ...it.data, text: e.target.value } } }]);
-                          else doc.remove([it.id]);
+                          commitText(it.id, e.target.value);
                           setEditing(null);
                         }}
                       />
@@ -1442,13 +1490,10 @@ function BoardCanvas({ board }: { board: Board }) {
                         className="sticker-input"
                         aria-label="Sticker text"
                         maxLength={40}
+                        data-edit={it.id}
                         defaultValue={it.data.text}
                         onBlur={(e) => {
-                          const text = e.target.value.trim();
-                          if (text) {
-                            const data = { ...it.data, text };
-                            doc.patch([{ id: it.id, changes: { data, ...stickerBox(text, data) } }]);
-                          }
+                          commitText(it.id, e.target.value);
                           setEditing(null);
                         }}
                         onKeyDown={(e) => {

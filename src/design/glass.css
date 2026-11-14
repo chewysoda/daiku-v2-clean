@@ -47,7 +47,7 @@
 
 /* While the board pans, glass over it goes solid and comes back when it stops (set by the canvas). */
 :root[data-panning] .packtray.glass-1,
-:root[data-panning] .sidebar.glass-1 { background: var(--glass-solid-1); backdrop-filter: none; }
+:root[data-panning] .app-sidebar.glass-1 { background: var(--glass-solid-1); backdrop-filter: none; }
 
 /* --- Shell ------------------------------------------------------------- */
 
@@ -62,7 +62,7 @@
 .route-view { flex: 1; min-width: 0; display: flex; border-radius: var(--radius-panel) var(--radius-panel) 0 0; overflow: hidden; background: var(--c-bg); box-shadow: 0 0 0 1px var(--c-hairline); }
 
 /* The sidebar. */
-.sidebar {
+.app-sidebar {
   flex: 0 0 var(--rail-width);
   width: var(--rail-width);
   display: flex;
@@ -75,13 +75,13 @@
   overflow: hidden;
   z-index: 3;
 }
-.sidebar.collapsed { flex-basis: var(--rail-collapsed); width: var(--rail-collapsed); }
+.app-sidebar.collapsed { flex-basis: var(--rail-collapsed); width: var(--rail-collapsed); }
 .side-top { display: flex; align-items: center; gap: 8px; padding: 4px 4px 10px 6px; min-height: 40px; }
 .side-top .monogram { color: var(--c-sourced); flex: none; }
 .side-wordmark { font-family: var(--font-display); font-style: italic; font-size: 20px; font-variation-settings: "SOFT" 100, "opsz" 144; letter-spacing: -0.01em; }
 .side-collapse { margin-left: auto; width: 30px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: var(--c-icon-idle); display: grid; place-items: center; cursor: pointer; flex: none; }
-.sidebar.collapsed .side-top { flex-direction: column; padding: 4px 0 10px; }
-.sidebar.collapsed .side-collapse { margin: 0; }
+.app-sidebar.collapsed .side-top { flex-direction: column; padding: 4px 0 10px; }
+.app-sidebar.collapsed .side-collapse { margin: 0; }
 .side-collapse:hover { background: var(--c-accent-tint); color: var(--c-text); }
 
 .side-project { position: relative; margin-bottom: 10px; }
@@ -109,7 +109,7 @@
 .side-link.active .i { color: var(--c-text); }
 .side-link-label { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .side-kbd { font-family: var(--font-ui); font-size: 11.5px; color: var(--c-caption); background: none; border: 0; padding: 0; }
-.sidebar.collapsed .side-link { justify-content: center; padding: 0; }
+.app-sidebar.collapsed .side-link { justify-content: center; padding: 0; }
 
 .side-boards { display: flex; flex-direction: column; gap: 1px; margin-top: 16px; min-height: 0; overflow-y: auto; }
 .side-label { font-size: 12px; font-weight: 500; color: var(--c-caption); padding: 0 10px 6px; }
@@ -119,11 +119,10 @@
 .side-board-dot { width: 6px; height: 6px; border-radius: 2px; background: var(--c-icon-idle); flex: none; opacity: 0.6; }
 .side-board.active .side-board-dot { background: var(--c-text); opacity: 1; }
 .side-board-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.side-gap { flex: 1; min-height: 12px; }
 .side-search { color: var(--c-text-muted); }
 .side-me { display: flex; align-items: center; gap: 10px; padding: 10px 6px 2px; border-top: 1px solid var(--glass-line); margin-top: 6px; }
 .side-me-name { font-size: 13px; color: var(--c-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sidebar.collapsed .side-me { justify-content: center; padding-left: 0; padding-right: 0; }
+.app-sidebar.collapsed .side-me { justify-content: center; padding-left: 0; padding-right: 0; }
 
 /* --- Pack tray: the receipt ----------------------------------------------- */
 
@@ -219,20 +218,20 @@
 @keyframes receipt-in { from { opacity: 0; transform: translateY(6px); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .sidebar, .pt-seg { transition: none; }
+  .app-sidebar, .pt-seg { transition: none; }
   .side-menu, .pt-receipt { animation: fade-only 120ms ease; }
 }
-:root[data-motion="off"] .sidebar, :root[data-motion="off"] .pt-seg { transition: none; }
+:root[data-motion="off"] .app-sidebar, :root[data-motion="off"] .pt-seg { transition: none; }
 @keyframes fade-only { from { opacity: 0; } }
 
 @media print {
-  .sidebar, .packtray { display: none !important; }
+  .app-sidebar, .packtray { display: none !important; }
   .route-view { margin: 0; box-shadow: none; }
 }
 
 /* Floating bars sit above the tray, never under it. */
 .shell .lib-toolbar { bottom: calc(var(--tray-height) + 28px); left: calc(50% + var(--rail-width) / 2); z-index: 21; }
-:root:has(.sidebar.collapsed) .shell .lib-toolbar { left: calc(50% + var(--rail-collapsed) / 2); }
+:root:has(.app-sidebar.collapsed) .shell .lib-toolbar { left: calc(50% + var(--rail-collapsed) / 2); }
 .palette-meta { display: inline-flex; align-items: center; gap: 10px; flex: none; }
 .palette-kbd { font-family: var(--font-ui); font-size: 11.5px; font-weight: 500; color: var(--c-text-muted); padding: 1px 6px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--c-border); background: transparent; }
 
@@ -270,10 +269,15 @@
 .side-fold { display: flex; align-items: center; justify-content: space-between; width: 100%; border: 0; background: transparent; cursor: pointer; text-align: left; font: inherit; font-size: 12px; font-weight: 500; color: var(--c-caption); padding: 0 10px 6px; }
 .side-fold:hover { color: var(--c-text); }
 .side-tool { height: 32px; font-size: 13px; font-weight: 450; }
-.sidebar { overflow-y: auto; }
-.sidebar .side-boards { overflow: visible; }
-/* Nothing in the sidebar squashes; when it runs out of room, it scrolls. */
-.sidebar > * { flex-shrink: 0; }
-.sidebar > .side-gap { flex: 1 0 12px; }
+/* The class is app-sidebar, not sidebar: pdf.js's viewer stylesheet styles any .sidebar (min-width 180px). */
+/* Top and bottom stay put; only the middle (sections, tools, boards) scrolls when the window is short. */
+.app-sidebar > * { flex-shrink: 0; }
+.app-sidebar > .side-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 2px; margin: 0 -10px; padding: 0 10px 12px; scrollbar-width: thin; }
+.app-sidebar .side-boards { overflow: visible; }
+/* The scroll area scrolls; what's in it keeps its height rather than squashing into its neighbours. */
+.app-sidebar > .side-scroll > * { flex-shrink: 0; }
+/* The project menu sits on the sidebar's glass, and blur inside blur shows nothing, so it's solid. */
+.side-menu.glass-3 { background: var(--glass-solid-3); backdrop-filter: none; }
+.app-sidebar.collapsed .side-project-btn { justify-content: center; padding-left: 0; padding-right: 0; }
 .side-menu-sep { height: 1px; margin: 4px 6px; background: var(--glass-line); }
 .side-menu .side-menu-new { color: var(--c-text-secondary); }

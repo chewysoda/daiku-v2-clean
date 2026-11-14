@@ -83,8 +83,18 @@ fn ext_from_mime(mime: &str) -> Option<&'static str> {
 fn write_content_addressed(dir: &Path, bytes: &[u8], ext: &str) -> Result<StoredFile, String> {
     let sha = hex(&Sha256::digest(bytes));
     let path = dir.join(format!("{sha}.{ext}"));
-    if !path.exists() {
-        std::fs::write(&path, bytes).map_err(|e| format!("Could not save file: {e}"))?;
+    // The name is the content's hash, so a file of the right length is already the right file. A shorter
+    // one was cut off by a crash or a full disk, and is written again. Writing beside it and renaming
+    // means a half-written file never carries the real name.
+    let whole = std::fs::metadata(&path).map(|m| m.len() == bytes.len() as u64).unwrap_or(false);
+    if !whole {
+        let part = dir.join(format!("{sha}.{ext}.part"));
+        std::fs::write(&part, bytes)
+            .and_then(|_| std::fs::rename(&part, &path))
+            .map_err(|e| {
+                let _ = std::fs::remove_file(&part);
+                format!("Could not save file: {e}")
+            })?;
     }
     Ok(StoredFile {
         file_path: path.to_string_lossy().into_owned(),
@@ -205,6 +215,22 @@ pub fn library_set_dir(
         .allow_directory(&dir, true)
         .map_err(|e| e.to_string())?;
     *state.0.lock().map_err(|e| e.to_string())? = Some(dir);
+    Ok(())
+}
+
+/// Lets the webview show files in folders the library used before. Only a library's own `assets`
+/// folder is accepted, and one that isn't there today (an unplugged drive) is skipped.
+#[tauri::command]
+pub fn library_allow_dirs(app: AppHandle, paths: Vec<String>) -> Result<(), String> {
+    for path in paths {
+        let dir = PathBuf::from(&path);
+        let is_assets = dir.file_name().is_some_and(|n| n == "assets");
+        if dir.is_absolute() && is_assets && dir.is_dir() {
+            app.asset_protocol_scope()
+                .allow_directory(&dir, false)
+                .map_err(|e| e.to_string())?;
+        }
+    }
     Ok(())
 }
 

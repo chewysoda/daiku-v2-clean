@@ -168,3 +168,36 @@ describe("upgrading from the older samples", () => {
     expect(s.assets).toEqual([]);
   });
 });
+
+describe("restoring a backup", () => {
+  it("puts everything back when the restore fails partway", async () => {
+    const repo = await start();
+    const board = useStore.getState().createBoard("Mine");
+    useStore.getState().putItems([item("a", board.id)]);
+    await useStore.getState().flush();
+    // The backup's boards go in, then its items fail: by then every table has been cleared.
+    const original = repo.putMany.bind(repo);
+    let calls = 0;
+    repo.putMany = async (table, rows) => {
+      if (++calls === 2) throw new Error("NOT NULL constraint failed");
+      return original(table, rows);
+    };
+    const theirs = { ...board, id: "theirs", name: "Theirs" };
+    await expect(useStore.getState().replaceAll({ boards: [theirs], board_items: [item("b", "theirs")] }, [])).rejects.toThrow(/Nothing was replaced/);
+    expect((await repo.all("boards")).map((b) => b.name)).toEqual(["Mine"]);
+    expect((await repo.all("board_items")).map((i) => i.id)).toEqual(["a"]);
+    expect(useStore.getState().boards.map((b) => b.name)).toEqual(["Mine"]);
+    expect(useStore.getState().pendingWrites).toBe(0);
+  });
+});
+
+describe("the workflow log", () => {
+  it("never quotes an interview note or names a participant", async () => {
+    await start();
+    const who = useStore.getState().addRecord("participant", null, { code: "PRIVATECODE", context: "", consent: false } as never);
+    useStore.getState().addRecord("interview_note", null, { participant_id: who.id, theme_id: null, text: "PRIVATEQUOTE" } as never);
+    const log = useStore.getState().workflow_log.map((e) => e.summary).join(" | ");
+    expect(log).toContain("Added interview note");
+    expect(log).not.toMatch(/PRIVATE/);
+  });
+});

@@ -43,7 +43,8 @@ export function ReaderPanel() {
       </div>
       <div className="reader-panel-page">
         <Suspense fallback={<p className="cap reader-panel-wait">Opening…</p>}>
-          <Reader assetId={id} embedded />
+          {/* Keyed by the file, so the page, zoom and search of the last one don't carry over. */}
+          <Reader key={id} assetId={id} embedded />
         </Suspense>
       </div>
     </aside>

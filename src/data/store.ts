@@ -167,6 +167,8 @@ interface State extends Rows {
   error: string | null;
   pendingWrites: number;
   saveError: string | null;
+  /** Why the library folder can't be used right now (a missing drive, say). The app still opens. */
+  libraryError: string | null;
   config: Settings;
   /** Opens the database, or the given repo (tests). */
   init: (testRepo?: Repo) => Promise<void>;
@@ -265,7 +267,10 @@ function describe(table: TableName, action: LogEntry["action"], row: Record<stri
   if (table === "board_items") return `${action === "update" ? "Edited" : VERB[action]} ${String(row.kind)} on a board`;
   if (table === "records") {
     const data = (row.data ?? {}) as Record<string, unknown>;
-    const name = data.title ?? data.name ?? data.code ?? data.label ?? data.text;
+    // What a participant said, and who they are, stays out of the log: it travels in packs and exports,
+    // and interview material may only leave with consent.
+    const personal = row.type === "interview_note" || row.type === "participant";
+    const name = personal ? null : (data.title ?? data.name ?? data.code ?? data.label ?? data.text);
     return `${VERB[action]} ${RECORD_LABEL[row.type as RecordType]}${name ? `: ${String(name).slice(0, 80)}` : ""}`;
   }
   const name = row.title ?? row.name ?? row.text;
@@ -458,9 +463,11 @@ export const useStore = create<State>((set, get) => {
     error: null,
     pendingWrites: 0,
     saveError: null,
+    libraryError: null,
     config: DEFAULTS,
 
     init: async (testRepo) => {
+      let libraryError: string | null = null;
       try {
         repo = testRepo ?? (await openRepo());
         const loaded = emptyRows() as Record<TableName, unknown[]>;
@@ -535,9 +542,18 @@ export const useStore = create<State>((set, get) => {
             config.library_dir = await native.libraryDefaultDir();
             await repo.put("settings", { id: "library_dir", value: config.library_dir });
           }
-          await native.librarySetDir(config.library_dir);
+          // A library folder on a drive that's missing today mustn't stop the app from opening:
+          // the data is all in the database, and Settings is where the folder gets changed.
+          try {
+            await native.librarySetDir(config.library_dir);
+          } catch (e) {
+            libraryError = String(e);
+          }
+          // Files saved before the folder was changed still live in the old one, so it stays readable.
+          const elsewhere = foldersOf(loaded.assets as Asset[]);
+          if (elsewhere.length) await native.libraryAllowDirs(elsewhere).catch(() => undefined);
         }
-        set({ ...(loaded as unknown as Rows), config, ready: true });
+        set({ ...(loaded as unknown as Rows), config, libraryError, ready: true });
       } catch (e) {
         set({ error: String(e), ready: true });
       }
@@ -578,6 +594,7 @@ export const useStore = create<State>((set, get) => {
     setLibraryDir: async (path) => {
       if (isTauri) await native.librarySetDir(path);
       get().setSetting("library_dir", path);
+      set({ libraryError: null });
     },
 
     putAsset: (asset) => put("assets", asset),
@@ -828,11 +845,24 @@ export const useStore = create<State>((set, get) => {
       const settings = ((rows.settings ?? []) as { id: string; value: string }[]).filter((r) => !kept.has(r.id as keyof Settings));
       for (const [id, value] of kept) settings.push({ id, value: String(value) });
       const next = { ...emptyRows(), ...rows, settings } as Rows;
-      set((s) => ({ pendingWrites: s.pendingWrites + 1 }));
-      try {
+      // The plugin's connection pool can't hold a transaction across calls, so a failed restore is undone
+      // by hand: what was there before (all of it is in memory, and flushed) is written back.
+      const before = Object.fromEntries(TABLES.map((t) => [t, get()[t]])) as unknown as Rows;
+      const write = async (rows: Rows) => {
         // Children first, so nothing is left pointing at a row that's gone; then parents first.
         for (const t of [...TABLES].reverse()) await active.clear(t);
-        for (const t of TABLES) if (next[t].length) await active.putMany(t, next[t] as never[]);
+        for (const t of TABLES) if (rows[t].length) await active.putMany(t, rows[t] as never[]);
+      };
+      set((s) => ({ pendingWrites: s.pendingWrites + 1 }));
+      try {
+        await write(next);
+      } catch (e) {
+        try {
+          await write(before);
+        } catch (undo) {
+          throw new Error(`${e}. Putting your data back failed too (${undo}). Keep Daiku open and restore a good backup now.`, { cause: undo });
+        }
+        throw new Error(`${e}. Nothing was replaced: your data is as it was.`, { cause: e });
       } finally {
         set((s) => ({ pendingWrites: s.pendingWrites - 1 }));
       }
@@ -858,6 +888,16 @@ export const useStore = create<State>((set, get) => {
     },
   };
 });
+
+/** The folders that hold saved files, so the ones outside today's library folder can still be shown. */
+function foldersOf(assets: Asset[]): string[] {
+  const dirs = new Set<string>();
+  for (const a of assets) {
+    const cut = a.file_path ? Math.max(a.file_path.lastIndexOf("\\"), a.file_path.lastIndexOf("/")) : -1;
+    if (cut > 0) dirs.add(a.file_path!.slice(0, cut));
+  }
+  return [...dirs];
+}
 
 /** Settings that belong to this computer, so a restored backup never overwrites them. */
 export const MACHINE_SETTINGS: (keyof Settings)[] = ["library_dir"];

@@ -160,3 +160,50 @@
 .start-steps .next .start-text a { font-weight: 600; }
 .start-hint { color: var(--c-text-secondary); font-size: 14px; line-height: 1.5; max-width: 62ch; }
 .start-example { align-self: flex-start; }
+
+/* The dashboard: who's here, the project in four numbers, then what to pick up. */
+.home-title { display: flex; flex-direction: column; gap: 4px; }
+.home-stack { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+
+.home-glance { display: flex; flex-direction: column; gap: 12px; }
+.home-glance-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.home-project { position: relative; display: inline-flex; align-items: center; color: var(--c-text); }
+.home-project svg { position: absolute; right: 10px; pointer-events: none; color: var(--c-icon-idle); }
+.home-project-pick {
+  appearance: none; border: 1px solid var(--c-hairline); border-radius: var(--radius-control); background: var(--c-surface);
+  color: var(--c-text); font: inherit; font-size: 15px; font-weight: 600; padding: 7px 32px 7px 12px; cursor: pointer; max-width: 320px;
+  text-overflow: ellipsis;
+}
+.home-project-pick:hover { border-color: var(--c-border); }
+.home-project-pick:focus-visible { outline: 2px solid var(--c-focus, var(--c-accent)); outline-offset: 2px; }
+
+.home-tiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.home-tile {
+  display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 14px 16px 16px; border-radius: 14px;
+  background: var(--c-surface); border: 1px solid var(--c-hairline); color: inherit; text-decoration: none;
+  transition: border-color 140ms ease, transform 140ms var(--ease-out);
+}
+.home-tile:hover { border-color: var(--c-border); }
+.home-tile:active { transform: scale(0.98); }
+.home-tile-value { font-family: var(--font-display); font-size: 30px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.home-tile-note { font-size: 13px; color: var(--c-text-muted); }
+.home-meter { display: block; height: 4px; border-radius: 2px; background: var(--c-surface-sunk); overflow: hidden; }
+.home-meter span { display: block; height: 100%; border-radius: 2px; background: var(--c-sourced); }
+
+.home-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.home-row-text .cap { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.home-standing.clear { color: var(--c-sourced); }
+.home-standing.fragile, .home-standing.close { color: var(--c-assumption-text); }
+
+.home-saved { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.home-saved li { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.home-saved a { font-size: 13.5px; color: inherit; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-decoration: none; }
+.home-saved a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.home-saved .cap { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+@media (max-width: 900px) {
+  .home-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-tile { transition: none; }
+}

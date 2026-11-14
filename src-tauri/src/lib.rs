@@ -105,6 +105,7 @@ pub fn run() {
             explore::explore_snapshot,
             library::library_default_dir,
             library::library_set_dir,
+            library::library_allow_dirs,
             library::library_import_file,
             library::library_store_png,
             library::library_store_file,

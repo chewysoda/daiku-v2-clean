@@ -1,12 +1,13 @@
 /**
- * The four places to go, the project you're in, and that project's boards. Everything else is in Ctrl+K,
+ * Home, the four places to go, the project you're in, and that project's boards. Everything else is in Ctrl+K,
  * so the sidebar stays short enough to take in at a glance.
  */
 import { useEffect, useMemo, useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { useStore } from "../data/store";
 import { Icon, IconName, Monogram } from "../design/Icon";
 import { Avatar } from "../design/primitives";
+import { useBoardHere } from "../lib/boardHere";
 import { projectsIn } from "../lib/projects";
 import { followProject } from "../features/pack/packShelf";
 import { NewDialog } from "./NewDialog";
@@ -20,7 +21,6 @@ export const SECTIONS: { to: string; label: string; icon: IconName; hint: string
 
 /** Every other screen, one click away. Ctrl+K reaches them too, with their shortcuts. */
 export const TOOLS: { to: string; label: string; icon: IconName }[] = [
-  { to: "/home", label: "Start", icon: "home" },
   { to: "/explore", label: "Explore", icon: "explore" },
   { to: "/explore/claims", label: "Claims", icon: "link" },
   { to: "/explore/interviews", label: "Interviews", icon: "comment" },
@@ -56,14 +56,34 @@ function Tools({ collapsed }: { collapsed: boolean }) {
       {!collapsed && (
         <button type="button" className="side-label side-fold" aria-expanded={open} onClick={toggle}>
           Tools
-          <svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true" style={{ transform: open ? undefined : "rotate(-90deg)" }}>
-            <path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 12 12"
+            aria-hidden="true"
+            style={{ transform: open ? undefined : "rotate(-90deg)" }}
+          >
+            <path
+              d="M3 4.5 6 7.5 9 4.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </button>
       )}
       {(open || collapsed) &&
         TOOLS.map((t) => (
-          <NavLink key={t.to} to={t.to} end={t.to === "/explore"} className="side-link side-tool" aria-label={t.label} title={collapsed ? t.label : undefined}>
+          <NavLink
+            key={t.to}
+            to={t.to}
+            end={t.to === "/explore"}
+            className="side-link side-tool"
+            aria-label={t.label}
+            title={collapsed ? t.label : undefined}
+          >
             {({ isActive }) => (
               <>
                 <Icon name={t.icon} size={18} fill={isActive} />
@@ -81,11 +101,14 @@ const ALL = "";
 function ProjectSwitcher({ collapsed }: { collapsed: boolean }) {
   const records = useStore((s) => s.records);
   const boards = useStore((s) => s.boards);
+  const remembered = useStore((s) => s.config.project_current);
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const projects = useMemo(() => projectsIn({ records }), [records]);
-  const boardId = pathname.startsWith("/board/") ? pathname.split("/")[2] : null;
-  const current = projects.find((p) => boardId && p.data.board_ids.includes(boardId));
+  const boardId = useBoardHere();
+  // A board says which project you're in; elsewhere, the last project you were in.
+  const current = boardId
+    ? projects.find((p) => p.data.board_ids.includes(boardId))
+    : projects.find((p) => p.id === remembered);
   const [open, setOpen] = useState(false);
   const [starting, setStarting] = useState(false);
   // Remembered, so Handoff knows which project's packs to show, and packs follow the project you're in.
@@ -102,14 +125,24 @@ function ProjectSwitcher({ collapsed }: { collapsed: boolean }) {
       useStore.getState().setSetting("project_current", id);
       followProject(id);
     }
+    // A board says which project you're in, so the choice only holds on a board of its own: one of the
+    // project's, or for All work one that's in no project. Without one, Home shows the choice instead.
     const project = projects.find((p) => p.id === id);
-    const first = project?.data.board_ids.find((b) => boards.some((x) => x.id === b)) ?? boards[0]?.id;
-    navigate(first ? `/board/${first}` : "/board");
+    const filed = new Set(projects.flatMap((p) => p.data.board_ids));
+    const first = project ? project.data.board_ids.find((b) => boards.some((x) => x.id === b)) : boards.find((b) => !filed.has(b.id))?.id;
+    navigate(first ? `/board/${first}` : "/home");
   };
   const name = current?.data.name || "All work";
   return (
     <div className="side-project">
-      <button type="button" className="side-project-btn" aria-haspopup="listbox" aria-expanded={open} title={collapsed ? `Project: ${name}` : undefined} onClick={() => setOpen((o) => !o)}>
+      <button
+        type="button"
+        className="side-project-btn"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        title={collapsed ? `Project: ${name}` : undefined}
+        onClick={() => setOpen((o) => !o)}
+      >
         <span className="side-project-mark" aria-hidden="true">
           {name.slice(0, 1).toUpperCase()}
         </span>
@@ -117,13 +150,25 @@ function ProjectSwitcher({ collapsed }: { collapsed: boolean }) {
           <>
             <span className="side-project-name">{name}</span>
             <svg className="side-chevron" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-              <path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M3 4.5 6 7.5 9 4.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </>
         )}
       </button>
       {open && (
-        <ul className="side-menu glass-3" role="listbox" aria-label="Switch project" onKeyDown={(e) => e.key === "Escape" && setOpen(false)}>
+        <ul
+          className="side-menu glass-3"
+          role="listbox"
+          aria-label="Switch project"
+          onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
+        >
           <li>
             <button type="button" role="option" aria-selected={!current} onClick={() => pick(ALL)}>
               All work
@@ -162,19 +207,22 @@ function ProjectSwitcher({ collapsed }: { collapsed: boolean }) {
 function BoardList() {
   const boards = useStore((s) => s.boards);
   const records = useStore((s) => s.records);
-  const { pathname } = useLocation();
-  const boardId = pathname.startsWith("/board/") ? pathname.split("/")[2] : null;
+  const remembered = useStore((s) => s.config.project_current);
+  const boardId = useBoardHere();
   const list = useMemo(() => {
-    const project = projectsIn({ records }).find((p) => boardId && p.data.board_ids.includes(boardId));
+    const projects = projectsIn({ records });
+    const project = boardId
+      ? projects.find((p) => p.data.board_ids.includes(boardId))
+      : projects.find((p) => p.id === remembered);
     const own = project ? boards.filter((b) => project.data.board_ids.includes(b.id)) : boards;
     return [...own].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 8);
-  }, [boards, records, boardId]);
+  }, [boards, records, boardId, remembered]);
   if (!list.length) return null;
   return (
     <div className="side-boards" aria-label="Boards">
       <span className="side-label">Boards</span>
       {list.map((b) => (
-        <NavLink key={b.id} to={`/board/${b.id}`} className="side-board">
+        <NavLink key={b.id} to={`/board/${b.id}`} className={() => `side-board${b.id === boardId ? " active" : ""}`}>
           <span className="side-board-dot" aria-hidden="true" />
           <span className="side-board-name">{b.name || "Untitled board"}</span>
         </NavLink>
@@ -188,36 +236,70 @@ export function Sidebar({ onPalette }: { onPalette: () => void }) {
   const collapsed = useStore((s) => s.config.sidebar === "collapsed");
   const setSetting = useStore((s) => s.setSetting);
   return (
-    <nav className={`sidebar glass-1 ${collapsed ? "collapsed" : ""}`} aria-label="Main">
+    <nav className={`app-sidebar glass-1 ${collapsed ? "collapsed" : ""}`} aria-label="Main">
       <div className="side-top">
         <Monogram size={26} />
         {!collapsed && <span className="side-wordmark">daiku.</span>}
-        <button type="button" className="side-collapse" aria-label={collapsed ? "Expand the sidebar" : "Collapse the sidebar"} title="Ctrl+\" onClick={() => setSetting("sidebar", collapsed ? "" : "collapsed")}>
+        <button
+          type="button"
+          className="side-collapse"
+          aria-label={collapsed ? "Expand the sidebar" : "Collapse the sidebar"}
+          title="Ctrl+\"
+          onClick={() => setSetting("sidebar", collapsed ? "" : "collapsed")}
+        >
           <Icon name="sidebar" size={18} />
         </button>
       </div>
       <ProjectSwitcher collapsed={collapsed} />
-      <div className="side-sections">
-        {SECTIONS.map((s, i) => (
-          <NavLink key={s.to} to={s.to} className="side-link" aria-label={s.label} aria-keyshortcuts={`Control+${i + 1}`} title={collapsed ? `${s.label} (Ctrl+${i + 1})` : s.hint}>
+      <div className="side-scroll">
+        <div className="side-sections">
+          <NavLink
+            to="/home"
+            className="side-link"
+            aria-label="Home"
+            title={collapsed ? "Home" : "Your projects at a glance"}
+          >
             {({ isActive }) => (
               <>
-                <Icon name={s.icon} fill={isActive} />
-                {!collapsed && (
-                  <>
-                    <span className="side-link-label">{s.label}</span>
-                    <kbd className="side-kbd">⌃{i + 1}</kbd>
-                  </>
-                )}
+                <Icon name="home" fill={isActive} />
+                {!collapsed && <span className="side-link-label">Home</span>}
               </>
             )}
           </NavLink>
-        ))}
+          {SECTIONS.map((s, i) => (
+            <NavLink
+              key={s.to}
+              to={s.to}
+              className="side-link"
+              aria-label={s.label}
+              aria-keyshortcuts={`Control+${i + 1}`}
+              title={collapsed ? `${s.label} (Ctrl+${i + 1})` : s.hint}
+            >
+              {({ isActive }) => (
+                <>
+                  <Icon name={s.icon} fill={isActive} />
+                  {!collapsed && (
+                    <>
+                      <span className="side-link-label">{s.label}</span>
+                      <kbd className="side-kbd">⌃{i + 1}</kbd>
+                    </>
+                  )}
+                </>
+              )}
+            </NavLink>
+          ))}
+        </div>
+        {!collapsed && <BoardList />}
+        <Tools collapsed={collapsed} />
       </div>
-      <Tools collapsed={collapsed} />
-      {!collapsed && <BoardList />}
-      <div className="side-gap" />
-      <button type="button" className="side-link side-search" aria-label="Everything else" aria-keyshortcuts="Control+K" onClick={onPalette} title={collapsed ? "Everything else (Ctrl+K)" : undefined}>
+      <button
+        type="button"
+        className="side-link side-search"
+        aria-label="Everything else"
+        aria-keyshortcuts="Control+K"
+        onClick={onPalette}
+        title={collapsed ? "Everything else (Ctrl+K)" : undefined}
+      >
         <Icon name="search" />
         {!collapsed && (
           <>
@@ -226,7 +308,12 @@ export function Sidebar({ onPalette }: { onPalette: () => void }) {
           </>
         )}
       </button>
-      <NavLink to="/settings" className="side-link" aria-label="Settings" title={collapsed ? "Settings (Ctrl+,)" : undefined}>
+      <NavLink
+        to="/settings"
+        className="side-link"
+        aria-label="Settings"
+        title={collapsed ? "Settings (Ctrl+,)" : undefined}
+      >
         {({ isActive }) => (
           <>
             <Icon name="settings" fill={isActive} />

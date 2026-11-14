@@ -99,6 +99,7 @@ const esc = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").
 function describeItem(it: BoardItem, assetOf: (id: string | null) => Asset | undefined, fileOf: (id: string) => string | undefined): string | null {
   switch (it.kind) {
     case "sticky":
+      if (it.data.claim) return oneLine(it.data.text) ? `- Claim: ${oneLine(it.data.text)}` : "- Claim: not in this export";
       return `- Note: ${oneLine(it.data.text) || "(empty)"}`;
     case "text":
       return `- Text: ${oneLine(it.data.text)}`;

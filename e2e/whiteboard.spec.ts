@@ -492,3 +492,17 @@ test.describe("build with Claude", () => {
     expect(text).toContain("ESP32 Node Programmer");
   });
 });
+
+test.describe("text being typed", () => {
+  test("is kept when a shortcut leaves the board mid-edit", async ({ page }) => {
+    await emptyBoard(page);
+    const before = await page.getByTestId("item-sticky").count();
+    await page.keyboard.press("Control+n");
+    await page.keyboard.type("Kept through the shortcut");
+    await page.keyboard.press("Control+2");
+    await expect(page).not.toHaveURL(/board|canvas/);
+    await page.keyboard.press("Control+1");
+    await expect(page.getByTestId("item-sticky")).toHaveCount(before + 1);
+    await expect(page.getByTestId("item-sticky").filter({ hasText: "Kept through the shortcut" })).toBeVisible();
+  });
+});

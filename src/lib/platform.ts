@@ -25,6 +25,8 @@ export const native = {
   imagePreview: (path: string) => invoke<string>("library_image_preview", { path }),
   libraryDefaultDir: () => invoke<string>("library_default_dir"),
   librarySetDir: (path: string) => invoke<void>("library_set_dir", { path }),
+  /** Lets files in earlier library folders be shown. Folders that are missing are skipped. */
+  libraryAllowDirs: (paths: string[]) => invoke<void>("library_allow_dirs", { paths }),
   importFile: (source: string) => invoke<StoredFile>("library_import_file", { source }),
   saveUrl: (url: string, referer?: string) =>
     invoke<StoredFile>("library_save_url", { url, referer: referer ?? null }),

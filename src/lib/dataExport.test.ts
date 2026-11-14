@@ -185,6 +185,13 @@ describe("projects", () => {
     expect(names.join()).not.toContain("Other project picture");
     expect(narrowToProject(s, data()).records.some((r) => r.id === "note-esp32")).toBe(true);
   });
+  it("keeps only the project's own entries in the workflow log", () => {
+    const s = project();
+    const entry = (id: string, target_id: string) => ({ id, at: "", actor: "me", action: "create", target_type: "boards", target_id, summary: id, before: null, after: null, why: null });
+    const inside = (data() as { board_ids: string[] }).board_ids[0];
+    s.workflow_log = [entry("mine", inside), entry("theirs", "b-some-other-project")] as never;
+    expect(narrowToProject(s, data()).workflow_log.map((e) => e.id)).toEqual(["mine"]);
+  });
   const withWorking = (working: boolean) => {
     const s = project();
     s.records = s.records.map((r) => (r.id === "pr-esp32" ? ({ ...r, data: { ...(r.data as object), working } } as never) : r));

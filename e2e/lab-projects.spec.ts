@@ -168,7 +168,7 @@ test("Deck Studio is gone from the rail and the command palette", async ({ page 
   await page.keyboard.press("Control+k");
   await page.getByRole("textbox").last().fill("Deck Studio");
   await expect(page.getByText("Go to Deck Studio")).toHaveCount(0);
-  // An old link, or a last page saved before it went, lands on the board.
+  // An old link, or a last page saved before it went, lands on Home.
   await page.goto("/#/deck");
-  await expect(page).toHaveURL(/#\/board/);
+  await expect(page).toHaveURL(/#\/home/);
 });
