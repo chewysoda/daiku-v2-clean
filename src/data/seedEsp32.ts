@@ -289,7 +289,7 @@ const case_items: BoardItem[] = [
   item("espe-p1", "image", 430, 100, 340, 340, "esp-img-devkitc", { caption: "what goes inside" }, ESP_CASE_BOARD),
   item("espe-n1", "sticky", 70, 240, 330, 130, null, { text: "The USB slot must clear the cable's plug, not just the port." }, ESP_CASE_BOARD),
   item("espe-n2", "sticky", 70, 400, 330, 130, null, { text: "Headers stay reachable: makers rewire more than they reflash." }, ESP_CASE_BOARD),
-  item("espe-t1", "text", 430, 460, 340, 110, null, { text: "Which enclosure? The printed tray leads, and its drop test passed." }, ESP_CASE_BOARD),
+  item("espe-t1", "text", 430, 490, 340, 90, null, { text: "Which enclosure? The printed tray leads, and its drop test passed." }, ESP_CASE_BOARD),
   item("espe-c1", "connector", 0, 0, 0, 0, null, { from: "espe-n1", to: "espe-cad", connector: "plain" }, ESP_CASE_BOARD),
 ].map((i) => ({ ...i, updated_at: at(90) }));
 

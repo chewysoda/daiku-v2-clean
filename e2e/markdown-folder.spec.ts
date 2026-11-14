@@ -23,7 +23,7 @@ async function wordFile() {
 }
 
 test("uploads files as Markdown into a folder on the board, and opens it", async ({ page }) => {
-  await page.goto("/#/canvas/b-furniture");
+  await page.goto("/#/canvas/b-esp32");
   await expect(page.getByTestId("item-sticky").first()).toBeVisible();
   const folders = page.getByTestId("item-folder");
   await expect(folders).toHaveCount(0);
@@ -33,7 +33,7 @@ test("uploads files as Markdown into a folder on the board, and opens it", async
   await (await chooser).setFiles([
     { name: "motor notes.docx", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", buffer: await wordFile() },
     { name: "parts.csv", mimeType: "text/csv", buffer: Buffer.from("Part,Cost\nMotor,12.50\n") },
-    { name: "study.pdf", mimeType: "application/pdf", buffer: readFileSync("public/samples/study.pdf") },
+    { name: "study.pdf", mimeType: "application/pdf", buffer: readFileSync("public/samples/esp32/code-target-notes.pdf") },
   ]);
 
   await expect(folders).toHaveCount(1);
@@ -62,7 +62,7 @@ test("uploads files as Markdown into a folder on the board, and opens it", async
 });
 
 test("scrolling zooms the board, and shift+scroll pans", async ({ page }) => {
-  await page.goto("/#/canvas/b-furniture");
+  await page.goto("/#/canvas/b-esp32");
   await expect(page.getByTestId("item-sticky").first()).toBeVisible();
   const zoom = page.getByTestId("zoom");
   const before = await zoom.textContent();
@@ -77,7 +77,7 @@ test("scrolling zooms the board, and shift+scroll pans", async ({ page }) => {
 });
 
 test("pinching zooms the board, on a touchpad and on a touchscreen", async ({ page }) => {
-  await page.goto("/#/canvas/b-furniture");
+  await page.goto("/#/canvas/b-esp32");
   await expect(page.getByTestId("item-sticky").first()).toBeVisible();
   const zoom = page.getByTestId("zoom");
   const percent = async () => parseInt((await zoom.textContent())!, 10);

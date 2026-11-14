@@ -1,16 +1,14 @@
 import { freshPack } from "./fresh";
 import { expect, Page, test } from "@playwright/test";
-import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
 });
 
 async function emptyBoard(page: Page) {
-  await page.goto("/#/canvas/b-furniture");
+  await page.goto("/#/canvas/b-esp32");
   await expect(page.getByTestId("item-sticky").first()).toBeVisible();
   // A bare stretch of board, well away from anything: pan the sample items out of the way.
   await page.mouse.move(700, 450);
@@ -438,7 +436,7 @@ test.describe("spiral map", () => {
     const count = await page.getByTestId("graph").getAttribute("data-nodes");
     await page.getByRole("button", { name: "All", exact: true }).click();
     await expect.poll(async () => Number(await page.getByTestId("graph").getAttribute("data-nodes"))).toBeGreaterThan(Number(count));
-    await page.getByLabel("Details").getByRole("button", { name: /Tube base/ }).click();
+    await page.getByLabel("Details").getByRole("button", { name: /Beginners will prefer/ }).click();
     await expect(page.getByLabel("Details").getByRole("link", { name: "Open" })).toBeVisible();
   });
 });
@@ -451,7 +449,7 @@ test.describe("build with Claude", () => {
   test("saves a pack with a brief, and remembers the brief", async ({ page }) => {
     await page.goto("/#/pack");
     const section = page.getByRole("main", { name: "Handoff" });
-    await section.getByLabel("What do you want built?").fill("A product page for the chair");
+    await section.getByLabel("What do you want built?").fill("A product page for the node editor");
     await section.getByLabel("Include the sample project").check();
     const [download] = await Promise.all([page.waitForEvent("download"), section.getByRole("button", { name: "Export zip" }).click()]);
     expect(download.suggestedFilename()).toBe("Daiku pack.zip");
@@ -460,15 +458,15 @@ test.describe("build with Claude", () => {
     const files = unzipSync(new Uint8Array(readFileSync(await download.path())));
     const names = Object.keys(files);
     expect(names).toContain("CLAUDE.md");
-    expect(strFromU8(files["CLAUDE.md"])).toContain("A product page for the chair");
-    expect(names).toContain("boards/Furniture Study.md");
-    expect(strFromU8(files["boards/Furniture Study.md"])).toContain("Ask the workshop");
+    expect(strFromU8(files["CLAUDE.md"])).toContain("A product page for the node editor");
+    expect(names).toContain("boards/ESP32 Node Programmer.md");
+    expect(strFromU8(files["boards/ESP32 Node Programmer.md"])).toContain("Every pin rule gets a test");
     expect(names.some((n) => n.startsWith("attachments/"))).toBe(true);
     expect(names.some((n) => n.startsWith("Decisions/"))).toBe(true);
 
     await page.waitForTimeout(300);
     await page.reload();
-    await expect(page.getByRole("main", { name: "Handoff" }).getByLabel("What do you want built?")).toHaveValue("A product page for the chair");
+    await expect(page.getByRole("main", { name: "Handoff" }).getByLabel("What do you want built?")).toHaveValue("A product page for the node editor");
   });
 
   test("leaves sample data out unless asked", async ({ page }) => {
@@ -478,7 +476,7 @@ test.describe("build with Claude", () => {
     const { unzipSync } = await import("fflate");
     const { readFileSync } = await import("node:fs");
     const names = Object.keys(unzipSync(new Uint8Array(readFileSync(await download.path()))));
-    expect(names).not.toContain("boards/Furniture Study.md");
+    expect(names).not.toContain("boards/ESP32 Node Programmer.md");
     expect(names).toContain("CLAUDE.md");
   });
 
@@ -491,6 +489,6 @@ test.describe("build with Claude", () => {
     await expect(page.locator(".toast")).toContainText("tokens");
     const text = await page.evaluate(() => navigator.clipboard.readText());
     expect(text).toContain('<file path="CLAUDE.md">');
-    expect(text).toContain("Furniture Study");
+    expect(text).toContain("ESP32 Node Programmer");
   });
 });

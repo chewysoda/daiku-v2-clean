@@ -22,11 +22,12 @@ export interface Hit {
   score: number;
 }
 
-/** About 80 characters around the first word found, on one line. */
+/** About 80 characters around the whole phrase, or else the first word found, on one line. */
 export function snippetOf(text: string, words: string[]): string {
   const flat = text.replace(/\s+/g, " ").trim();
   const lower = flat.toLowerCase();
-  const at = Math.min(...words.map((w) => lower.indexOf(w)).filter((i) => i >= 0));
+  const phrase = words.length > 1 ? lower.indexOf(words.join(" ")) : -1;
+  const at = phrase >= 0 ? phrase : Math.min(...words.map((w) => lower.indexOf(w)).filter((i) => i >= 0));
   if (!Number.isFinite(at)) return flat.slice(0, 80);
   const start = Math.max(0, at - 30);
   return `${start > 0 ? "…" : ""}${flat.slice(start, start + 80)}${start + 80 < flat.length ? "…" : ""}`;

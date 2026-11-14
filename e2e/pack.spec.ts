@@ -2,10 +2,8 @@ import { readFileSync } from "node:fs";
 import { expect, Page, test } from "@playwright/test";
 import { strFromU8, unzipSync } from "fflate";
 import { freshPack } from "./fresh";
-import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
@@ -49,31 +47,31 @@ test("organises work into groups and exports the arrangement as a zip", async ({
   await m.getByLabel("How the AI should use group 1").fill("Follow these exactly");
   await m.getByRole("button", { name: "Add group" }).click();
   await m.getByLabel("Name of group 2").fill("Look and feel");
-  await m.getByLabel("Add an item to group 2").selectOption({ label: "Furniture Study" });
-  await m.getByLabel("Add an item to group 1").selectOption({ label: "Which chair base?" });
-  await m.getByRole("button", { name: "Add a note about Furniture Study" }).click();
-  await m.getByLabel("Note for the AI about Furniture Study").fill("Match this tone");
+  await m.getByLabel("Add an item to group 2").selectOption({ label: "ESP32 Enclosure" });
+  await m.getByLabel("Add an item to group 1").selectOption({ label: "Which enclosure?" });
+  await m.getByRole("button", { name: "Add a note about ESP32 Enclosure" }).click();
+  await m.getByLabel("Note for the AI about ESP32 Enclosure").fill("Match this tone");
 
   const zip = await exportZip(page);
   expect(zip.name).toBe("Daiku pack.zip");
-  expect(zip.names).toContain("02 Look and feel/Furniture Study.md");
-  expect(zip.names).not.toContain("boards/Furniture Study.md");
+  expect(zip.names).toContain("02 Look and feel/ESP32 Enclosure.md");
+  expect(zip.names).not.toContain("boards/ESP32 Enclosure.md");
   expect(zip.names.some((n) => n.startsWith("01 Constraints/"))).toBe(true);
   expect(zip.names).toContain("manifest.json");
   expect(zip.names).toContain("AGENTS.md");
   const brief = zip.text("CLAUDE.md");
   expect(brief).toContain("A product page");
   expect(brief).toContain("Follow these exactly");
-  expect(brief).toContain("`02 Look and feel/Furniture Study.md`: Match this tone");
+  expect(brief).toContain("`02 Look and feel/ESP32 Enclosure.md`: Match this tone");
 });
 
 test("something left out is gone from the whole zip, and says why", async ({ page }) => {
   const m = main(page);
-  expect((await exportZip(page)).everything).toContain("Furniture Study");
-  await m.getByRole("button", { name: "Leave out Furniture Study" }).click();
-  await expect(m.locator(".ho-row.out").filter({ hasText: "Furniture Study" })).toContainText("You left it out");
+  expect((await exportZip(page)).everything).toContain("ESP32 Enclosure");
+  await m.getByRole("button", { name: "Leave out ESP32 Enclosure" }).click();
+  await expect(m.locator(".ho-row.out").filter({ hasText: "ESP32 Enclosure" })).toContainText("You left it out");
   const zip = await exportZip(page);
-  expect(zip.everything).not.toContain("Furniture Study");
+  expect(zip.everything).not.toContain("ESP32 Enclosure");
   expect(zip.text("CLAUDE.md")).toContain("left out on purpose");
 });
 
@@ -82,12 +80,12 @@ test("keeps the arrangement after a restart", async ({ page }) => {
   await moreOptions(page);
   await m.getByRole("button", { name: "Add group" }).click();
   await m.getByLabel("Name of group 1").fill("Constraints");
-  await m.getByRole("button", { name: "Leave out Furniture Study" }).click();
+  await m.getByRole("button", { name: "Leave out ESP32 Enclosure" }).click();
   await page.waitForTimeout(300);
   await page.reload();
   await moreOptions(page);
   await expect(main(page).getByLabel("Name of group 1")).toHaveValue("Constraints");
-  await expect(main(page).getByRole("button", { name: "Include Furniture Study" })).toBeVisible();
+  await expect(main(page).getByRole("button", { name: "Include ESP32 Enclosure" })).toBeVisible();
 });
 
 test("can bulk-leave-out by kind, search, and drop the files", async ({ page }) => {
@@ -107,8 +105,8 @@ test("can bulk-leave-out by kind, search, and drop the files", async ({ page }) 
 
 test("pins an item, and a budget holds back the rest with a reason", async ({ page }) => {
   const m = main(page);
-  await m.getByRole("button", { name: "Pin Which chair base?" }).click();
-  await expect(m.locator(".ho-group.pinned")).toContainText("Which chair base?");
+  await m.getByRole("button", { name: "Pin Which enclosure?" }).click();
+  await expect(m.locator(".ho-group.pinned")).toContainText("Which enclosure?");
   await moreOptions(page);
   await m.getByLabel("Token budget").fill("1500");
   await expect(m.locator(".ho-group.out")).toContainText("Over budget");
@@ -119,7 +117,7 @@ test("pins an item, and a budget holds back the rest with a reason", async ({ pa
 
 test("names the conflict when pinned items alone are over budget", async ({ page }) => {
   const m = main(page);
-  await m.getByRole("button", { name: "Pin Which chair base?" }).click();
+  await m.getByRole("button", { name: "Pin Which enclosure?" }).click();
   await moreOptions(page);
   await m.getByLabel("Token budget").fill("200");
   await expect(m.getByRole("region", { name: "Budget" })).toContainText("Raise the budget or unpin something");
@@ -150,10 +148,10 @@ test("offers the sample project when there's nothing else", async ({ page }) => 
 
 test("a PDF in the Library goes along with its full text as Markdown", async ({ page }) => {
   const zip = await exportZip(page);
-  const source = zip.names.find((n) => /Sample study, try the Reader\.md$/.test(n));
+  const source = zip.names.find((n) => /Picking a first code target[^/]*\.md$/.test(n));
   expect(source).toBeTruthy();
   const text = zip.text(source!);
   expect(text).toContain("## Full text");
   expect(text).toContain("## Page 2");
-  expect(text).toContain("participants rated the textured sample as softer");
+  expect(text).toContain("All five finished blink-plus-button fastest");
 });

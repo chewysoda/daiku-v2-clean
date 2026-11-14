@@ -1,10 +1,8 @@
 import { expect, Page, test } from "@playwright/test";
 import { strFromU8, unzipSync } from "fflate";
 import { readFileSync } from "node:fs";
-import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
@@ -134,6 +132,8 @@ test.describe("export formats", () => {
 });
 
 test.describe("image formats", () => {
+  // The example's PDF, model and sketch go in the same folder as themselves; only pictures are converted.
+  const pictures = (names: string[]) => names.filter((n) => n.startsWith("images/") && !/\.(pdf|stl|ino)$/i.test(n));
   const MAGIC: [string, string, number[]][] = [
     ["png", ".png", [0x89, 0x50, 0x4e, 0x47]],
     ["jpg", ".jpg", [0xff, 0xd8, 0xff]],
@@ -151,7 +151,7 @@ test.describe("image formats", () => {
       await expect(list).toContainText(ending);
       const [download] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: "Export zip" }).click()]);
       const files = unzipSync(new Uint8Array(readFileSync(await download.path())));
-      const images = Object.keys(files).filter((n) => n.startsWith("images/"));
+      const images = pictures(Object.keys(files));
       expect(images.length).toBeGreaterThan(0);
       for (const name of images) {
         expect(name.endsWith(ending), name).toBe(true);
@@ -166,7 +166,7 @@ test.describe("image formats", () => {
       await page.getByLabel("Image format").selectOption(format);
       const [download] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: "Export zip" }).click()]);
       const files = unzipSync(new Uint8Array(readFileSync(await download.path())));
-      const name = Object.keys(files).find((n) => n.startsWith("images/"))!;
+      const name = pictures(Object.keys(files))[0];
       const size = await page.evaluate(async ([bytes, type]) => {
         const img = new Image();
         img.src = URL.createObjectURL(new Blob([new Uint8Array(bytes as number[])], { type: type as string }));
@@ -185,6 +185,9 @@ test.describe("image formats", () => {
     const [download] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: "Export zip" }).click()]);
     const files = unzipSync(new Uint8Array(readFileSync(await download.path())));
     expect(strFromU8(files["data/weightage.py"])).toContain("DATA = {");
-    expect(Object.keys(files).filter((n) => n.startsWith("images/")).every((n) => n.endsWith(".svg"))).toBe(true);
+    const names = Object.keys(files);
+    expect(pictures(names).length).toBeGreaterThan(0);
+    expect(pictures(names).every((n) => n.endsWith(".jpg"))).toBe(true);
+    expect(names.some((n) => n.startsWith("images/") && n.endsWith(".pdf"))).toBe(true);
   });
 });

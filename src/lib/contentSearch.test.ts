@@ -36,4 +36,9 @@ describe("searching inside the work", () => {
   it("shows the words around the match", () => {
     expect(snippetOf("x ".repeat(40) + "needle here", ["needle"])).toMatch(/^….*needle here$/);
   });
+
+  it("centres on the whole phrase when it's there, not a short word found earlier inside another", () => {
+    const text = `Code generation · ${"y ".repeat(60)}one scheduler, so the board can do several things at once.`;
+    expect(snippetOf(text, ["several", "things", "at", "once"])).toContain("several things at once");
+  });
 });

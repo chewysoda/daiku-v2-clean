@@ -480,7 +480,8 @@ export function Notes() {
                 }}
               />
               {(hasMath(note.data.body) || hasMarkdown(note.data.body)) && (
-                <div className="note-preview" data-testid="note-preview">
+                // Focusable, so a long preview can be scrolled from the keyboard.
+                <div className="note-preview" data-testid="note-preview" tabIndex={0} role="region" aria-label="Note preview">
                   <span className="cap">preview</span>
                   <MarkdownText text={note.data.body} />
                 </div>

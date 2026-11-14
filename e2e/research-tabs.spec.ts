@@ -1,8 +1,6 @@
 import { expect, Page, test } from "@playwright/test";
-import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
@@ -56,7 +54,7 @@ test.describe("research tabs", () => {
 
 test.describe("snips in a PDF", () => {
   test("drags out a snip, and offers it with the document's credit and page", async ({ page }) => {
-    await page.goto("/#/reader/a-paper");
+    await page.goto("/#/reader/esp-paper");
     const pdf = page.getByTestId("pdf-page");
     await expect(pdf.locator("canvas")).toBeVisible();
     await page.waitForTimeout(500);
@@ -78,7 +76,7 @@ test.describe("snips in a PDF", () => {
   });
 
   test("Escape cancels a snip and brings the highlights back", async ({ page }) => {
-    await page.goto("/#/reader/a-paper");
+    await page.goto("/#/reader/esp-paper");
     await expect(page.getByTestId("pdf-page").locator("canvas")).toBeVisible();
     await page.waitForTimeout(500);
     await page.getByRole("button", { name: "Snip", exact: true }).click();
@@ -123,7 +121,7 @@ test.describe("drafting", () => {
     await page.waitForTimeout(250);
     await page.goto("/#/handoff");
     await expect(page.locator(".ho-group.included")).toContainText("Write-up");
-    await expect(page.getByRole("region", { name: "Pack tray" })).not.toContainText("0 items");
+    await expect(page.getByRole("region", { name: "Pack tray" })).not.toContainText(/(^|\D)0 items/);
   });
 
   test("opens from the palette, and in a research tab", async ({ page }) => {
@@ -144,7 +142,7 @@ test.describe("drafting", () => {
 
 test.describe("the PDF reader matches web research", () => {
   const ready = async (page: Page) => {
-    await page.goto("/#/reader/a-paper");
+    await page.goto("/#/reader/esp-paper");
     await expect(page.getByTestId("pdf-page").locator("canvas")).toBeVisible();
     await expect(page.locator(".textLayer span", { hasText: "Background" })).toBeVisible();
   };
