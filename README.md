@@ -1,16 +1,53 @@
-# Daiku
+<p align="center">
+  <img src="design/brand/app-icon-dark-1024.png" width="96" alt="Daiku app icon">
+</p>
 
-A place where ideas take form: a local-first visual research and engineering workspace for evidence-backed concept
-selection. Windows-first desktop app, built with Tauri 2, React and TypeScript.
+<h1 align="center">Daiku</h1>
 
-- **Home:** continue a board, search everything, see what needs attention.
-- **Canvas:** infinite board with images, stickies, sections, connectors, palettes and undo. Every image shows its credit.
-- **Library:** your files as normal files, with full-text and colour search. Add code too: paste a snippet, or pick files from a public GitHub repository. Code keeps its credit and licence, and is shown, never run.
-- **Explore:** a Chromium browser and free scholarly search. Save images and papers with their source attached.
-- **Threads:** a graph of how everything links, with unsupported items flagged.
-- **Lab:** weighted decision matrix, where unsourced scores stay marked as guesses and the app shows what would flip the result.
-- **Share:** present a board, comment on it, or export one self-contained page.
-- **Send to Claude:** any board or decision, with its sources and claims, as text to paste or a zip for a Claude project.
+<p align="center">
+  <b>A place where ideas take form.</b><br>
+  Collect sources, lay them out on a board, and make decisions you can back up.<br>
+  A local-first research and design workspace for Windows.
+</p>
+
+<p align="center">
+  <a href="#install-it">Install</a> ·
+  <a href="FEATURES.md">How it fits together</a> ·
+  <a href="#run-it">Build from source</a>
+</p>
+
+<p align="center">
+  <img src=".github/media/board.png" width="900" alt="A Daiku board: datasheet quotes, claims and notes for an ESP32 project, grouped into sections">
+</p>
+
+## Why Daiku
+
+Research tends to scatter: a screenshot here, a PDF there, a decision made on a hunch nobody wrote down. Daiku keeps it
+in one place and keeps it honest.
+
+- **Every source keeps its credit.** Pictures, quotes and papers carry where they came from, and anything without a
+  source is flagged.
+- **Guesses stay marked as guesses.** A score with no evidence behind it is shown as a guess until you back it up.
+- **It's yours.** Everything lives on your PC as normal files and a local database. No account, no cloud.
+- **It hands off cleanly to AI.** Send a board or a decision to Claude with its sources, claims and full document text
+  as Markdown.
+
+## What's inside
+
+| | |
+|---|---|
+| **Board** | An infinite whiteboard: pictures, stickies, sections, drawings, shapes and connectors, with undo. Zoom with a pinch or the scroll wheel, like FigJam. Drop in files and they become a folder of Markdown. |
+| **Library** | Your files as normal files, with full-text and colour search. Code keeps its credit and licence, and is shown, never run. |
+| **Explore** | A built-in browser and free scholarly search. Save images and papers with their source attached. |
+| **Decide** | A weighted decision matrix, with requirements, a bill of materials, simulation and a decision record. It shows what would flip the result. |
+| **Threads** | A map of how everything links, with unsupported claims flagged. |
+| **Share** | Present a board, collect comments, or export one self-contained page. |
+| **Handoff** | Send one board, one decision or the whole project to Claude: as text to paste, or a zip for a Claude project. PDFs and Word files go along as Markdown. |
+
+<p align="center">
+  <img src=".github/media/lab.png" width="440" alt="The decision matrix: three options ranked, with scores still marked as guesses">
+  <img src=".github/media/home.png" width="440" alt="Home: recent boards, what needs a look, and a five-step start-here list">
+</p>
 
 How the features connect: [FEATURES.md](FEATURES.md).
 
@@ -76,3 +113,12 @@ cd src-tauri && cargo test --lib
 | `src-tauri/src/library.rs` | Library files, image download, scholarly proxy |
 | `src-tauri/migrations` | SQLite schema |
 | `e2e` | Playwright click-through tests; `e2e/native` checks the real app |
+
+## Built with
+
+[Tauri 2](https://tauri.app) and Rust for the desktop app, [React](https://react.dev) and TypeScript for the interface,
+SQLite for storage, and [ONNX Runtime](https://onnxruntime.ai) to read handwritten maths on your PC. The maths model is
+[Pix2Text MFR](https://huggingface.co/breezedeus/pix2text-mfr-1.5) by breezedeus (MIT licence). Icons are from
+[Phosphor](https://phosphoricons.com) (MIT licence).
+
+<p align="center"><sub>Built with care, one board at a time.</sub></p>
