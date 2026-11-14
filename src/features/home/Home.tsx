@@ -33,7 +33,7 @@ function BoardRow({ board }: { board: Board }) {
   return (
     <li>
       <Link to={`/board/${board.id}`} className="home-row" aria-label={`Continue ${board.name}`}>
-        <span className="home-thumb">{picture && <AssetImage asset={picture} />}</span>
+        <span className="home-thumb">{picture ? <AssetImage asset={picture} /> : <Icon name="board" size={20} />}</span>
         <span className="home-row-name">{board.name}</span>
         <span className="cap">edited {timeAgo(board.updated_at)}</span>
       </Link>

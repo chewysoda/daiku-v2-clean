@@ -108,3 +108,24 @@ test("pinching zooms the board, on a touchpad and on a touchscreen", async ({ pa
   await touch("touchEnd", 0);
   await expect.poll(percent).toBeLessThan(zoomedIn * 0.7);
 });
+
+test("a new folder lands in the middle of the view, and can be dragged", async ({ page }) => {
+  await page.goto("/#/board/b-esp32");
+  await expect(page.getByTestId("item-sticky").first()).toBeVisible();
+  const chooser = page.waitForEvent("filechooser");
+  await page.getByRole("button", { name: "Upload files as Markdown" }).click();
+  await (await chooser).setFiles([{ name: "a.md", mimeType: "text/markdown", buffer: Buffer.from("# A") }]);
+  const folder = page.getByTestId("item-folder");
+  await expect(folder).toHaveCount(1);
+  const view = (await page.locator(".viewport").boundingBox())!;
+  const box = (await folder.boundingBox())!;
+  expect(Math.abs(box.x + box.width / 2 - (view.x + view.width / 2))).toBeLessThan(40);
+  expect(Math.abs(box.y + box.height / 2 - (view.y + view.height / 2))).toBeLessThan(40);
+
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 + 120, box.y + box.height / 2 + 60, { steps: 6 });
+  await page.mouse.up();
+  const moved = (await folder.boundingBox())!;
+  expect(moved.x - box.x).toBeGreaterThan(100);
+});

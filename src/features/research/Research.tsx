@@ -17,9 +17,12 @@ import "../studio.css";
 function ExploreTabs() {
   return (
     <nav className="seg-group" aria-label="Explore sections">
-      <NavLink to="/explore" end className={({ isActive }) => `seg ${isActive ? "on" : ""}`}>
-        Discover
-      </NavLink>
+      <Link to="/explore" className="seg">
+        Web
+      </Link>
+      <Link to="/explore?tab=papers" className="seg">
+        Papers
+      </Link>
       <NavLink to="/explore/claims" className={({ isActive }) => `seg ${isActive ? "on" : ""}`}>
         Claims
       </NavLink>
@@ -73,7 +76,7 @@ export function Claims() {
       </div>
       <div className="eng-bar">
         <span className="cap">
-          {counts("strong")} strong · {counts("medium")} medium · {counts("mixed")} mixed · {counts("assumption")} assumptions{anySample ? " · sample data" : ""}
+          {counts("strong")} strong · {counts("medium")} medium · {counts("mixed")} mixed · {counts("assumption")} {counts("assumption") === 1 ? "assumption" : "assumptions"}{anySample ? " · sample data" : ""}
         </span>
         <Pill onClick={() => setAdding(true)}>
           <Icon name="plus" size={16} />
@@ -137,10 +140,11 @@ export function Claims() {
                   Caveat, p. {c.data.page}: {c.data.text}
                 </span>
               ))}
+              <span className="cap side-section">Add evidence</span>
               <div className="form-row">
                 <select className="field" aria-label="Stance" value={stance} onChange={(e) => setStance(e.target.value as "for" | "against")}>
-                  <option value="for">for</option>
-                  <option value="against">against</option>
+                  <option value="for">For</option>
+                  <option value="against">Against</option>
                 </select>
                 <select
                   className="field"

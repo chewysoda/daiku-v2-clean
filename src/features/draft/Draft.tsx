@@ -186,7 +186,16 @@ export default function Draft() {
             </button>
           )}
         </nav>
-        {current ? <DraftEditor key={current.id} draftId={current.id} /> : <p>Start a draft to write up your research.</p>}
+        {current ? (
+          <DraftEditor key={current.id} draftId={current.id} />
+        ) : (
+          <div className="draft-empty">
+            <p>Start a draft to write up your research. Anything you quote keeps its credit.</p>
+            <Pill ink onClick={() => setAdding(true)}>
+              Start a draft
+            </Pill>
+          </div>
+        )}
       </div>
       {adding && (
         <PromptDialog

@@ -665,7 +665,7 @@ export default function Explore() {
   const webQuery = params.get("web");
   const startUrl = params.get("url");
   const paperQuery = params.get("q") ?? "";
-  const [tab, setTab] = useState<Tab>(paperQuery ? "papers" : "web");
+  const [tab, setTab] = useState<Tab>(paperQuery || params.get("tab") === "papers" ? "papers" : "web");
 
   useEffect(() => {
     if (webQuery || startUrl) setTab("web");

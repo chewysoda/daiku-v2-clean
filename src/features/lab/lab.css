@@ -25,11 +25,11 @@
 .concept-edit { position: absolute; right: 8px; top: 8px; width: 32px; height: 32px; background: rgba(251, 250, 247, 0.9); color: #1e1f1c; opacity: 0; }
 .concept:hover .concept-edit, .concept-edit:focus-visible { opacity: 1; }
 .concept-pop { top: 44px; right: 8px; width: 260px; display: flex; flex-direction: column; gap: 10px; }
-.concept-meta { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+.concept-meta { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .concept-names { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .concept-names .fr { font-size: 23px; }
-.concept-score { display: flex; align-items: baseline; gap: 4px; }
-.concept-score .fr { font-size: 46px; line-height: 1; }
+.concept-score { display: flex; flex: none; align-items: baseline; gap: 4px; }
+.concept-score .fr { font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
 .faded { color: var(--c-caption); }
 .concept-add {
   min-height: 250px;
@@ -84,8 +84,6 @@
 .score-value { flex: 1; height: 34px; border: 1px solid var(--c-border); border-radius: 8px; background: var(--c-surface); cursor: pointer; font-family: var(--font-mono); }
 .score-value.on { background: var(--c-inverse); color: var(--c-on-inverse); border-color: var(--c-inverse); }
 .score-note { font-size: 13px; line-height: 1.5; }
-.ev-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; }
-.ev-row button { border: 0; background: transparent; cursor: pointer; display: flex; color: var(--c-text-muted); }
 .ev-list { max-height: 180px; overflow-y: auto; }
 .row-x { width: 24px; }
 .row-x button { border: 0; background: transparent; cursor: pointer; color: var(--c-icon-idle); display: flex; opacity: 0; padding: 2px; }
@@ -119,14 +117,6 @@ tr:hover .row-x button, .row-x button:focus-visible { opacity: 1; }
 /* Evidence that can be weighed. Clay stays for assumptions, so strength is shown in words. */
 .score-pop { width: 300px; max-height: min(70vh, 560px); overflow-y: auto; }
 .ev-mark { font-size: 10px; font-weight: 600; color: var(--c-text-muted); }
-.ev-card { display: flex; flex-direction: column; gap: 6px; padding: 10px; border: 1px solid var(--c-hairline); border-radius: 10px; background: var(--c-surface-sunk); font-weight: 400; }
-.ev-title { font-weight: 600; overflow-wrap: anywhere; }
-.ev-fields { display: grid; grid-template-columns: 84px 1fr; gap: 6px; }
-.ev-card .field { min-width: 0; width: 100%; height: 32px; font-size: 13px; padding: 0 8px; }
-.ev-card .field.ev-needs { border-color: var(--c-text); }
-.ev-strength { display: flex; gap: 4px; }
-.ev-strength-btn { flex: 1; height: 28px; border: 1px solid var(--c-border); border-radius: 8px; background: var(--c-surface); color: var(--c-text); cursor: pointer; font-size: 13px; }
-.ev-strength-btn.on { background: var(--c-inverse); color: var(--c-on-inverse); border-color: var(--c-inverse); }
 .log-why-not { min-height: 56px; }
 
 /* The decision record and its readiness check */

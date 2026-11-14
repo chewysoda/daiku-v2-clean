@@ -39,7 +39,7 @@
 .guide { stroke: #F0508C; stroke-dasharray: none; shape-rendering: crispEdges; pointer-events: none; }
 .link-hit { fill: none; stroke: transparent; stroke-width: 14; pointer-events: stroke; cursor: pointer; }
 
-.section, .sticky, .text-item, .sticker, .palette-card, .image-item { position: absolute; margin: 0; }
+.section, .sticky, .text-item, .sticker, .palette-card, .image-item, .folder-item { position: absolute; margin: 0; }
 .section { pointer-events: none; }
 .section-label { pointer-events: auto; display: inline-flex; align-items: baseline; gap: 8px; cursor: default; }
 .section-label .fr { font-size: var(--size-board-name); color: var(--c-text-secondary); }

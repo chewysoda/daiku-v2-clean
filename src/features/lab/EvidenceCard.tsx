@@ -3,6 +3,7 @@ import { EvidenceLink, EvidenceStrength, SourceType } from "../../data/types";
 import { Icon } from "../../design/Icon";
 import { SOURCE_TYPES, STRENGTHS, strengthOf } from "../../lib/readiness";
 import { stanceOf } from "../../lib/studio";
+import "./evidence.css";
 
 /** One piece of evidence, with what makes it weighable. Used on both scores and claims. */
 export function EvidenceCard({ link, conflicted }: { link: EvidenceLink; conflicted: boolean }) {

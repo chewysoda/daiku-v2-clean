@@ -28,6 +28,7 @@
   --c-avatar: #CCD3E5;
   --c-assumption: #9C5530;
   --c-assumption-text: #8A4A28;
+  --c-scrim: rgba(30, 31, 28, 0.28);
   --c-assumption-tint: #FBF1EA;
   --c-conflict: #B47800;
   --c-conflict-text: #7A5000;
@@ -114,6 +115,7 @@
   --c-avatar: #3A4A5E;
   --c-assumption: #E9A17D;
   --c-assumption-text: #F0AE8C;
+  --c-scrim: rgba(0, 0, 0, 0.55);
   --c-assumption-tint: #33221A;
   --c-conflict: #E8B64A;
   --c-conflict-text: #F1C66A;
