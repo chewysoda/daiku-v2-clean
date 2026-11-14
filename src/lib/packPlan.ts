@@ -159,13 +159,17 @@ export function historyWithheld(plan: PackPlan, items: PackItem[]): boolean {
 /** Interview notes only travel when consent is on record for that participant. */
 export function withConsentOnly(s: S): S {
   const consented = new Set(s.records.filter((r) => r.type === "participant" && (r as RecordRow<"participant">).data.consent).map((r) => r.id));
+  const records = s.records.filter((r) => {
+    if (r.type === "participant") return consented.has(r.id);
+    if (r.type === "interview_note") return consented.has((r as RecordRow<"interview_note">).data.participant_id);
+    return true;
+  });
+  const kept = new Set(records.map((r) => r.id));
   return {
     ...s,
-    records: s.records.filter((r) => {
-      if (r.type === "participant") return consented.has(r.id);
-      if (r.type === "interview_note") return consented.has((r as RecordRow<"interview_note">).data.participant_id);
-      return true;
-    }),
+    records,
+    // Older log entries quote the note or name the participant, so they go with the record.
+    workflow_log: s.workflow_log.filter((e) => (e.target_type !== "interview_note" && e.target_type !== "participant") || kept.has(e.target_id)),
   };
 }
 
@@ -213,7 +217,9 @@ export function applyPlan(s: S, plan: PackPlan, items: PackItem[] = listPackItem
     // A left-out picture stays a gap on the board, without the caption that describes it.
     board_items: s.board_items
       .filter((i) => boardIds.has(i.board_id))
-      .map((i) => (i.asset_id && !assetIds.has(i.asset_id) ? { ...i, data: { ...i.data, caption: undefined } } : i)),
+      .map((i) => (i.asset_id && !assetIds.has(i.asset_id) ? { ...i, data: { ...i.data, caption: undefined } } : i))
+      // A claim's card carries a copy of its text, so a left-out claim's card goes blank too.
+      .map((i) => (i.data.claim && !claimIds.has(i.data.claim) ? { ...i, data: { ...i.data, text: "" } } : i)),
     comments: s.comments.filter((c) => boardIds.has(c.board_id) && (!c.asset_id || assetIds.has(c.asset_id))),
     // A claim keeps its count of evidence, but a note or limitation can quote a source that was left out.
     evidence_links: s.evidence_links
@@ -235,6 +241,8 @@ export function focusPlan(s: S, focus: PackFocus): PackPlan {
   const project: ProjectData = { name: "", working: false, board_ids, decision_ids, asset_ids: [], record_ids: [] };
   const keep = new Set<string>([...board_ids, ...decision_ids, ...projectAssetIds(s, project)]);
   for (const c of s.claims) if (c.board_id && board_ids.includes(c.board_id)) keep.add(c.id);
+  // A claim made elsewhere (in the Reader, say) whose card sits on this board is part of the board.
+  for (const i of s.board_items) if (i.data.claim && board_ids.includes(i.board_id)) keep.add(i.data.claim);
   // Samples stay in reach, so the example board can be sent too; everything outside the focus is left out anyway.
   return { ...EMPTY_PLAN, includeSamples: true, excluded: listPackItems(s).filter((i) => !keep.has(i.id)).map((i) => i.id) };
 }

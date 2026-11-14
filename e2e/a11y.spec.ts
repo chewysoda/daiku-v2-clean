@@ -1,14 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { withOlderSamples } from "./samples";
-
-test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
-});
 
 const SCREENS: [string, string][] = [
   ["Start", "/#/home"],
-  ["Board", "/#/board/b-furniture"],
+  ["Board", "/#/board/b-esp32"],
   ["Library", "/#/library"],
   ["Explore", "/#/explore"],
   ["Threads", "/#/threads"],
@@ -20,7 +15,7 @@ const SCREENS: [string, string][] = [
   ["Preview", "/#/handoff/preview"],
   ["Drafting", "/#/draft"],
   ["Export", "/#/export"],
-  ["Reader", "/#/reader/a-paper"],
+  ["Reader", "/#/reader/esp-paper"],
   ["Settings", "/#/settings"],
 ];
 

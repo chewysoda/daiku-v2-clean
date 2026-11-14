@@ -1,10 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { withOlderSamples } from "./samples";
-
-test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
-});
 
 const shots = process.env.RECORD_SHOTS;
 
@@ -45,8 +40,8 @@ test("weighing evidence, logging a decision and reading the readiness check", as
   await expect(page.getByTestId("readiness-title")).toHaveText("Not ready yet.");
   await expect(page.locator('[data-rule="no_record"]')).toBeVisible();
   // A long run of one kind collapses to a line that counts them, and still opens.
-  const many = page.locator(".ready-many[data-rule=unrated_evidence]");
-  await expect(many.locator("summary")).toContainText("need a strength rating");
+  const many = page.locator(".ready-many[data-rule=unsupported_score]");
+  await expect(many.locator("summary")).toContainText("scores have no source backing them");
   await many.locator("summary").click();
   await expect(many.locator("li").first()).toBeVisible();
   await expect(page.locator('[data-rule="weak_only"]').first()).toBeVisible();
@@ -97,7 +92,7 @@ test("weighing evidence, logging a decision and reading the readiness check", as
 
 test("an open evidence card has no serious accessibility problems", async ({ page }) => {
   await page.goto("/#/lab");
-  await page.locator(".score-btn").first().click();
+  await page.getByRole("button", { name: /Arduino C\+\+, Build tools on Windows: 4, sourced/ }).click();
   await expect(page.getByTestId("evidence-card").first()).toBeVisible();
   await page.waitForTimeout(400);
   const { violations } = await new AxeBuilder({ page }).include(".score-pop").analyze();

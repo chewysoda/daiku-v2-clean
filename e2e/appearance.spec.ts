@@ -1,6 +1,5 @@
 import { expect, Page, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import { withOlderSamples } from "./samples";
 
 const FONT = "node_modules/@fontsource/dm-mono/files/dm-mono-latin-400-normal.woff2";
 const FONT_2 = "node_modules/@fontsource/dm-mono/files/dm-mono-latin-500-normal.woff2";
@@ -9,7 +8,6 @@ const IMAGE = "src-tauri/icons/128x128.png";
 const VIDEO = "e2e/fixtures/loop.webm";
 
 test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
@@ -30,7 +28,7 @@ test.describe("cutting mat themes", () => {
     expect(await root.evaluate((el) => getComputedStyle(el).getPropertyValue("--c-bg").trim())).toBe("#16324B");
 
     await page.goto("/#/home");
-    await page.getByRole("link", { name: "Continue Furniture Study" }).click();
+    await page.getByRole("link", { name: "Continue ESP32 Node Programmer" }).click();
     const mat = page.getByTestId("cutting-mat");
     await expect(mat).toBeVisible();
     // Something was really drawn, in the mat's colour.
@@ -49,7 +47,7 @@ test.describe("cutting mat themes", () => {
     await expect(root).not.toHaveAttribute("data-mat");
     expect(await root.evaluate((el) => el.style.getPropertyValue("--c-bg"))).toBe("");
     await page.goto("/#/home");
-    await page.getByRole("link", { name: "Continue Furniture Study" }).click();
+    await page.getByRole("link", { name: "Continue ESP32 Node Programmer" }).click();
     await expect(page.getByTestId("item-sticky").first()).toBeVisible();
     await expect(page.getByTestId("cutting-mat")).toHaveCount(0);
   });
@@ -202,13 +200,13 @@ test.describe("background image and video", () => {
 
 test.describe("TeX and LaTeX", () => {
   test("double-clicking a plain sticky opens it for editing", async ({ page }) => {
-    await page.goto("/#/canvas/b-furniture");
-    await page.getByTestId("item-sticky").first().dblclick();
+    await page.goto("/#/canvas/b-esp32");
+    await page.getByTestId("item-sticky").filter({ hasText: "Every pin rule gets a test" }).dblclick();
     await expect(page.getByLabel("Sticky note text")).toBeVisible();
   });
 
   test("typesets math in a sticky note, and keeps the source for editing", async ({ page }) => {
-    await page.goto("/#/canvas/b-furniture");
+    await page.goto("/#/canvas/b-esp32");
     await page.getByRole("button", { name: "Sticky note" }).click();
     await page.locator(".viewport").click({ position: { x: 500, y: 300 } });
     const source = String.raw`Stress: $\sigma = \frac{F}{A}$`;

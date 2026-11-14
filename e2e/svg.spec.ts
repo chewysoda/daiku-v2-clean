@@ -1,12 +1,10 @@
 import { expect, Page, test } from "@playwright/test";
-import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
-  await page.goto("/#/canvas/b-furniture");
+  await page.goto("/#/canvas/b-esp32");
   await expect(page.getByTestId("item-sticky").first()).toBeVisible();
 });
 
@@ -66,7 +64,7 @@ test("never runs a script inside one", async ({ page }) => {
 });
 
 test("the sample pictures still fill their frames like photos", async ({ page }) => {
-  await expect(page.getByTestId("item-image").first().locator("img")).toHaveCSS("object-fit", "cover");
+  await expect(page.getByRole("img", { name: "ESP32 dev board" })).toHaveCSS("object-fit", "cover");
   await expect(page.locator("img.is-svg")).toHaveCount(0);
 });
 

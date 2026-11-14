@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { Repo, openRepo } from "./repo";
-import { ESP_BOARD, ESP_BOARD_ITEMS, ESP_BRIEF, ESP_ITEMS_AT, ESP_REVIEW, ESP_V1_ITEM_IDS, esp32Plan, SEED_ESP32 } from "./seedEsp32";
+import { ESP_BOARD, ESP_BOARD_ITEMS, ESP_BRIEF, ESP_ITEMS_AT, ESP_PROJECT, ESP_REVIEW, ESP_V1_ITEM_IDS, esp32Plan, SEED_ESP32 } from "./seedEsp32";
 import {
   Asset,
   Board,
@@ -92,6 +92,8 @@ export interface Settings {
   seeded_v4: string;
   /** Set once the ESP32 board has its claim cards. */
   seeded_v5: string;
+  /** Set once the older samples are gone and the ESP32 example has everything it shows. */
+  seeded_v6: string;
   /** "open" shows the pack tray's itemised breakdown. */
   tray: string;
   seeded_v3: string;
@@ -149,6 +151,7 @@ const DEFAULTS: Settings = {
   sidebar: "",
   seeded_v4: "",
   seeded_v5: "",
+  seeded_v6: "",
   tray: "",
   seeded_v3: "",
   packs: "",
@@ -164,6 +167,8 @@ interface State extends Rows {
   error: string | null;
   pendingWrites: number;
   saveError: string | null;
+  /** Why the library folder can't be used right now (a missing drive, say). The app still opens. */
+  libraryError: string | null;
   config: Settings;
   /** Opens the database, or the given repo (tests). */
   init: (testRepo?: Repo) => Promise<void>;
@@ -262,7 +267,10 @@ function describe(table: TableName, action: LogEntry["action"], row: Record<stri
   if (table === "board_items") return `${action === "update" ? "Edited" : VERB[action]} ${String(row.kind)} on a board`;
   if (table === "records") {
     const data = (row.data ?? {}) as Record<string, unknown>;
-    const name = data.title ?? data.name ?? data.code ?? data.label ?? data.text;
+    // What a participant said, and who they are, stays out of the log: it travels in packs and exports,
+    // and interview material may only leave with consent.
+    const personal = row.type === "interview_note" || row.type === "participant";
+    const name = personal ? null : (data.title ?? data.name ?? data.code ?? data.label ?? data.text);
     return `${VERB[action]} ${RECORD_LABEL[row.type as RecordType]}${name ? `: ${String(name).slice(0, 80)}` : ""}`;
   }
   const name = row.title ?? row.name ?? row.text;
@@ -277,6 +285,56 @@ function snapshotValue(table: TableName, row: Record<string, unknown>): string |
 
 /** A row that failed to save, as "table\u0000id". Retried from memory, so a stale write never wins. */
 const dirtyKey = (table: TableName, id: string) => `${table}\u0000${id}`;
+
+/**
+ * Removes the older samples (furniture, engineering, agents) from a store loaded before they were retired, and
+ * gives the ESP32 example any rows added to it since. Only sample rows go, plus what lived inside a sample board
+ * or decision; the ESP32 example and the person's own work stay. Changes `loaded` to match what it writes.
+ */
+export async function retireOldSamples(repo: Repo, loaded: Record<TableName, unknown[]>) {
+  type Row = { id: string; is_sample?: boolean; board_id?: string | null; decision_id?: string; concept_id?: string; parent_id?: string | null };
+  const rows = (t: TableName) => loaded[t] as Row[];
+  const esp = new Set(Object.values(SEED_ESP32).flatMap((list) => (list as { id: string }[]).map((r) => r.id)));
+  const old = (r: Row) => !!r.is_sample && !esp.has(r.id);
+  const boards = new Set(rows("boards").filter(old).map((r) => r.id));
+  const decisions = new Set(rows("decisions").filter(old).map((r) => r.id));
+  const concepts = new Set(rows("concepts").filter((r) => decisions.has(r.decision_id!)).map((r) => r.id));
+  const gone: Partial<Record<TableName, (r: Row) => boolean>> = {
+    assets: old,
+    boards: old,
+    claims: old,
+    evidence_links: old,
+    decisions: old,
+    comments: (r) => old(r) || boards.has(r.board_id!),
+    records: (r) => old(r) || decisions.has(r.parent_id!),
+    board_items: (r) => boards.has(r.board_id!),
+    concepts: (r) => concepts.has(r.id),
+    criteria: (r) => decisions.has(r.decision_id!),
+    scores: (r) => concepts.has(r.concept_id!),
+  };
+  for (const [table, test] of Object.entries(gone) as [TableName, (r: Row) => boolean][]) {
+    const drop = rows(table).filter(test);
+    for (const r of drop) await repo.del(table, r.id);
+    if (drop.length) loaded[table] = rows(table).filter((r) => !test(r));
+  }
+  // Only for someone who still has the ESP32 example: add what's missing, never replacing a row they have.
+  if (!rows("boards").some((b) => b.id === ESP_BOARD)) return;
+  for (const [table, seed] of Object.entries(SEED_ESP32) as [TableName, Row[]][]) {
+    const have = new Set(rows(table).map((r) => r.id));
+    const missing = seed.filter((r) => !have.has(r.id) && r.id !== ESP_PROJECT);
+    for (const r of missing) await repo.put(table, r as never);
+    if (missing.length) loaded[table] = [...rows(table), ...missing];
+  }
+  // The project lists the new parts too, keeping anything the person added to it.
+  const project = (loaded.records as RecordRow[]).find((r) => r.id === ESP_PROJECT && r.type === "project") as RecordRow<"project"> | undefined;
+  const seeded = SEED_ESP32.records.find((r) => r.id === ESP_PROJECT) as RecordRow<"project">;
+  if (project) {
+    const merge = (k: "board_ids" | "decision_ids" | "asset_ids" | "record_ids") => [...new Set([...project.data[k], ...seeded.data[k]])];
+    const next = { ...project, data: { ...project.data, board_ids: merge("board_ids"), decision_ids: merge("decision_ids"), asset_ids: merge("asset_ids"), record_ids: merge("record_ids") } };
+    await repo.put("records", next);
+    loaded.records = (loaded.records as RecordRow[]).map((r) => (r.id === ESP_PROJECT ? next : r));
+  }
+}
 
 export const useStore = create<State>((set, get) => {
   const dirty = new Set<string>();
@@ -405,9 +463,11 @@ export const useStore = create<State>((set, get) => {
     error: null,
     pendingWrites: 0,
     saveError: null,
+    libraryError: null,
     config: DEFAULTS,
 
     init: async (testRepo) => {
+      let libraryError: string | null = null;
       try {
         repo = testRepo ?? (await openRepo());
         const loaded = emptyRows() as Record<TableName, unknown[]>;
@@ -417,7 +477,7 @@ export const useStore = create<State>((set, get) => {
           (config as Record<string, string>)[row.id] = row.value;
         }
         // A fresh install starts with one example: the ESP32 Node Programmer (added just below).
-        // The older furniture, engineering and agents samples are no longer seeded.
+        // The older furniture, engineering and agents samples are no longer seeded, and seeded_v6 removes them.
         const fresh = !config.seeded;
         if (fresh) {
           for (const id of ["seeded", "seeded_v2", "seeded_v3"] as const) {
@@ -470,14 +530,30 @@ export const useStore = create<State>((set, get) => {
           config.seeded_v5 = "1";
           await repo.put("settings", { id: "seeded_v5", value: "1" });
         }
+        // The ESP32 project is the only example. The older samples go, with everything inside their boards and
+        // decisions (as Remove sample data does). Anyone who still has the ESP32 sample gains the parts added since.
+        if (!config.seeded_v6) {
+          await retireOldSamples(repo, loaded);
+          config.seeded_v6 = "1";
+          await repo.put("settings", { id: "seeded_v6", value: "1" });
+        }
         if (isTauri) {
           if (!config.library_dir) {
             config.library_dir = await native.libraryDefaultDir();
             await repo.put("settings", { id: "library_dir", value: config.library_dir });
           }
-          await native.librarySetDir(config.library_dir);
+          // A library folder on a drive that's missing today mustn't stop the app from opening:
+          // the data is all in the database, and Settings is where the folder gets changed.
+          try {
+            await native.librarySetDir(config.library_dir);
+          } catch (e) {
+            libraryError = String(e);
+          }
+          // Files saved before the folder was changed still live in the old one, so it stays readable.
+          const elsewhere = foldersOf(loaded.assets as Asset[]);
+          if (elsewhere.length) await native.libraryAllowDirs(elsewhere).catch(() => undefined);
         }
-        set({ ...(loaded as unknown as Rows), config, ready: true });
+        set({ ...(loaded as unknown as Rows), config, libraryError, ready: true });
       } catch (e) {
         set({ error: String(e), ready: true });
       }
@@ -518,6 +594,7 @@ export const useStore = create<State>((set, get) => {
     setLibraryDir: async (path) => {
       if (isTauri) await native.librarySetDir(path);
       get().setSetting("library_dir", path);
+      set({ libraryError: null });
     },
 
     putAsset: (asset) => put("assets", asset),
@@ -768,11 +845,24 @@ export const useStore = create<State>((set, get) => {
       const settings = ((rows.settings ?? []) as { id: string; value: string }[]).filter((r) => !kept.has(r.id as keyof Settings));
       for (const [id, value] of kept) settings.push({ id, value: String(value) });
       const next = { ...emptyRows(), ...rows, settings } as Rows;
-      set((s) => ({ pendingWrites: s.pendingWrites + 1 }));
-      try {
+      // The plugin's connection pool can't hold a transaction across calls, so a failed restore is undone
+      // by hand: what was there before (all of it is in memory, and flushed) is written back.
+      const before = Object.fromEntries(TABLES.map((t) => [t, get()[t]])) as unknown as Rows;
+      const write = async (rows: Rows) => {
         // Children first, so nothing is left pointing at a row that's gone; then parents first.
         for (const t of [...TABLES].reverse()) await active.clear(t);
-        for (const t of TABLES) if (next[t].length) await active.putMany(t, next[t] as never[]);
+        for (const t of TABLES) if (rows[t].length) await active.putMany(t, rows[t] as never[]);
+      };
+      set((s) => ({ pendingWrites: s.pendingWrites + 1 }));
+      try {
+        await write(next);
+      } catch (e) {
+        try {
+          await write(before);
+        } catch (undo) {
+          throw new Error(`${e}. Putting your data back failed too (${undo}). Keep Daiku open and restore a good backup now.`, { cause: undo });
+        }
+        throw new Error(`${e}. Nothing was replaced: your data is as it was.`, { cause: e });
       } finally {
         set((s) => ({ pendingWrites: s.pendingWrites - 1 }));
       }
@@ -798,6 +888,16 @@ export const useStore = create<State>((set, get) => {
     },
   };
 });
+
+/** The folders that hold saved files, so the ones outside today's library folder can still be shown. */
+function foldersOf(assets: Asset[]): string[] {
+  const dirs = new Set<string>();
+  for (const a of assets) {
+    const cut = a.file_path ? Math.max(a.file_path.lastIndexOf("\\"), a.file_path.lastIndexOf("/")) : -1;
+    if (cut > 0) dirs.add(a.file_path!.slice(0, cut));
+  }
+  return [...dirs];
+}
 
 /** Settings that belong to this computer, so a restored backup never overwrites them. */
 export const MACHINE_SETTINGS: (keyof Settings)[] = ["library_dir"];

@@ -1,26 +1,39 @@
 import { expect, Page, test } from "@playwright/test";
-import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
 });
 
-const board = (page: Page) => page.goto("/#/canvas/b-furniture");
+const board = (page: Page) => page.goto("/#/canvas/b-esp32");
 
 async function addSticky(page: Page, text: string) {
   await page.getByRole("button", { name: "Sticky note" }).click();
   await page.locator(".viewport").click({ position: { x: 700, y: 120 } });
   await page.getByLabel("Sticky note text").fill(text);
   await page.locator(".viewport").click({ position: { x: 1000, y: 560 } });
-  const sticky = page.getByTestId("item-sticky").filter({ hasText: text });
+  // Exactly this text: the example's own stickies contain common words like "one".
+  const sticky = page.getByTestId("item-sticky").filter({ hasText: new RegExp(`^${text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`) });
   await sticky.click();
   return sticky;
 }
 
 const itemCount = (page: Page, kind: string) => page.getByTestId(`item-${kind}`).count();
+
+/** Waits until the board has fitted itself to the window and the zoom holds still. */
+async function settled(page: Page) {
+  const zoom = page.getByTestId("zoom");
+  let last = await zoom.textContent();
+  await expect
+    .poll(async () => {
+      const now = await zoom.textContent();
+      const same = now === last;
+      last = now;
+      return same;
+    }, { intervals: [300] })
+    .toBe(true);
+}
 
 test.describe("sticky note styling", () => {
   test("changes colour with readable text, font, size, shape and tilt, and undoes", async ({ page }) => {
@@ -218,14 +231,21 @@ test.describe("canvas quality of life", () => {
   });
 
   test("snaps to the grid when dragging, with G to toggle", async ({ page }) => {
-    await board(page);
+    // A board of its own: on a full one, a nearby card's edge rightly wins over the grid.
+    await page.goto("/#/home");
+    await page.getByRole("button", { name: "New board" }).click();
+    await page.getByPlaceholder("Name this board").fill("Grid");
+    await page.getByRole("button", { name: "Create board" }).click();
+    await expect(page.getByRole("button", { name: "Grid", exact: true })).toBeVisible();
     const sticky = await addSticky(page, "Snap");
     await page.keyboard.press("g");
     await expect(page.locator(".toast")).toContainText("Snap to grid on");
     const box = (await sticky.boundingBox())!;
-    await page.mouse.move(box.x + 40, box.y + 40);
+    // From the middle: on a zoomed-out board the corner is the resize handle.
+    const [cx, cy] = [box.x + box.width / 2, box.y + box.height / 2];
+    await page.mouse.move(cx, cy);
     await page.mouse.down();
-    await page.mouse.move(box.x + 77, box.y + 91, { steps: 4 });
+    await page.mouse.move(cx + 37, cy + 51, { steps: 4 });
     await page.mouse.up();
     await expect
       .poll(async () => {
@@ -264,8 +284,8 @@ test.describe("canvas quality of life", () => {
     await page.locator(".viewport").click({ position: { x: 900, y: 300 } });
     await page.getByLabel("Sticky note text").fill("Two");
     await page.locator(".viewport").click({ position: { x: 1000, y: 560 } });
-    const one = page.getByTestId("item-sticky").filter({ hasText: "One" });
-    const two = page.getByTestId("item-sticky").filter({ hasText: "Two" });
+    const one = page.getByTestId("item-sticky").filter({ hasText: /^One$/ });
+    const two = page.getByTestId("item-sticky").filter({ hasText: /^Two$/ });
     await one.click();
     await two.click({ modifiers: ["Shift"] });
     await page.getByRole("button", { name: "Align top edges" }).click();
@@ -322,6 +342,8 @@ test.describe("canvas quality of life", () => {
   test("ignores pasted items that are malformed", async ({ page }) => {
     await board(page);
     await expect(page.getByTestId("item-sticky").first()).toBeVisible();
+    // Only what's on screen is mounted, so let the board fit itself before counting.
+    await settled(page);
     const stickies = await itemCount(page, "sticky");
     await page.evaluate(() => {
       const dt = new DataTransfer();
@@ -356,7 +378,7 @@ test.describe("general customisation", () => {
     await page.goto("/#/settings");
     await page.getByLabel("Canvas grid").selectOption("lines");
     await page.goto("/#/home");
-    await page.getByRole("link", { name: "Continue Furniture Study" }).click();
+    await page.getByRole("link", { name: "Continue ESP32 Node Programmer" }).click();
     await expect(page.locator(".line-grid")).toBeVisible();
     await expect(page.locator(".dot-grid")).toHaveCount(0);
   });

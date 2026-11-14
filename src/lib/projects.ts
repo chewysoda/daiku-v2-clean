@@ -63,22 +63,29 @@ export function narrowToProject(s: S, project: ProjectData): S {
   const claimIds = new Set(claims.map((c) => c.id));
   const scores = s.scores.filter((x) => conceptIds.has(x.concept_id));
   const scoreIds = new Set(scores.map((x) => x.id));
+  const board_items = s.board_items.filter((i) => boardIds.has(i.board_id));
+  const criteria = s.criteria.filter((c) => decisionIds.has(c.decision_id));
+  const records = s.records.filter((r) => {
+    if (r.type === "highlight") return assetIds.has((r as RecordRow<"highlight">).data.asset_id);
+    if (r.parent_id && decisionIds.has(r.parent_id)) return true;
+    return recordIds.has(r.id);
+  });
+  // The log covers every project, so only what happened to this one's own things goes along.
+  const mine = new Set<string>([...boardIds, ...decisionIds, ...assetIds, ...conceptIds, ...claimIds, ...scoreIds]);
+  for (const row of [...board_items, ...criteria, ...records]) mine.add(row.id);
   return {
     ...s,
     boards: s.boards.filter((b) => boardIds.has(b.id)),
-    board_items: s.board_items.filter((i) => boardIds.has(i.board_id)),
+    board_items,
+    workflow_log: s.workflow_log.filter((e) => mine.has(e.target_id)),
     decisions: s.decisions.filter((d) => decisionIds.has(d.id)),
     concepts,
     scores,
-    criteria: s.criteria.filter((c) => decisionIds.has(c.decision_id)),
+    criteria,
     assets: s.assets.filter((a) => assetIds.has(a.id)),
     claims,
     evidence_links: s.evidence_links.filter((l) => (l.target_type === "claim" ? claimIds.has(l.target_id) : scoreIds.has(l.target_id))),
-    records: s.records.filter((r) => {
-      if (r.type === "highlight") return assetIds.has((r as RecordRow<"highlight">).data.asset_id);
-      if (r.parent_id && decisionIds.has(r.parent_id)) return true;
-      return recordIds.has(r.id);
-    }),
+    records,
     comments: s.comments.filter((c) => boardIds.has(c.board_id)),
   };
 }

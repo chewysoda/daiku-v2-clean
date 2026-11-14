@@ -286,6 +286,8 @@ select.field { padding-right: 4px; }
 .win-btn:hover { background: var(--c-surface-sunk); }
 .win-btn.close:hover { background: #c42b1c; color: #fff; }
 .shell-body { flex: 1; display: flex; min-height: 0; }
+.library-notice { display: flex; align-items: center; gap: 10px; margin: 0 10px 8px; padding: 8px 12px; border-radius: 10px; background: var(--c-assumption-tint); color: var(--c-assumption-text); font-size: 13px; }
+.library-notice > span { flex: 1; min-width: 0; }
 .rail {
   flex: 0 0 var(--rail-width);
   display: flex;

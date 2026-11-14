@@ -45,7 +45,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       { label: "Collapse or expand the sidebar", hint: "action", keys: "Ctrl \\", run: setting("sidebar", "collapsed") },
       { label: "Show or hide the pack receipt", hint: "action", also: "tray", run: setting("tray", "open") },
       { label: "Reduce transparency", hint: "setting", also: "glass solid", run: setting("transparency", "reduced") },
-      { label: "Go to Start", hint: "screen", also: "home start here", run: go("/home") },
+      { label: "Go to Home", hint: "screen", also: "home start here dashboard", run: go("/home") },
       { label: "Go to Explore", hint: "screen", run: go("/explore") },
       { label: "Go to Threads", hint: "screen", run: go("/threads") },
       { label: "Go to Share", hint: "screen", run: go("/share") },
@@ -137,7 +137,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         </label>
         <ul className="palette-list">
           {results.map((c, i) => (
-            <li key={`${c.hint}-${c.label}`}>
+            <li key={`${c.hint}-${c.label}-${i}`}>
               <button
                 type="button"
                 className={`palette-row ${i === index ? "on" : ""}`}

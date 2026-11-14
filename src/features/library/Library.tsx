@@ -136,7 +136,7 @@ function AssetDetails({ asset, onClose }: { asset: Asset; onClose: () => void })
         <Pill
           className="small"
           disabled={!asset.source_url}
-          onClick={() => asset.source_url && void openExternal(asset.source_url)}
+          onClick={() => asset.source_url && void openExternal(asset.source_url).catch(() => toast("That link can't be opened. A source link has to start with http:// or https://.", "error"))}
         >
           Open source
         </Pill>
@@ -338,7 +338,7 @@ export function Library() {
               )}
               <input
                 aria-label="Search the library by idea, colour or maker"
-                placeholder="soft curves, lounge, maker…"
+                placeholder="pins, breadboard, Espressif…"
                 value={query}
                 onChange={(e) => setParam("q", e.target.value || null)}
               />

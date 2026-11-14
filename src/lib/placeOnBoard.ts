@@ -14,6 +14,3 @@ export interface PlaceRequest {
 }
 
 export const placeOnBoard = (request: PlaceRequest) => window.dispatchEvent(new CustomEvent<PlaceRequest>(PLACE_EVENT, { detail: request }));
-
-/** The board in the address, if one is open: "/board/<id>". */
-export const openBoardId = (pathname: string) => (pathname.startsWith("/board/") ? pathname.split("/")[2] || null : null);

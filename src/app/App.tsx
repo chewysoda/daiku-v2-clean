@@ -83,20 +83,53 @@ function crumb(pathname: string, boardName: string | undefined) {
   const first = pathname.split("/")[1];
   const section = SECTIONS.find((n) => n.to === `/${first}`);
   if (first === "board" && boardName) return `Board / ${boardName}`;
-  const named: Record<string, string> = { settings: "Settings", reader: "Reader", cad: "CAD viewer", home: "Start", explore: "Explore", threads: "Threads", notes: "Notes", draft: "Drafting", progress: "Progress", share: "Present and share", export: "Export" };
+  const named: Record<string, string> = { settings: "Settings", reader: "Reader", cad: "CAD viewer", home: "Home", explore: "Explore", threads: "Threads", notes: "Notes", draft: "Drafting", progress: "Progress", share: "Present and share", export: "Export" };
   return section?.label ?? named[first] ?? "Board";
 }
 
-/** Opening the app: the board, or the last screen when that's what's been chosen. */
+/** Opening the app: Home, or the last screen when that's what's been chosen. */
 function Start() {
   const { start_screen, last_route } = useStore.getState().config;
-  return <Navigate to={start_screen === "last" && last_route && last_route !== "/" ? last_route : "/board"} replace />;
+  return <Navigate to={start_screen === "last" && last_route && last_route !== "/" ? last_route : "/home"} replace />;
 }
 
 /** An old address, kept working: everything after the old prefix carries over. */
 function Moved({ from, to }: { from: string; to: string }) {
   const { pathname, search } = useLocation();
   return <Navigate to={`${to}${pathname.slice(from.length)}${search}`} replace />;
+}
+
+/** The library folder can't be reached (a missing drive, say). The app still opens, and this says how to fix it. */
+function LibraryNotice() {
+  const problem = useStore((s) => s.libraryError);
+  if (!problem) return null;
+  const use = async (pick: () => Promise<string | null>) => {
+    try {
+      const path = await pick();
+      if (path) await useStore.getState().setLibraryDir(path);
+    } catch (e) {
+      toast(String(e), "error");
+    }
+  };
+  const choose = async () => {
+    const { open } = await import("@tauri-apps/plugin-dialog");
+    const picked = await open({ directory: true, title: "Choose your library folder" });
+    return typeof picked === "string" ? picked : null;
+  };
+  return (
+    <div className="library-notice" role="alert">
+      <span>
+        <b>Your library folder can't be reached.</b> Boards and notes are fine, but saved files won't show and new ones can't be saved until it's back.
+        <span className="cap"> {problem}</span>
+      </span>
+      <button type="button" className="pill" onClick={() => void use(choose)}>
+        Choose folder
+      </button>
+      <button type="button" className="pill" onClick={() => void use(() => native.libraryDefaultDir())}>
+        Use the default
+      </button>
+    </div>
+  );
 }
 
 function SaveState() {
@@ -260,6 +293,7 @@ function Frame() {
         <SaveState />
         <WindowButtons />
       </header>
+      <LibraryNotice />
       <div className="shell-body">
         <Sidebar onPalette={() => setPaletteOpen(true)} />
         {/* Keyed by screen, so moving between screens animates but editing within one doesn't. */}

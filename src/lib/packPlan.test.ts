@@ -254,3 +254,30 @@ describe("a pack of one board or decision", () => {
     expect(Object.keys(unzipSync(bytes))).toContain("boards/Private board.md");
   });
 });
+
+describe("what a pack never carries", () => {
+  const entry = (id: string, target_type: string, target_id: string, summary: string) => ({ id, at: "2026-01-02T00:00:00Z", actor: "me", action: "create", target_type, target_id, summary, before: null, after: null, why: null });
+
+  it("leaves out log entries about interview notes that have no consent", async () => {
+    const s = project();
+    s.workflow_log = [entry("l2", "interview_note", "in2", "Added interview note: NOCONSENTLOG"), entry("l3", "interview_note", "in1", "Added interview note: stacks it"), entry("l4", "participant", "p2", "Added participant: NOCONSENTNAME")] as never;
+    const { everything } = await pack(EMPTY_PLAN, s);
+    expect(everything).not.toMatch(/NOCONSENT/);
+    expect(everything).toContain("Added interview note: stacks it");
+  });
+
+  it("blanks the board card of a claim that was left out", async () => {
+    const s = project();
+    s.board_items = [...s.board_items, { id: "i5", board_id: "b-keep", kind: "sticky", x: 0, y: 0, w: 1, h: 1, rotation: 0, z: 0, asset_id: null, data: { text: "Secret claim", claim: "c-out" }, updated_at: "" }] as never;
+    const { everything } = await pack(setIncluded(EMPTY_PLAN, ["c-out"], false), s);
+    expect(everything).not.toMatch(/secret claim/i);
+    expect(everything).toContain("- Claim: not in this export");
+  });
+
+  it("sends a board with the claims whose cards are on it, wherever they were made", async () => {
+    const s = project();
+    s.board_items = [...s.board_items, { id: "i6", board_id: "b-keep", kind: "sticky", x: 0, y: 0, w: 1, h: 1, rotation: 0, z: 0, asset_id: null, data: { text: "Oak outlasts ash", claim: "c-keep" }, updated_at: "" }] as never;
+    const { everything } = await pack(focusPlan(s, { type: "board", id: "b-keep" }), s);
+    expect(everything).toContain("- Claim: Oak outlasts ash");
+  });
+});

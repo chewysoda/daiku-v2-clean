@@ -1,46 +1,45 @@
 import { expect, test } from "@playwright/test";
-import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
 });
 
 test("the Reader opens beside the board and closes with Esc", async ({ page }) => {
-  await page.goto("/#/board/b-furniture?read=a-paper");
+  await page.goto("/#/board/b-esp32?read=esp-paper");
   const panel = page.getByRole("complementary", { name: /^Reading / });
   await expect(panel).toBeVisible();
-  await expect(page.getByRole("button", { name: "Furniture Study" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "ESP32 Node Programmer" })).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(panel).toHaveCount(0);
-  await expect(page).toHaveURL(/#\/board\/b-furniture$/);
+  await expect(page).toHaveURL(/#\/board\/b-esp32$/);
 });
 
 test("P pins the selected card's source in the pack, and P again unpins it", async ({ page }) => {
   await page.goto("/#/handoff");
   await page.getByLabel("Include the sample project").check();
-  await page.goto("/#/board/b-furniture");
-  await page.getByRole("img", { name: "Lounge, oak legs" }).click();
+  await page.goto("/#/board/b-esp32");
+  await page.getByRole("img", { name: "ESP32 dev board" }).click();
   await page.keyboard.press("p");
   await expect(page.locator(".toast")).toContainText("Pinned");
   await page.goto("/#/handoff");
   await expect(page.locator(".ho-group.pinned")).not.toContainText("Pin what the AI must always see");
-  await page.goto("/#/board/b-furniture");
-  await page.getByRole("img", { name: "Lounge, oak legs" }).click();
+  await page.goto("/#/board/b-esp32");
+  await page.getByRole("img", { name: "ESP32 dev board" }).click();
   await page.keyboard.press("p");
   await expect(page.locator(".toast").last()).toContainText("Unpinned");
 });
 
 test("Ctrl+N adds a note ready to type", async ({ page }) => {
-  await page.goto("/#/board/b-furniture");
+  await page.goto("/#/board/b-esp32");
   await expect(page.getByTestId("item-sticky").first()).toBeVisible();
-  const before = await page.getByTestId("item-sticky").count();
   await page.keyboard.press("Control+n");
-  await page.getByLabel("Sticky note text").fill("From the keyboard");
-  await page.keyboard.press("Escape");
-  await expect(page.getByTestId("item-sticky")).toHaveCount(before + 1);
+  // Ready to type: the new note's editor has the focus, so keys go straight in.
+  const editor = page.getByLabel("Sticky note text");
+  await expect(editor).toBeFocused();
+  await page.keyboard.type("From the keyboard");
+  await expect(editor).toHaveValue("From the keyboard");
 });
 
 test("the tray opens into a receipt, and the sidebar collapses to icons", async ({ page }) => {
@@ -50,8 +49,38 @@ test("the tray opens into a receipt, and the sidebar collapses to icons", async 
   await expect(tray.getByRole("heading", { name: /Pinned/ })).toBeVisible();
   await expect(tray.getByRole("heading", { name: /Left out/ })).toBeVisible();
   await page.keyboard.press("Control+\\");
-  await expect(page.locator(".sidebar.collapsed")).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Decide", exact: true })).toBeVisible();
+  const nav = page.getByRole("navigation", { name: "Main" });
+  await expect(nav).toHaveClass(/collapsed/);
+  await expect(nav.getByRole("link", { name: "Decide", exact: true })).toBeVisible();
+});
+
+test("the collapsed sidebar is a narrow rail, whatever other stylesheets are loaded", async ({ page }) => {
+  // pdf.js ships a global .sidebar rule (min-width 180px) that once held the rail open at 180px.
+  await page.goto("/#/home");
+  // The Reader (and with it pdf.js's stylesheet) is preloaded shortly after start; wait until it is in.
+  await page.waitForFunction(() =>
+    [...document.styleSheets].some((s) => {
+      try {
+        return [...s.cssRules].some((r) => r.cssText.includes("--sidebar-min-width"));
+      } catch {
+        return false;
+      }
+    }),
+  );
+  const nav = page.getByRole("navigation", { name: "Main" });
+  await nav.getByRole("button", { name: "Collapse the sidebar" }).click();
+  await expect(nav).toHaveClass(/collapsed/);
+  await expect.poll(async () => (await nav.boundingBox())?.width ?? 0).toBeLessThanOrEqual(64);
+});
+
+test("on a short window the bottom of the sidebar stays reachable with Tools open", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/#/home");
+  const nav = page.getByRole("navigation", { name: "Main" });
+  const tools = nav.getByRole("button", { name: "Tools" });
+  if ((await tools.getAttribute("aria-expanded")) !== "true") await tools.click();
+  await expect(nav.getByRole("link", { name: "Settings" })).toBeInViewport();
+  await expect(nav.getByRole("button", { name: "Everything else" })).toBeInViewport();
 });
 
 test("reduce transparency makes the glass solid; the browser preview never claims Mica", async ({ page }) => {
@@ -60,7 +89,7 @@ test("reduce transparency makes the glass solid; the browser preview never claim
   await page.getByLabel("Reduce transparency").selectOption("on");
   await expect(page.locator("html")).toHaveAttribute("data-glass", "solid");
   await page.goto("/#/library");
-  const filter = await page.locator(".sidebar").evaluate((el) => getComputedStyle(el).backdropFilter);
+  const filter = await page.locator(".app-sidebar").evaluate((el) => getComputedStyle(el).backdropFilter);
   expect(filter).toBe("none");
 });
 
@@ -91,7 +120,7 @@ test("the Tools list starts folded; Ctrl+K still reaches every tool", async ({ p
 });
 
 test("Make claim turns selected words into a sourced claim card on the open board", async ({ page }) => {
-  await page.goto("/#/board/b-furniture?read=a-paper");
+  await page.goto("/#/board/b-esp32?read=esp-paper");
   await expect(page.locator(".textLayer span", { hasText: "Background" })).toBeVisible();
   await page.locator(".textLayer span", { hasText: "Background" }).evaluate((el) => {
     const range = document.createRange();
@@ -116,7 +145,7 @@ const pasteText = (page: import("@playwright/test").Page, text: string) =>
   }, text);
 
 test("a link pasted on the board becomes a credited source card, and isn't saved twice", async ({ page }) => {
-  await page.goto("/#/board/b-furniture");
+  await page.goto("/#/board/b-esp32");
   await expect(page.getByTestId("item-sticky").first()).toBeVisible();
   await pasteText(page, "https://docs.espressif.com/projects/arduino-esp32/gpio-pin_limits.html");
   await expect(page.locator(".toast")).toContainText("credited to docs.espressif.com");
@@ -156,12 +185,12 @@ test("packs: a new pack starts empty, and switching back brings the first one's 
 test("Ctrl+K finds words inside the work, not just names, and opens where they are", async ({ page }) => {
   await page.goto("/#/library");
   await page.keyboard.press("Control+k");
-  await page.getByLabel("Search or run a command").fill("mould lead");
+  await page.getByLabel("Search or run a command").fill("several things at once");
   const hit = page.locator(".palette-row").filter({ hasText: "on a board" });
-  await expect(hit).toContainText("Furniture Study");
-  await expect(hit).toContainText("FRP mould lead time");
+  await expect(hit).toContainText("ESP32 Node Programmer");
+  await expect(hit).toContainText("several things at once");
   await hit.click();
-  await expect(page).toHaveURL(/#\/board\/b-furniture/);
+  await expect(page).toHaveURL(/#\/board\/b-esp32/);
 });
 
 test("a backup restores what changed since, after asking", async ({ page }) => {

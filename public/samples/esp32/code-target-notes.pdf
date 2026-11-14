@@ -1,0 +1,174 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 3 /Kids [7 0 R 9 0 R 11 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Times-Roman >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Times-Bold >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Times-Italic >>
+endobj
+6 0 obj
+<< /Length 1370 >>
+stream
+BT
+/F2 18 Tf
+1 0 0 1 72 730 Tm
+(Picking a first code target for an ESP32 node editor) Tj
+/F3 11 Tf
+1 0 0 1 72 700 Tm
+(Sample study notes, written for Daiku's example project. Not a published paper: the) Tj
+/F3 11 Tf
+1 0 0 1 72 684 Tm
+(participants and numbers are made up to show how the Reader, highlights and evidence) Tj
+/F3 11 Tf
+1 0 0 1 72 668 Tm
+(work.) Tj
+/F2 14 Tf
+1 0 0 1 72 644 Tm
+(Background) Tj
+/F1 12 Tf
+1 0 0 1 72 620 Tm
+(A node editor lets makers wire blocks on screen and get firmware out. Before) Tj
+/F1 12 Tf
+1 0 0 1 72 603 Tm
+(building one for the ESP32 DevKitC, we need a first code target: Arduino C++,) Tj
+/F1 12 Tf
+1 0 0 1 72 586 Tm
+(ESP-IDF C or MicroPython. The target decides which libraries people can reach, how) Tj
+/F1 12 Tf
+1 0 0 1 72 569 Tm
+(long a build takes on Windows, and how readable the generated code is.) Tj
+/F1 12 Tf
+1 0 0 1 72 542 Tm
+(Espressif's GPIO guide sets hard rules any target must respect: GPIO 34 to 39 are) Tj
+/F1 12 Tf
+1 0 0 1 72 525 Tm
+(input only, ADC2 pins cannot be used while Wi-Fi is on, and the flash pins must) Tj
+/F1 12 Tf
+1 0 0 1 72 508 Tm
+(never be offered.) Tj
+/F2 14 Tf
+1 0 0 1 72 483 Tm
+(Question) Tj
+/F1 12 Tf
+1 0 0 1 72 459 Tm
+(Which code target lets a beginner go from an empty canvas to a blinking LED and a) Tj
+/F1 12 Tf
+1 0 0 1 72 442 Tm
+(button fastest, without hiding what the code does?) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 1116 >>
+stream
+BT
+/F2 14 Tf
+1 0 0 1 72 722 Tm
+(Method) Tj
+/F1 12 Tf
+1 0 0 1 72 698 Tm
+(Five sample makers, each new to C++, built the same two examples with each target:) Tj
+/F1 12 Tf
+1 0 0 1 72 681 Tm
+(blink-plus-button, and a temperature sensor publishing over MQTT. We timed each) Tj
+/F1 12 Tf
+1 0 0 1 72 664 Tm
+(build from a clean install and noted every place they stopped.) Tj
+/F2 14 Tf
+1 0 0 1 72 639 Tm
+(Findings) Tj
+/F1 12 Tf
+1 0 0 1 72 615 Tm
+(All five finished blink-plus-button fastest with Arduino C++. Its one command-line) Tj
+/F1 12 Tf
+1 0 0 1 72 598 Tm
+(tool compiles and uploads, and most sensor examples online are written for it.) Tj
+/F1 12 Tf
+1 0 0 1 72 581 Tm
+(ESP-IDF builds were slower to set up on Windows, but its documentation covers every) Tj
+/F1 12 Tf
+1 0 0 1 72 564 Tm
+(peripheral. MicroPython was the easiest to read, but two sensor libraries were) Tj
+/F1 12 Tf
+1 0 0 1 72 547 Tm
+(missing.) Tj
+/F1 12 Tf
+1 0 0 1 72 520 Tm
+(Generated code was easier to follow when each node became one function and the main) Tj
+/F1 12 Tf
+1 0 0 1 72 503 Tm
+(loop used a millis\(\) scheduler instead of delay\(\).) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 649 >>
+stream
+BT
+/F2 14 Tf
+1 0 0 1 72 722 Tm
+(Limitations) Tj
+/F1 12 Tf
+1 0 0 1 72 698 Tm
+(Five people is a small group, and none had used ESP-IDF before. Build times depend) Tj
+/F1 12 Tf
+1 0 0 1 72 681 Tm
+(on the machine. These notes are a sample, so treat every figure here as a guess) Tj
+/F1 12 Tf
+1 0 0 1 72 664 Tm
+(until it is measured for real.) Tj
+/F2 14 Tf
+1 0 0 1 72 639 Tm
+(Sources) Tj
+/F1 12 Tf
+1 0 0 1 72 615 Tm
+(Espressif Systems. ESP-IDF Programming Guide: GPIO and RTC GPIO \(ESP32\).) Tj
+/F1 12 Tf
+1 0 0 1 72 598 Tm
+(docs.espressif.com) Tj
+/F1 12 Tf
+1 0 0 1 72 581 Tm
+(Arduino SA. Arduino CLI: Getting started. arduino.github.io/arduino-cli) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Title (Picking a first code target for an ESP32 node editor) /Author (Daiku sample) >>
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000128 00000 n 
+0000000200 00000 n 
+0000000271 00000 n 
+0000000344 00000 n 
+0000001766 00000 n 
+0000001912 00000 n 
+0000003080 00000 n 
+0000003226 00000 n 
+0000003927 00000 n 
+0000004075 00000 n 
+trailer
+<< /Size 13 /Root 1 0 R /Info 12 0 R >>
+startxref
+4182
+%%EOF

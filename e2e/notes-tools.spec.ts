@@ -1,13 +1,11 @@
 import { expect, Page, test } from "@playwright/test";
-import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
   await page.goto("/#/notes");
-  await expect(page.getByLabel("Note title")).toHaveValue("Why bouclé");
+  await expect(page.getByLabel("Note title")).toHaveValue("Pin rules to enforce");
 });
 
 const body = (page: Page) => page.getByLabel("Note body");

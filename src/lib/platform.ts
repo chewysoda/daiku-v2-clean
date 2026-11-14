@@ -25,6 +25,8 @@ export const native = {
   imagePreview: (path: string) => invoke<string>("library_image_preview", { path }),
   libraryDefaultDir: () => invoke<string>("library_default_dir"),
   librarySetDir: (path: string) => invoke<void>("library_set_dir", { path }),
+  /** Lets files in earlier library folders be shown. Folders that are missing are skipped. */
+  libraryAllowDirs: (paths: string[]) => invoke<void>("library_allow_dirs", { paths }),
   importFile: (source: string) => invoke<StoredFile>("library_import_file", { source }),
   saveUrl: (url: string, referer?: string) =>
     invoke<StoredFile>("library_save_url", { url, referer: referer ?? null }),
@@ -51,17 +53,10 @@ export const native = {
     invoke<void>("explore_action", { tab, action }),
 };
 
-const samples = import.meta.glob("/design/images/*.svg", {
-  query: "?url",
-  import: "default",
-  eager: true,
-}) as Record<string, string>;
-
-export const sampleUrl = (name: string) => samples[`/design/images/${name}.svg`] ?? "";
-
 /** The displayable URL for an asset, or null when there's nothing to show (links, for example). */
 export function mediaUrl(asset: Pick<Asset, "file_path" | "preview">): string | null {
-  if (asset.preview) return /^(blob:|\/)/.test(asset.preview) ? asset.preview : sampleUrl(asset.preview);
+  // A preview is a blob or a bundled file, such as the example's pictures in public/samples.
+  if (asset.preview && /^(blob:|\/)/.test(asset.preview)) return asset.preview;
   if (asset.file_path) {
     const shown = needsPreview(asset.file_path) ? `${asset.file_path}.preview.png` : asset.file_path;
     return isTauri ? convertFileSrc(shown) : shown;

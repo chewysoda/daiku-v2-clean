@@ -5,7 +5,7 @@ import { MACHINE_SETTINGS, useStore } from "../../data/store";
 import { TABLES } from "../../data/types";
 import { ConfirmDialog, Pill, toast } from "../../design/primitives";
 import { BackupRows, buildBackup, OpenedBackup, openBackup, restoredRows } from "../../lib/backup";
-import { fileUrl, isTauri, native } from "../../lib/platform";
+import { fileUrl, isTauri, native, needsPreview } from "../../lib/platform";
 import { fetchBytes, saveBytes } from "../../lib/saveFile";
 
 const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? "" : "s"}`;
@@ -53,14 +53,20 @@ export function Backup() {
     setOpened(null);
     setBusy("restore");
     try {
-      const store = async (bytes: Uint8Array, ext: string) => (isTauri ? (await native.storeFile(bytes, ext)).file_path : null);
+      const store = async (bytes: Uint8Array, ext: string) => {
+        if (!isTauri) return null;
+        const path = (await native.storeFile(bytes, ext)).file_path;
+        // A HEIC or TIFF is shown through a PNG made beside it, which a backup doesn't carry.
+        if (needsPreview(path)) await native.imagePreview(path).catch(() => undefined);
+        return path;
+      };
       const preview = (bytes: Uint8Array) => URL.createObjectURL(new Blob([bytes as BlobPart]));
       const { rows, missing } = await restoredRows(backup, store, preview);
       await useStore.getState().replaceAll(rows, MACHINE_SETTINGS);
       navigate("/board");
       toast(missing.length ? `Restored, but ${plural(missing.length, "file")} weren't in the backup: ${missing.join(", ")}` : "Restored.", missing.length ? "error" : "info");
     } catch (e) {
-      toast(`Restore failed, and nothing was replaced unless it says so above: ${e}`, "error");
+      toast(`Restore failed: ${e instanceof Error ? e.message : e}`, "error");
     } finally {
       setBusy("");
     }

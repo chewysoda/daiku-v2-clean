@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { Asset } from "../data/types";
 import { MemoryRepo } from "../data/repo";
-import { SEED } from "../data/seed";
+import { SEED_ESP32 as SEED } from "../data/seedEsp32";
 import { BoardDoc } from "../features/canvas/boardDoc";
 import { CONNECTOR_LOOKS, connectorPath, connectorShape, fitView, itemsInSection, visibleItems, zoomAt } from "../features/canvas/geometry";
 import { buildGraph, neighbourhood } from "../features/threads/graph";
@@ -124,9 +124,9 @@ describe("search", () => {
     expect(colourDistance(asset({}), "#C9A67D")).toBe(Infinity);
   });
 
-  it("finds the seeded oak images from the Home swatch", () => {
-    const r = filterAssets(SEED.assets, { ids: null, kind: "all", colour: "#C9A67D", humanOnly: false, creditedOnly: false });
-    expect(r[0].id).toBe("a-oak");
+  it("finds the example's die shot from its own colour", () => {
+    const r = filterAssets(SEED.assets, { ids: null, kind: "all", colour: "#B4B499", humanOnly: false, creditedOnly: false });
+    expect(r[0].id).toBe("esp-img-die");
   });
 });
 
@@ -235,9 +235,9 @@ describe("canvas geometry", () => {
     expect(fitView([], 1000, 800).zoom).toBe(1);
   });
   it("finds a section's contents by centre point", () => {
-    const form = SEED.board_items.find((i) => i.id === "i-form")!;
-    const inside = itemsInSection(form, SEED.board_items.filter((i) => i.board_id === form.board_id)).map((i) => i.id);
-    expect(inside.sort()).toEqual(["i-detail", "i-lounge", "i-sketch"]);
+    const section = SEED.board_items.find((i) => i.id === "espi-s6")!;
+    const inside = itemsInSection(section, SEED.board_items.filter((i) => i.board_id === section.board_id)).map((i) => i.id);
+    expect(inside.sort()).toEqual(["espi-p1", "espi-p2", "espi-p3", "espi-pal"]);
   });
   it("draws connectors from edge to edge", () => {
     const d = connectorPath({ x: 0, y: 0, w: 10, h: 10 }, { x: 100, y: 0, w: 10, h: 10 });
@@ -279,17 +279,20 @@ describe("threads graph", () => {
       expect(ids.has(e.target)).toBe(true);
     }
   });
-  it("flags gaps: the unsourced tube base, and claims with no evidence, but not a backed claim", () => {
+  it("flags gaps: an uncredited file, and claims with no evidence, but not a backed claim", () => {
+    const loose = { ...SEED.assets[0], id: "loose", credit: null, source_url: null };
+    const withLoose = buildGraph({ boards: SEED.boards, items: [...SEED.board_items, { ...SEED.board_items[5], id: "loose-item", asset_id: "loose" }], assets: [...SEED.assets, loose], claims: SEED.claims, links: SEED.evidence_links, decisions: SEED.decisions, concepts: SEED.concepts, criteria: SEED.criteria, scores: SEED.scores });
+    expect(withLoose.nodes.find((n) => n.id === "asset:loose")?.gap).toBe(true);
     const gap = (id: string) => graph.nodes.find((n) => n.id === id)?.gap;
-    expect(gap("asset:a-tube")).toBe(true);
-    expect(gap("claim:c-cost")).toBe(true);
-    expect(gap("claim:c-softness")).toBe(false);
-    expect(gap("concept:k-a")).toBe(true);
+    expect(gap("asset:esp-q-input")).toBe(false);
+    expect(gap("claim:esp-c3")).toBe(true);
+    expect(gap("claim:esp-c1")).toBe(false);
+    expect(gap("concept:espk-a")).toBe(true);
   });
   it("limits by depth", () => {
-    const near = neighbourhood("claim:c-softness", graph.edges, 1);
-    expect(near.has("asset:a-room")).toBe(true);
-    expect(near.has("decision:d-chair")).toBe(false);
+    const near = neighbourhood("claim:esp-c1", graph.edges, 1);
+    expect(near.has("asset:esp-q-input")).toBe(true);
+    expect(near.has("decision:d-esp32")).toBe(false);
   });
 });
 
@@ -331,6 +334,6 @@ describe("sample data", () => {
     const repo = new MemoryRepo();
     for (const a of SEED.assets) await repo.put("assets", a);
     expect((await repo.all("assets")).length).toBe(SEED.assets.length);
-    expect((await repo.searchAssets("walnut"))[0]).toBe("a-walnut");
+    expect((await repo.searchAssets("breadboard"))[0]).toBe("esp-img-breadboard");
   });
 });

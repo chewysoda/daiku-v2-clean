@@ -1,16 +1,14 @@
 import { expect, test } from "@playwright/test";
-import { withOlderSamples } from "./samples";
 
 test.beforeEach(async ({ page }) => {
-  await withOlderSamples(page);
   page.on("pageerror", (e) => {
     throw e;
   });
 });
 
 test("a connector has an arrowhead, and can be drawn in a playful look that sticks", async ({ page }) => {
-  await page.goto("/#/canvas/b-furniture");
-  const link = page.locator('g[data-item="i-link"]');
+  await page.goto("/#/canvas/b-esp32");
+  const link = page.locator('g[data-item="espi-c1"]');
   await expect(link.locator(".link-head")).toHaveCount(1);
   await expect(link).toHaveAttribute("data-look", "curve");
   const plain = await link.locator(".link:not(.link-head)").getAttribute("d");
@@ -28,5 +26,5 @@ test("a connector has an arrowhead, and can be drawn in a playful look that stic
   await expect(bar.getByRole("button", { name: "supports" })).toHaveAttribute("aria-pressed", "true");
 
   await page.reload();
-  await expect(page.locator('g[data-item="i-link"]')).toHaveAttribute("data-look", "hops");
+  await expect(page.locator('g[data-item="espi-c1"]')).toHaveAttribute("data-look", "hops");
 });

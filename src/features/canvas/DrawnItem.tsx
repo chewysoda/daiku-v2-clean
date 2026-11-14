@@ -95,6 +95,7 @@ export function ShapeItem({
               aria-label="Shape label"
               defaultValue={it.data.text}
               onFocus={(e) => e.target.select()}
+              data-edit={it.id}
               onBlur={(e) => onLabel(e.target.value.trim())}
             />
           ) : (
