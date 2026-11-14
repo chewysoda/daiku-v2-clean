@@ -1,0 +1,3 @@
+# Files whose bytes must not change: line-ending conversion would corrupt them.
+*.pdf binary
+*.stl binary
