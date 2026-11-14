@@ -5,7 +5,7 @@
 .DESCRIPTION
   1. Checks for what the build needs: Node.js, Rust, the Microsoft C++ build tools and WebView2.
      Anything missing is installed with winget, but only after you say yes.
-  2. Installs the npm packages, fetches the maths model (checked by hash) and builds the app.
+  2. Installs the npm packages and builds the app. The maths model downloads inside the app, the first time it is used.
   3. Runs the Daiku installer it just built. It installs for your user only, so no admin rights.
 
   Run it from Explorer with "Install Daiku.cmd", or from PowerShell:

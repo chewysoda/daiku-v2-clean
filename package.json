@@ -6,7 +6,6 @@
   "scripts": {
     "models": "node scripts/fetch-models.mjs",
     "predev": "node scripts/fetch-models.mjs",
-    "prebuild": "node scripts/fetch-models.mjs",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",

@@ -18,7 +18,8 @@ How the features connect: [FEATURES.md](FEATURES.md).
 ## Install it
 
 **Got `Daiku-Setup-<version>.exe`?** Double-click it. Daiku installs in under a minute for your user only, with nothing
-else to download. It isn't code-signed, so Windows asks you to confirm: "More info", then "Run anyway".
+else to download. It isn't code-signed, so Windows asks you to confirm: "More info", then "Run anyway". The one extra
+is the handwriting-maths reader (120 MB): it downloads the first time you read a formula, and stays on the PC after that.
 
 ### Give it to someone
 

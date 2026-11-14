@@ -147,3 +147,13 @@ test("offers the sample project when there's nothing else", async ({ page }) => 
   await page.getByLabel("Include the sample project").uncheck();
   await expect(main(page)).toContainText("try it with the sample project");
 });
+
+test("a PDF in the Library goes along with its full text as Markdown", async ({ page }) => {
+  const zip = await exportZip(page);
+  const source = zip.names.find((n) => /Sample study, try the Reader\.md$/.test(n));
+  expect(source).toBeTruthy();
+  const text = zip.text(source!);
+  expect(text).toContain("## Full text");
+  expect(text).toContain("## Page 2");
+  expect(text).toContain("participants rated the textured sample as softer");
+});

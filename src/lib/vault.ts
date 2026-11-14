@@ -10,6 +10,7 @@ import { evidenceMarkdown, evidenceRows } from "./decisionRecord";
 import { isCredited } from "./search";
 import { bibEntry, frontMatter, safeFileName, stanceOf, toCsv } from "./studio";
 import { fence, languageOf } from "./github";
+import { fullText, hasFullText } from "./fullText";
 
 type S = ReturnType<typeof useStore.getState>;
 
@@ -49,8 +50,11 @@ export async function buildVault(s: S): Promise<{ bytes: Uint8Array; missing: st
   return { bytes: zipSync(files, { level: 6 }), missing };
 }
 
-/** The vault's contents as files. `attachments` maps each asset to where its file went. */
-export async function vaultFiles(s: S, options: { attachments: boolean } = { attachments: true }) {
+/**
+ * The vault's contents as files. `attachments` maps each asset to where its file went. With `fullText`,
+ * each PDF, Word file, spreadsheet or slide deck in the Library also carries its text as Markdown.
+ */
+export async function vaultFiles(s: S, options: { attachments: boolean; fullText?: boolean } = { attachments: true }) {
   const files: Record<string, Uint8Array> = {};
   const text = (path: string, body: string) => {
     files[path] = strToU8(body);
@@ -62,12 +66,14 @@ export async function vaultFiles(s: S, options: { attachments: boolean } = { att
   // Attachments
   const attachments = new Map<string, string>();
   const usedAttachments = new Set<string>();
+  const fetched = new Map<string, Uint8Array>();
   for (const a of s.assets) {
     const url = options.attachments ? fileUrl(a) : null;
     if (!url) continue;
     const name = `${uniquely(usedAttachments, safeFileName(a.title))}.${extOf(a)}`;
     try {
       files[`attachments/${name}`] = await fetchBytes(url);
+      fetched.set(a.id, files[`attachments/${name}`]);
       attachments.set(a.id, `attachments/${name}`);
     } catch {
       missing.push(a.title);
@@ -84,10 +90,19 @@ export async function vaultFiles(s: S, options: { attachments: boolean } = { att
     const marks = selectRecords(s.records, "highlight", a.id).sort((x, y) => x.data.page - y.data.page);
     const marked = marks.length ? `\n## Highlights\n\n${marks.map((h) => `- p. ${h.data.page} (${h.data.kind}): ${h.data.text}`).join("\n")}\n` : "";
     paths.set(a.id, `Sources/${name}.md`);
+    const bytes = async () => {
+      const got = fetched.get(a.id);
+      if (got) return got;
+      const url = fileUrl(a);
+      if (!url) throw new Error("no file");
+      return fetchBytes(url);
+    };
+    const full =
+      options.fullText && hasFullText(a) ? `\n## Full text\n\n${await fullText(a, bytes).catch(() => "_Couldn't read the text of this file._")}\n` : "";
     text(
       `Sources/${name}.md`,
       frontMatter({ daiku_id: a.id, type: "source", kind: a.kind, credit: isCredited(a) ? a.credit : "no source yet", source: a.source_url, captured: a.captured_at, provenance: a.provenance }) +
-        `\n# ${a.title}\n\n${file ? `![[${file}]]\n\n` : ""}${a.kind === "code" ? `${a.via ? `From ${a.via}.\n\n` : ""}${fence(a.notes, languageOf(a))}` : a.notes}\n${marked}`,
+        `\n# ${a.title}\n\n${file ? `![[${file}]]\n\n` : ""}${a.kind === "code" ? `${a.via ? `From ${a.via}.\n\n` : ""}${fence(a.notes, languageOf(a))}` : a.notes}\n${marked}${full}`,
     );
   }
 

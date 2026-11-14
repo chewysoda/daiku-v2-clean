@@ -5,6 +5,7 @@ mod ink;
 mod library;
 mod local_model;
 mod material;
+mod models;
 mod ocr;
 
 use tauri::Manager;
@@ -82,8 +83,9 @@ pub fn run() {
             if let Some(window) = app.get_webview_window("main") {
                 material::apply(&window);
             }
-            // The math model sits beside the app, and is read like any other local file.
-            let models = app.path().resource_dir()?.join("models");
+            // The math model downloads on first use, and is then read like any other local file.
+            let models = models::models_dir(app.handle())?;
+            std::fs::create_dir_all(&models)?;
             app.asset_protocol_scope().allow_directory(&models, true)?;
             // Updates switch on once `npm run updates:setup` has written a key and an address into
             // tauri.conf.json. Until then there's nothing to check against, so the plugin stays out.
@@ -114,6 +116,8 @@ pub fn run() {
             library::scholar_get,
             library::github_get,
             local_model::local_model_call,
+            models::math_model_dir,
+            models::math_model_download,
             updates_enabled,
             material::window_material,
         ])

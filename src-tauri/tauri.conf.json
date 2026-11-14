@@ -45,7 +45,6 @@
     "active": true,
     "targets": ["nsis"],
     "category": "Productivity",
-    "resources": { "models/mfr/*": "models/mfr/" },
     "shortDescription": "A place where ideas take form",
     "windows": {
       "nsis": {

@@ -1,5 +1,5 @@
-// Gets the math-reading model at build time, pinned to one revision and checked by hash, so the app
-// itself never downloads anything. It's too big for git, so it's kept out of the repo and fetched here.
+// Gets the math-reading model for the browser preview (npm run dev), pinned to one revision and checked by
+// hash. The desktop app downloads the same files itself the first time someone reads a formula (models.rs).
 //
 // Pix2Text MFR 1.5 by breezedeus, MIT licence: https://huggingface.co/breezedeus/pix2text-mfr-1.5
 import { createHash } from "node:crypto";

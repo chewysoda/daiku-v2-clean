@@ -1,19 +1,43 @@
 import { BoardItem } from "../../data/types";
+import { toast } from "../../design/primitives";
 import { isTauri } from "../../lib/platform";
 import { strokePoints, writingBox, writtenStrokes } from "./handwriting";
 import { INPUT_SIZE, toModelInput } from "./mathDecode";
 
 const FILES = ["encoder_model.onnx", "decoder_model.onnx", "tokenizer.json"];
 
-/** Where the model's files are: beside the app once installed, and served by Vite in the browser preview. */
+const TOTAL_BYTES = 119_650_191;
+
+/**
+ * Where the model's files are. The desktop app downloads them the first time (about 120 MB, once),
+ * showing how far it's got. The browser preview has them served by Vite.
+ */
 async function modelUrls(): Promise<Record<string, string>> {
   if (!isTauri) return Object.fromEntries(FILES.map((f) => [f, new URL(`/models/mfr/${f}`, location.href).href]));
-  const { resolveResource, convertFileSrc } = await import("@tauri-apps/api/core").then(async (core) => ({
-    convertFileSrc: core.convertFileSrc,
-    resolveResource: (await import("@tauri-apps/api/path")).resolveResource,
-  }));
-  const entries = await Promise.all(FILES.map(async (f) => [f, convertFileSrc(await resolveResource(`models/mfr/${f}`))] as const));
-  return Object.fromEntries(entries);
+  const { invoke, convertFileSrc, Channel } = await import("@tauri-apps/api/core");
+  const dir = (await invoke<string | null>("math_model_dir")) ?? (await (download ??= downloadModel(invoke, Channel).finally(() => (download = null))));
+  const base = dir.replace(/[\\/]+$/, "");
+  return Object.fromEntries(FILES.map((f) => [f, convertFileSrc(`${base}\\${f}`)]));
+}
+
+/** One download at a time, however many formulas are asked for while it runs. */
+let download: Promise<string> | null = null;
+
+async function downloadModel(
+  invoke: typeof import("@tauri-apps/api/core").invoke,
+  Channel: typeof import("@tauri-apps/api/core").Channel,
+): Promise<string> {
+  let shown = -1;
+  const progress = new Channel<number>();
+  progress.onmessage = (bytes) => {
+    const percent = Math.floor((bytes / TOTAL_BYTES) * 100);
+    if (percent === shown) return;
+    shown = percent;
+    toast(`Getting the math reader, once: ${percent}% of 120 MB`);
+  };
+  const dir = await invoke<string>("math_model_download", { onProgress: progress });
+  toast("Math reader saved on this PC. Reading the formula…");
+  return dir;
 }
 
 /**

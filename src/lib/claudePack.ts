@@ -205,7 +205,7 @@ export function claudeMd(s: S, options: PackOptions, layout?: { reading: string;
     ["Drafts", "`Drafts/` | Written drafts. `![[Name]]` is a picture listed in Sources"],
     ["Claims", "`Claims/` | Claims, and the evidence for and against them"],
     ["Decisions", "`Decisions/` | Decision matrices, requirements, parts, calculations, materials and simulation runs"],
-    ["Sources", "`Sources/` | Everything saved, with its credit and source. Quotes hold the saved text, code its source in a fenced block, and PDFs their highlights"],
+    ["Sources", "`Sources/` | Everything saved, with its credit and source. Quotes hold the saved text, code its source in a fenced block, and PDFs, Word files, spreadsheets and slides their highlights and full text as Markdown"],
     ["Research", "`Research/` | Interview notes by theme, with participants as codes"],
     ["Decks", "`Decks/` | Slide decks, with speaker notes"],
     ["Progress.md", "`Progress.md` | Milestones and saved checks"],
@@ -309,7 +309,7 @@ export async function packFiles(state: S, options: PackOptions): Promise<{ files
   const shaped = shapeFor(base, options, items);
   const plan = shaped.plan;
   const s = applyPlan(base, plan, items);
-  const { files, missing, attachments, paths } = await vaultFiles(s, { attachments: options.includeFiles });
+  const { files, missing, attachments, paths } = await vaultFiles(s, { attachments: options.includeFiles, fullText: true });
   const fileOf = (id: string) => attachments.get(id);
 
   // These are for Obsidian, and the readable boards below say the same thing.

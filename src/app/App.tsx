@@ -18,21 +18,42 @@ import { countVisit, parseVisits, screenKey } from "../lib/screenUse";
 import { Home } from "../features/home/Home";
 import { Library } from "../features/library/Library";
 
-// Heavier screens load on demand: canvas (pixi), threads (cytoscape), explore.
-const Canvas = lazy(() => import("../features/canvas/Canvas"));
-const Present = lazy(() => import("../features/canvas/Present"));
-const Explore = lazy(() => import("../features/explore/Explore"));
-const Threads = lazy(() => import("../features/threads/Threads"));
-const Lab = lazy(() => import("../features/lab/Lab"));
-const LabAll = lazy(() => import("../features/lab/LabAll"));
-const Share = lazy(() => import("../features/share/Share"));
-const Settings = lazy(() => import("../features/settings/Settings"));
-const Reader = lazy(() => import("../features/reader/Reader"));
-const CadViewer = lazy(() => import("../features/cad/CadViewer"));
-const Pack = lazy(() => import("../features/pack/Pack"));
-const Draft = lazy(() => import("../features/draft/Draft"));
-const Export = lazy(() => import("../features/export/Export"));
-const named = <K extends string>(load: () => Promise<Record<K, React.ComponentType>>, key: K) => lazy(async () => ({ default: (await load())[key] }));
+// Heavier screens load on demand: canvas (pixi), threads (cytoscape), explore. Most are fetched in the
+// background once the app is up (see `preloadScreens`), so opening one the first time doesn't wait.
+const preloads: (() => Promise<unknown>)[] = [];
+
+/**
+ * A screen that loads its code on first use, or straight away once preloaded. A screen whose code is
+ * already here renders without Suspense, which would otherwise hold it back for a moment.
+ */
+function screen<P extends object>(load: () => Promise<React.ComponentType<P>>, preload = true) {
+  let loaded: React.ComponentType<P> | null = null;
+  let pending: Promise<{ default: React.ComponentType<P> }> | null = null;
+  const get = () => (pending ??= load().then((c) => ({ default: (loaded = c) })));
+  const Lazy = lazy(get);
+  if (preload) preloads.push(get);
+  // Chosen once per mount, so a screen never swaps component halfway through and loses its state.
+  return function Screen(props: P) {
+    const [Comp] = useState(() => loaded ?? (Lazy as unknown as React.ComponentType<P>));
+    return <Comp {...props} />;
+  };
+}
+const fromDefault = <P extends object>(load: () => Promise<{ default: React.ComponentType<P> }>) => () => load().then((m) => m.default);
+const named = <K extends string>(load: () => Promise<Record<K, React.ComponentType>>, key: K) => screen(() => load().then((m) => m[key]));
+
+const Canvas = screen(fromDefault(() => import("../features/canvas/Canvas")));
+const Present = screen(fromDefault(() => import("../features/canvas/Present")), false);
+const Explore = screen(fromDefault(() => import("../features/explore/Explore")));
+const Threads = screen(fromDefault(() => import("../features/threads/Threads")));
+const Lab = screen(fromDefault(() => import("../features/lab/Lab")));
+const LabAll = screen(fromDefault(() => import("../features/lab/LabAll")));
+const Share = screen(fromDefault(() => import("../features/share/Share")));
+const Settings = screen(fromDefault(() => import("../features/settings/Settings")));
+const Reader = screen(fromDefault(() => import("../features/reader/Reader")));
+const CadViewer = screen(fromDefault(() => import("../features/cad/CadViewer")), false);
+const Pack = screen(fromDefault(() => import("../features/pack/Pack")));
+const Draft = screen(fromDefault(() => import("../features/draft/Draft")));
+const Export = screen(fromDefault(() => import("../features/export/Export")));
 const loadEngineering = () => import("../features/lab/Engineering");
 const Requirements = named(loadEngineering, "Requirements");
 const PropertiesBom = named(loadEngineering, "PropertiesBom");
@@ -46,6 +67,16 @@ const loadProgress = () => import("../features/progress/Progress");
 const ProgressOverview = named(loadProgress, "ProgressOverview");
 const HeatMaps = named(loadProgress, "HeatMaps");
 const WorkflowLog = named(loadProgress, "WorkflowLog");
+
+/** Fetches the screens one at a time while the app is idle, so it never competes with what's on screen. */
+function preloadScreens() {
+  const idle = (fn: () => void) => ("requestIdleCallback" in window ? requestIdleCallback(fn, { timeout: 2000 }) : setTimeout(fn, 200));
+  const next = (i: number) => {
+    if (i >= preloads.length) return;
+    idle(() => void preloads[i]().catch(() => {}).finally(() => next(i + 1)));
+  };
+  next(0);
+}
 
 /** Where the title bar says you are. */
 function crumb(pathname: string, boardName: string | undefined) {
@@ -314,6 +345,12 @@ export function App() {
     if (!splash) return;
     splash.classList.add("gone");
     const t = setTimeout(() => splash.remove(), 300);
+    return () => clearTimeout(t);
+  }, [ready]);
+  // A moment after the first screen is up, the rest start loading in the background.
+  useEffect(() => {
+    if (!ready) return;
+    const t = setTimeout(preloadScreens, 1500);
     return () => clearTimeout(t);
   }, [ready]);
 
